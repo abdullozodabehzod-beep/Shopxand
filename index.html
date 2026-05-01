@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Shopxand-Интернет магазин</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Шрифты (бесплатные современные) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Иконки Font Awesome 6 (бесплатно) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+    <!-- Хидер -->
+    <header class="header">
+        <div class="container header__container">
+            
+            <!-- Логотип -->
+            <a href="/" class="header__logo">
+                <i class="fas fa-store"></i>
+                <span>Shop<span class="header__logo-accent">Xand</span></span>
+            </a>
+
+            <!-- Десктопная навигация -->
+            <nav class="header__nav">
+                <ul class="header__nav-list">
+                    <li><a href="#" class="header__nav-link active">Главная</a></li>
+                    <li><a href="#" class="header__nav-link">Каталог</a></li>
+                    <li><a href="#" class="header__nav-link">Акции</a></li>
+                    <li><a href="#" class="header__nav-link">Блог</a></li>
+                    <li><a href="#" class="header__nav-link">Контакты</a></li>
+                </ul>
+            </nav>
+
+            <!-- Поиск (десктоп) -->
+            <div class="header__search desktop-search">
+                <input type="text" placeholder="Поиск товаров..." class="header__search-input">
+                <button class="header__search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+
+            <!-- Правые иконки -->
+            <div class="header__actions">
+                <button class="header__action-icon mobile-search-trigger">
+                    <i class="fas fa-search"></i>
+                </button>
+                        <a href="javascript:void(0)" class="header__action-icon wishlist-icon">
+            <i class="far fa-heart"></i>
+            <span class="badge wishlist-badge">0</span>
+        </a>
+                <a href="#" class="header__action-icon">
+                    <i class="far fa-user"></i>
+                </a>
+                <a href="#" class="header__action-icon cart-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="badge">2</span>
+                </a>
+                <!-- Бургер кнопка (только на мобилке) -->
+                <button class="header__burger" id="burgerBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Мобильное меню (бургер) -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu__header">
+            <span class="mobile-menu__title">Меню</span>
+            <button class="mobile-menu__close" id="closeMenuBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="mobile-menu__search">
+            <input type="text" placeholder="Поиск...">
+            <button><i class="fas fa-search"></i></button>
+        </div>
+        <nav class="mobile-menu__nav">
+            <ul>
+                <li><a href="#"><i class="fas fa-home"></i>Главная</a></li>
+                <li><a href="#"><i class="fas fa-grid-2"></i>Каталог</a></li>
+                <li><a href="#"><i class="fas fa-tags"></i>Акции</a></li>
+                <li><a href="#"><i class="fas fa-blog"></i>Блог</a></li>
+                <li><a href="#"><i class="fas fa-phone"></i>Контакты</a></li>
+            </ul>
+        </nav>
+        <div class="mobile-menu__footer">
+            <a href="#"><i class="far fa-heart"></i> Избранное</a>
+            <a href="#"><i class="far fa-user"></i> Профиль</a>
+        </div>
+    </div>
+
+    <!-- Оверлей для затемнения фона при открытом бургере -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Мобильный поиск (выезжающий сверху) -->
+    <div class="mobile-search" id="mobileSearch">
+        <div class="mobile-search__container">
+            <input type="text" placeholder="Что ищем?" autofocus>
+            <button id="closeMobileSearch"><i class="fas fa-arrow-left"></i></button>
+        </div>
+    </div>
+
+
+    <!-- Просто контент, чтобы визуально оценить хидер -->
+    <main>
+            <!-- ========= HERO СЕКЦИЯ ========= -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero__content">
+                <span class="hero__badge">🔥 Летняя распродажа</span>
+                <h1 class="hero__title">
+                    Стиль, который 
+                    <span class="hero__title-accent">вдохновляет</span>
+                </h1>
+                <p class="hero__subtitle">
+                    Скидки до 70% на коллекцию 2025. Бесплатная доставка от 5000₽
+                </p>
+                <div class="hero__buttons">
+                    <a href="#" class="btn btn-primary">В каталог <i class="fas fa-arrow-right"></i></a>
+                    <a href="#" class="btn btn-secondary">Акции <i class="fas fa-gift"></i></a>
+                </div>
+                <div class="hero__stats">
+                    <div class="stat">
+                        <span class="stat__number">50k+</span>
+                        <span class="stat__label">Довольных клиентов</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat__number">24/7</span>
+                        <span class="stat__label">Поддержка</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat__number">15 дней</span>
+                        <span class="stat__label">Возврат товара</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero__image">
+                <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&h=600&fit=crop" alt="Shopping">
+            </div>
+        </div>
+    </section>
+
+        <!-- ========= ФИЛЬТРЫ И ПОИСК ========= -->
+    <section class="filters-section">
+        <div class="container">
+            <div class="filters__wrapper">
+                <!-- Поиск -->
+                <div class="filter__search">
+                    <input type="text" id="searchInput" placeholder="Поиск товаров по названию...">
+                    <i class="fas fa-search"></i>
+                </div>
+                
+                <!-- Кнопка фильтров (на мобилке) -->
+                <button class="filter__toggle-btn" id="filterToggleBtn">
+                    <i class="fas fa-sliders-h"></i>
+                    Фильтры
+                </button>
+                
+                <!-- Панель фильтров -->
+                <div class="filter__panel" id="filterPanel">
+                    <div class="filter__group">
+                        <h3>Цена</h3>
+                        <div class="price-range">
+                            <input type="range" id="priceMinSlider" min="0" max="120000" value="0">
+                            <input type="range" id="priceMaxSlider" min="0" max="120000" value="120000">
+                            <div class="price-inputs">
+                                <input type="number" id="priceMin" placeholder="от" value="0">
+                                <span>-</span>
+                                <input type="number" id="priceMax" placeholder="до" value="120000">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="filter__group">
+                        <h3>Категории</h3>
+                        <label class="filter__checkbox">
+                            <input type="checkbox" value="electronics" class="category-filter">
+                            <span>Электроника</span>
+                        </label>
+                        <label class="filter__checkbox">
+                            <input type="checkbox" value="clothing" class="category-filter">
+                            <span>Одежда</span>
+                        </label>
+                        <label class="filter__checkbox">
+                            <input type="checkbox" value="shoes" class="category-filter">
+                            <span>Обувь</span>
+                        </label>
+                        <label class="filter__checkbox">
+                            <input type="checkbox" value="beauty" class="category-filter">
+                            <span>Красота</span>
+                        </label>
+                    </div>
+                    
+                    <div class="filter__group">
+                        <h3>Скидки</h3>
+                        <label class="filter__checkbox">
+                            <input type="checkbox" id="saleOnly">
+                            <span>Только со скидкой</span>
+                        </label>
+                    </div>
+                    
+                    <button class="filter__reset-btn" id="resetFiltersBtn">
+                        <i class="fas fa-undo-alt"></i>
+                        Сбросить все фильтры
+                    </button>
+                </div>
+                
+                <!-- Информация о результатах -->
+                <div class="filter__results">
+                    Найдено: <span id="productsCount">0</span> товаров
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========= КАТЕГОРИИ ========= -->
+    <section class="categories">
+        <div class="container">
+            <div class="section-header">
+                <h2>Категории товаров</h2>
+                <a href="#" class="view-all">Смотреть все <i class="fas fa-chevron-right"></i></a>
+            </div>
+            <div class="categories__grid">
+                <div class="category-card">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>Электроника</h3>
+                    <p>128 товаров</p>
+                </div>
+                <div class="category-card">
+                    <i class="fas fa-tshirt"></i>
+                    <h3>Одежда</h3>
+                    <p>342 товара</p>
+                </div>
+                <div class="category-card">
+                    <i class="fas fa-shoe-prints"></i>
+                    <h3>Обувь</h3>
+                    <p>156 товаров</p>
+                </div>
+                <div class="category-card">
+                    <i class="fas fa-home"></i>
+                    <h3>Дом и сад</h3>
+                    <p>89 товаров</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========= ТОВАРЫ (СЕТКА) ========= -->
+    <section class="products">
+        <div class="container">
+            <div class="section-header">
+                <h2>Популярные товары</h2>
+                <div class="products__sort">
+                    <select id="sortSelect">
+                        <option value="popular">По популярности</option>
+                        <option value="price-asc">Сначала дешевле</option>
+                        <option value="price-desc">Сначала дороже</option>
+                        <option value="newest">Новинки</option>
+                    </select>
+                </div>
+            </div>
+            <div class="products__grid" id="productsGrid">
+                <!-- Товары будут загружены через JS -->
+            </div>
+
+                        <!-- Пагинация -->
+            <div class="pagination" id="pagination">
+                <button class="pagination__btn pagination__prev" id="prevPageBtn">
+                    <i class="fas fa-chevron-left"></i>
+                    Назад
+                </button>
+                <div class="pagination__numbers" id="paginationNumbers">
+                    <!-- Номера страниц будут сгенерированы динамически -->
+                </div>
+                <button class="pagination__btn pagination__next" id="nextPageBtn">
+                    Вперед
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+    </main>
+
+        <!-- ========= МОДАЛЬНОЕ ОКНО КОРЗИНЫ ========= -->
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-modal__overlay"></div>
+        <div class="cart-modal__container">
+            <div class="cart-modal__header">
+                <h2>
+                    <i class="fas fa-shopping-bag"></i>
+                    Корзина
+                    <span class="cart-count" id="cartCountLabel">0</span>
+                </h2>
+                <button class="cart-modal__close" id="closeCartBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="cart-modal__content" id="cartContent">
+                <!-- Товары будут загружены динамически -->
+                <div class="cart-empty">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Ваша корзина пуста</p>
+                    <button class="btn-continue-shopping" onclick="closeCart()">Продолжить покупки</button>
+                </div>
+            </div>
+            
+            <div class="cart-modal__footer" id="cartFooter" style="display: none;">
+                <div class="cart-summary">
+                    <div class="cart-subtotal">
+                        <span>Подытог:</span>
+                        <span id="cartSubtotal">0 ₽</span>
+                    </div>
+                    <div class="cart-delivery">
+                        <span>Доставка:</span>
+                        <span id="cartDelivery">Бесплатно</span>
+                    </div>
+                    <div class="cart-total">
+                        <span>Итого:</span>
+                        <span id="cartTotal">0 ₽</span>
+                    </div>
+                </div>
+                <div class="cart-actions">
+                    <button class="btn-clear-cart" id="clearCartBtn">
+                        <i class="fas fa-trash-alt"></i> Очистить
+                    </button>
+                    <button class="btn-checkout" id="checkoutBtn">
+                        Оформить заказ <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========= ТОСТ УВЕДОМЛЕНИЯ ========= -->
+    <div class="toast-notification" id="toast"></div>
+
+        <!-- ========= МОДАЛЬНОЕ ОКНО ТОВАРА (ДЕТАЛКА) ========= -->
+    <div class="product-modal" id="productModal">
+        <div class="product-modal__overlay"></div>
+        <div class="product-modal__container">
+            <button class="product-modal__close" id="closeProductModal">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="product-modal__content" id="productModalContent">
+                <!-- Контент будет загружен динамически -->
+            </div>
+        </div>
+    </div>
+
+
+        <!-- ========= СТРАНИЦА ИЗБРАННОГО ========= -->
+    <div class="wishlist-page" id="wishlistPage" style="display: none;">
+        <div class="container">
+            <div class="wishlist__header">
+                <h1>
+                    <i class="fas fa-heart" style="color: #ef4444;"></i>
+                    Избранное
+                </h1>
+                <button class="wishlist__clear-btn" id="clearWishlistBtn">
+                    <i class="fas fa-trash-alt"></i>
+                    Очистить всё
+                </button>
+            </div>
+            <div class="wishlist__grid" id="wishlistGrid">
+                <!-- Товары из избранного будут загружены сюда -->
+            </div>
+        </div>
+    </div>
+
+        <!-- ========= FOOTER ========= -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__grid">
+                <!-- Колонка 1: Лого и описание -->
+                <div class="footer__col">
+                    <div class="footer__logo">
+                        <i class="fas fa-store"></i>
+                        <span>Shop<span class="footer__logo-accent">Xand</span></span>
+                    </div>
+                    <p class="footer__description">
+                        Лучший интернет-магазин с широким ассортиментом товаров. 
+                        Качество, стиль и надежность — наш главный приоритет.
+                    </p>
+                    <div class="footer__social">
+                        <a href="#" class="social-icon"><i class="fab fa-telegram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-vk"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-whatsapp"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Колонка 2: Быстрые ссылки -->
+                <div class="footer__col">
+                    <h3 class="footer__title">О магазине</h3>
+                    <ul class="footer__links">
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> О нас</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Доставка и оплата</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Возврат товара</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Оптовикам</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Контакты</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Колонка 3: Категории -->
+                <div class="footer__col">
+                    <h3 class="footer__title">Категории</h3>
+                    <ul class="footer__links">
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Электроника</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Одежда</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Обувь</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Красота и здоровье</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Аксессуары</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Колонка 4: Подписка и контакты -->
+                <div class="footer__col">
+                    <h3 class="footer__title">Подписка</h3>
+                    <p class="footer__subscribe-text">
+                        Получайте первыми новости о скидках и акциях
+                    </p>
+                    <form class="footer__subscribe" id="subscribeForm">
+                        <input type="email" placeholder="Ваш Email" required>
+                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                    
+                    <div class="footer__contacts">
+                        <div class="footer__contact-item">
+                            <i class="fas fa-phone-alt"></i>
+                            <a href="tel:+78001234567">8 (800) 123-45-67</a>
+                        </div>
+                        <div class="footer__contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:info@markethub.ru">info@shopxand.tj</a>
+                        </div>
+                        <div class="footer__contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>г. Душанбе, ул. Рудаки, 35</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Платежные системы -->
+            <div class="footer__payments">
+                <div class="footer__payments-title">Принимаем к оплате:</div>
+                <div class="footer__payments-icons">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fab fa-cc-mir"></i>
+                    <i class="fab fa-cc-paypal"></i>
+                    <i class="fab fa-apple-pay"></i>
+                    <i class="fab fa-google-pay"></i>
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+            </div>
+            
+            <!-- Копирайт -->
+            <div class="footer__bottom">
+                <p>&copy; 2026 Shopxand. Все права защищены.</p>
+                <div class="footer__bottom-links">
+                    <a href="#">Политика конфиденциальности</a>
+                    <a href="#">Пользовательское соглашение</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+
+    <script src="script.js"></script>
+</body>
+</html>
