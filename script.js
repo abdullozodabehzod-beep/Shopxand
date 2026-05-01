@@ -593,6 +593,9 @@ function openProductModal(productId) {
     currentQuantity = 1;
     
     const similarProducts = productsData.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
+    const productRating = product.rating || 0;
+    const productReviewsCount = product.reviewsCount || (reviews[productId]?.length || 0);
+    
     const container = document.getElementById('productModalContent');
     if (!container) return;
     
@@ -607,16 +610,29 @@ function openProductModal(productId) {
             <div class="product-info-detail">
                 <span class="product-category">${getCategoryName(product.category)}</span>
                 <h1 class="product-title-detail">${product.name}</h1>
+                
+                <div class="product-rating">
+                    <div class="stars" id="productStars">
+                        ${generateStarRating(productRating)}
+                    </div>
+                    <span class="rating-value" id="productRatingValue">${productRating.toFixed(1)}</span>
+                    <span class="reviews-count" id="productReviewsCount">${productReviewsCount}</span>
+                    <span>отзывов</span>
+                </div>
+                
                 <div class="product-price-detail">
                     <span class="current-price">${product.price.toLocaleString()} ₽</span>
                     ${product.oldPrice ? `<span class="old-price-detail">${product.oldPrice.toLocaleString()} ₽</span><span class="discount-badge">-${Math.round((1 - product.price/product.oldPrice)*100)}%</span>` : ''}
                 </div>
+                
                 <div class="product-description"><p>${getDescription(product.name)}</p></div>
+                
                 <div class="product-attributes">
                     <div class="attribute"><i class="fas fa-truck"></i><span>Бесплатная доставка от 5000₽</span></div>
                     <div class="attribute"><i class="fas fa-undo-alt"></i><span>Возврат 14 дней</span></div>
                     <div class="attribute"><i class="fas fa-shield-alt"></i><span>Гарантия 12 месяцев</span></div>
                 </div>
+                
                 <div class="quantity-selector">
                     <label>Количество:</label>
                     <div class="quantity-controls">
@@ -625,14 +641,39 @@ function openProductModal(productId) {
                         <button class="quantity-btn" onclick="changeQuantity(1)"><i class="fas fa-plus"></i></button>
                     </div>
                 </div>
+                
                 <div class="product-actions-detail">
                     <button class="btn-add-to-cart" onclick="addToCartFromDetail()"><i class="fas fa-shopping-cart"></i> В корзину</button>
                     <button class="btn-buy-now" onclick="buyNow()">Купить сейчас</button>
                 </div>
             </div>
         </div>
+        
+        <!-- Блок ОТЗЫВОВ -->
+        <div class="reviews-section">
+            <div class="reviews-header">
+                <h3>Отзывы покупателей</h3>
+                <button class="btn-write-review" onclick="openReviewForm()">
+                    <i class="fas fa-pen"></i> Написать отзыв
+                </button>
+            </div>
+            <div class="reviews-summary">
+                <div class="reviews-summary__rating">
+                    <div class="big-rating">${productRating.toFixed(1)}</div>
+                    <div class="stars">${generateStarRating(productRating)}</div>
+                    <div>${productReviewsCount} отзывов</div>
+                </div>
+            </div>
+            <div id="reviewsContainer" class="reviews-container">
+                <!-- Отзывы загрузятся сюда -->
+            </div>
+        </div>
+        
         ${similarProducts.length ? `<div class="similar-products"><h3>Похожие товары</h3><div class="similar-grid">${similarProducts.map(p => `<div class="similar-card" onclick="openProductModal(${p.id})"><img src="${p.image}"><div class="similar-card-info"><div class="similar-card-title">${p.name}</div><div class="similar-card-price">${p.price.toLocaleString()} ₽</div></div></div>`).join('')}</div></div>` : ''}
     `;
+    
+    // Рендерим отзывы
+    renderReviews(product.id);
     
     const modal = document.getElementById('productModal');
     if (modal) {
@@ -737,6 +778,248 @@ if (subscribeForm) {
     });
 }
 
+// ========= ОТЗЫВЫ И РЕЙТИНГИ =========
+let reviews = JSON.parse(localStorage.getItem('reviews')) || {};
+
+// Инициализация отзывов для товаров
+function initReviews() {
+    productsData.forEach(product => {
+        if (!reviews[product.id]) {
+            reviews[product.id] = [];
+        }
+    });
+    saveReviews();
+}
+
+function saveReviews() {
+    localStorage.setItem('reviews', JSON.stringify(reviews));
+}
+
+// Добавить отзыв
+function addReview(productId, rating, text, userName) {
+    if (!reviews[productId]) {
+        reviews[productId] = [];
+    }
+    
+    const newReview = {
+        id: Date.now(),
+        userName: userName || 'Покупатель',
+        rating: parseInt(rating),
+        text: text,
+        date: new Date().toLocaleDateString('ru-RU'),
+        likes: 0
+    };
+    
+    reviews[productId].unshift(newReview);
+    saveReviews();
+    updateProductRating(productId);
+    showToast('Спасибо за отзыв!', 'success');
+    
+    // Обновляем отображение в открытой модалке
+    const modal = document.getElementById('productModal');
+    if (modal && modal.classList.contains('active') && currentProduct && currentProduct.id === productId) {
+        renderReviews(productId);
+        // Обновляем рейтинг в модалке
+        const product = productsData.find(p => p.id === productId);
+        if (product) {
+            const starsContainer = document.getElementById('productStars');
+            const ratingValue = document.getElementById('productRatingValue');
+            const reviewsCountSpan = document.getElementById('productReviewsCount');
+            if (starsContainer) starsContainer.innerHTML = generateStarRating(product.rating);
+            if (ratingValue) ratingValue.textContent = product.rating.toFixed(1);
+            if (reviewsCountSpan) reviewsCountSpan.textContent = product.reviewsCount;
+        }
+    }
+}
+
+// Обновить рейтинг товара
+function updateProductRating(productId) {
+    const productReviews = reviews[productId] || [];
+    if (productReviews.length === 0) return;
+    
+    const avgRating = productReviews.reduce((sum, r) => sum + r.rating, 0) / productReviews.length;
+    const roundedRating = Math.round(avgRating * 10) / 10;
+    
+    // Сохраняем рейтинг в товаре
+    const product = productsData.find(p => p.id === productId);
+    if (product) {
+        product.rating = roundedRating;
+        product.reviewsCount = productReviews.length;
+    }
+}
+
+// Генерация звезд для отображения
+function generateStarRating(rating) {
+    const fullStars = Math.floor(rating);
+    const hasHalf = rating % 1 >= 0.5;
+    let stars = '';
+    
+    for (let i = 0; i < fullStars; i++) {
+        stars += '<i class="fas fa-star" style="color: #fbbf24;"></i>';
+    }
+    if (hasHalf) {
+        stars += '<i class="fas fa-star-half-alt" style="color: #fbbf24;"></i>';
+    }
+    const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+    for (let i = 0; i < emptyStars; i++) {
+        stars += '<i class="far fa-star" style="color: #fbbf24;"></i>';
+    }
+    return stars;
+}
+
+// Генерация интерактивных звезд для выбора
+function generateRatingSelect(currentRating) {
+    let stars = '';
+    for (let i = 1; i <= 5; i++) {
+        stars += `<i class="fas fa-star rating-star ${i <= currentRating ? 'active' : ''}" data-rating="${i}" style="cursor: pointer; color: ${i <= currentRating ? '#fbbf24' : '#cbd5e1'}; transition: 0.2s; margin: 0 3px;"></i>`;
+    }
+    return stars;
+}
+
+// Рендер отзывов
+function renderReviews(productId) {
+    const container = document.getElementById('reviewsContainer');
+    if (!container) return;
+    
+    const productReviews = reviews[productId] || [];
+    
+    if (productReviews.length === 0) {
+        container.innerHTML = `
+            <div class="reviews-empty">
+                <i class="far fa-comment-dots"></i>
+                <p>Пока нет отзывов. Будьте первым!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = productReviews.map(review => `
+        <div class="review-card">
+            <div class="review-header">
+                <div class="review-user">
+                    <i class="fas fa-user-circle"></i>
+                    <strong>${escapeHtml(review.userName)}</strong>
+                </div>
+                <div class="review-rating">
+                    ${generateStarRating(review.rating)}
+                </div>
+            </div>
+            <div class="review-date">${review.date}</div>
+            <div class="review-text">${escapeHtml(review.text)}</div>
+            <div class="review-footer">
+                <button class="review-like" onclick="likeReview(${productId}, ${review.id})">
+                    <i class="far fa-heart"></i> <span>${review.likes}</span>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Лайк отзыва
+function likeReview(productId, reviewId) {
+    const review = reviews[productId]?.find(r => r.id === reviewId);
+    if (review) {
+        review.likes++;
+        saveReviews();
+        renderReviews(productId);
+        showToast('Спасибо за лайк! ❤️', 'info');
+    }
+}
+
+// Экранирование HTML
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+// Открыть форму отзыва
+function openReviewForm() {
+    if (!currentProduct) {
+        showToast('Ошибка: товар не выбран', 'error');
+        return;
+    }
+    
+    const modal = document.getElementById('reviewModal');
+    const productNameSpan = document.getElementById('reviewProductName');
+    if (productNameSpan) {
+        productNameSpan.innerHTML = `<i class="fas fa-box"></i> ${currentProduct.name}`;
+    }
+    
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    // Сбрасываем форму
+    document.getElementById('reviewRating')?.setAttribute('data-rating', '0');
+    const textarea = document.getElementById('reviewText');
+    const userNameInput = document.getElementById('reviewUserName');
+    if (textarea) textarea.value = '';
+    if (userNameInput) userNameInput.value = '';
+    updateRatingStars(0);
+}
+
+function closeReviewForm() {
+    const modal = document.getElementById('reviewModal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    // Сбрасываем форму
+    const ratingInput = document.getElementById('reviewRating');
+    if (ratingInput) ratingInput.setAttribute('data-rating', '0');
+    const textarea = document.getElementById('reviewText');
+    const userNameInput = document.getElementById('reviewUserName');
+    if (textarea) textarea.value = '';
+    if (userNameInput) userNameInput.value = '';
+    updateRatingStars(0);
+}
+
+function updateRatingStars(rating) {
+    const stars = document.querySelectorAll('.rating-star');
+    stars.forEach((star, index) => {
+        if (index < rating) {
+            star.style.color = '#fbbf24';
+            star.classList.add('active');
+        } else {
+            star.style.color = '#cbd5e1';
+            star.classList.remove('active');
+        }
+    });
+    const ratingInput = document.getElementById('reviewRating');
+    if (ratingInput) ratingInput.setAttribute('data-rating', rating);
+}
+
+function submitReview() {
+    if (!currentProduct) {
+        showToast('Ошибка: товар не выбран', 'error');
+        return;
+    }
+    
+    const ratingInput = document.getElementById('reviewRating');
+    const rating = parseInt(ratingInput?.getAttribute('data-rating') || 0);
+    const text = document.getElementById('reviewText')?.value.trim();
+    const userName = document.getElementById('reviewUserName')?.value.trim() || 'Покупатель';
+    
+    if (rating === 0) {
+        showToast('Пожалуйста, оцените товар ⭐', 'error');
+        return;
+    }
+    if (!text) {
+        showToast('Пожалуйста, напишите отзыв 📝', 'error');
+        return;
+    }
+    
+    addReview(currentProduct.id, rating, text, userName);
+    closeReviewForm();
+}
+
+
 // ========= ГЛОБАЛЬНЫЕ ФУНКЦИИ =========
 window.addToCart = addToCart;
 window.addToWishlist = addToWishlist;
@@ -758,6 +1041,15 @@ window.removeFromWishlist = removeFromWishlist;
 window.hideWishlistPage = hideWishlistPage;
 window.showWishlistPage = showWishlistPage;
 window.clearWishlist = clearWishlist;
+window.addReview = addReview;
+window.likeReview = likeReview;
+window.openReviewForm = openReviewForm;
+window.closeReviewForm = closeReviewForm;
+window.updateRatingStars = updateRatingStars;
+window.initReviews = initReviews;
+window.submitReview = submitReview;
+window.renderReviews = renderReviews;
+window.generateStarRating = generateStarRating;
 
 // ========= ЗАПУСК =========
 document.addEventListener('DOMContentLoaded', () => {
@@ -772,6 +1064,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initScrollEffect();
     initWishlistButtons();
     updatePagination();
+    initReviews();
+
     
     const cartIcon = document.querySelector('.cart-icon');
     if (cartIcon) cartIcon.addEventListener('click', (e) => { e.preventDefault(); openCart(); });

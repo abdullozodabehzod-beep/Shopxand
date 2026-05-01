@@ -354,6 +354,50 @@
         </div>
     </div>
 
+        <!-- ========= МОДАЛЬНОЕ ОКНО ДЛЯ ОТЗЫВА ========= -->
+    <div class="review-modal" id="reviewModal">
+        <div class="review-modal__overlay"></div>
+        <div class="review-modal__container">
+            <div class="review-modal__header">
+                <h2><i class="fas fa-star"></i> Написать отзыв</h2>
+                <button class="review-modal__close" onclick="closeReviewForm()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="review-modal__body">
+                <div class="review-product" id="reviewProductName">
+                    <!-- Название товара подставится -->
+                </div>
+                
+                <div class="review-rating-select">
+                    <label>Ваша оценка:</label>
+                    <div class="rating-stars" id="ratingStars">
+                        <i class="fas fa-star rating-star" data-rating="1" onclick="updateRatingStars(1)"></i>
+                        <i class="fas fa-star rating-star" data-rating="2" onclick="updateRatingStars(2)"></i>
+                        <i class="fas fa-star rating-star" data-rating="3" onclick="updateRatingStars(3)"></i>
+                        <i class="fas fa-star rating-star" data-rating="4" onclick="updateRatingStars(4)"></i>
+                        <i class="fas fa-star rating-star" data-rating="5" onclick="updateRatingStars(5)"></i>
+                    </div>
+                    <input type="hidden" id="reviewRating" data-rating="0">
+                </div>
+                
+                <div class="review-text-input">
+                    <label>Ваш отзыв:</label>
+                    <textarea id="reviewText" rows="5" placeholder="Расскажите о своем опыте использования товара..."></textarea>
+                </div>
+                
+                <div class="review-name-input">
+                    <label>Ваше имя:</label>
+                    <input type="text" id="reviewUserName" placeholder="Как к вам обращаться?">
+                </div>
+            </div>
+            <div class="review-modal__footer">
+                <button class="btn-cancel" onclick="closeReviewForm()">Отмена</button>
+                <button class="btn-submit" onclick="submitReview()">Отправить отзыв</button>
+            </div>
+        </div>
+    </div>
+
 
         <!-- ========= СТРАНИЦА ИЗБРАННОГО ========= -->
     <div class="wishlist-page" id="wishlistPage" style="display: none;">
@@ -476,5 +520,23 @@
     
 
     <script src="script.js"></script>
+
+    <!-- Яндекс.Метрика -->
+<script type="text/javascript">
+   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+   m[i].l=1*new Date();
+   for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+   ym(ВАШ_СЧЕТЧИК, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true,
+        webvisor:true
+   });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/ВАШ_СЧЕТЧИК" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Яндекс.Метрика -->
 </body>
 </html>
