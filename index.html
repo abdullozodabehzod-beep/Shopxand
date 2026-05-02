@@ -467,6 +467,99 @@
         </div>
     </div>
 
+        <!-- ========= ФОРМА ОФОРМЛЕНИЯ ЗАКАЗА ========= -->
+    <div class="checkout-modal" id="checkoutModal">
+        <div class="checkout-modal__overlay"></div>
+        <div class="checkout-modal__container">
+            <div class="checkout-modal__header">
+                <h2><i class="fas fa-clipboard-list"></i> Оформление заказа</h2>
+                <button class="checkout-modal__close" onclick="closeCheckoutModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="checkout-modal__body">
+                <!-- Список товаров -->
+                <div class="checkout-items" id="checkoutItems">
+                    <!-- Товары из корзины будут показаны здесь -->
+                </div>
+                
+                <!-- Форма -->
+                <form id="checkoutForm" onsubmit="submitOrder(event)">
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Ваше имя *</label>
+                        <input type="text" id="userName" required placeholder="Иван Иванов">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-phone-alt"></i> Телефон *</label>
+                        <input type="tel" id="userPhone" required placeholder="+7 (999) 123-45-67">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="userEmail" placeholder="ivan@example.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-map-marker-alt"></i> Адрес доставки *</label>
+                        <textarea id="userAddress" rows="3" required placeholder="Город, улица, дом, квартира"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-comment"></i> Комментарий к заказу</label>
+                        <textarea id="userComment" rows="2" placeholder="Пожелания по доставке..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-truck"></i> Способ доставки</label>
+                        <select id="deliveryMethod">
+                            <option value="courier">Курьером (300₽)</option>
+                            <option value="pickup">Самовывоз (бесплатно)</option>
+                            <option value="post">Почта России (500₽)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-credit-card"></i> Способ оплаты</label>
+                        <select id="paymentMethod">
+                            <option value="card">Картой онлайн</option>
+                            <option value="cash">Наличными курьеру</option>
+                            <option value="sbp">СБП</option>
+                        </select>
+                    </div>
+                    
+                    <div class="checkout-summary">
+                        <div class="summary-row">
+                            <span>Товары:</span>
+                            <span id="checkoutSubtotal">0 ₽</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Доставка:</span>
+                            <span id="checkoutDelivery">0 ₽</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Итого к оплате:</span>
+                            <span id="checkoutTotal">0 ₽</span>
+                        </div>
+                    </div>
+                    
+                    <div class="checkout-actions">
+                        <button type="button" class="btn-back" onclick="closeCheckoutModal()">
+                            <i class="fas fa-arrow-left"></i> Вернуться
+                        </button>
+                        <button type="submit" class="btn-submit-order">
+                            <i class="fas fa-check"></i> Подтвердить заказ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    
+
+
         <!-- ========= FOOTER ========= -->
     <footer class="footer">
         <div class="container">
@@ -578,7 +671,7 @@
    k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
    (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
 
-   ym(ВАШ_СЧЕТЧИК, "init", {
+   ym(109002279, "init", {
         clickmap:true,
         trackLinks:true,
         accurateTrackBounce:true,
