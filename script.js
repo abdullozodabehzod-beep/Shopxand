@@ -1104,3 +1104,43 @@ if (currentUser) {
     renderProfilePage();
 }
 updateUserIcon();
+
+
+// ========= PWA: РЕГИСТРАЦИЯ SERVICE WORKER =========
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/Shopxand/sw.js')
+            .then(registration => {
+                console.log('✅ Service Worker зарегистрирован:', registration);
+            })
+            .catch(error => {
+                console.log('❌ Ошибка регистрации Service Worker:', error);
+            });
+    });
+}
+
+// Проверка, можно ли установить PWA
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    // Показываем кнопку "Установить приложение" (опционально)
+    const installBtn = document.createElement('button');
+    installBtn.textContent = '📱 Установить приложение';
+    installBtn.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#3b82f6;color:white;border:none;padding:12px 20px;border-radius:50px;z-index:9999;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+    installBtn.onclick = () => {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('Пользователь установил приложение');
+            }
+            installBtn.remove();
+            deferredPrompt = null;
+        });
+    };
+    setTimeout(() => {
+        if (installBtn.parentNode) installBtn.remove();
+    }, 10000);
+    document.body.appendChild(installBtn);
+});
