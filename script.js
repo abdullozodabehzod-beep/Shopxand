@@ -1144,3 +1144,12 @@ window.addEventListener('beforeinstallprompt', (e) => {
     }, 10000);
     document.body.appendChild(installBtn);
 });
+
+// ========= PWA: РЕГИСТРАЦИЯ SERVICE WORKER =========
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/Shopxand/sw.js')
+            .then(reg => console.log('✅ SW зарегистрирован:', reg))
+            .catch(err => console.log('❌ SW ошибка:', err));
+    });
+}
