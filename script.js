@@ -615,6 +615,8 @@ function showOrderConfirmation(order) {
 
 // ========= ЗАПУСК =========
 document.addEventListener('DOMContentLoaded', () => {
+
+      checkUserSession();
     currentFilteredProducts = [...productsData];
     renderProducts(getCurrentPageProducts());
     updateCartBadge();
@@ -664,29 +666,75 @@ document.addEventListener('DOMContentLoaded', () => {
             if (val) { filters.categories = [val]; document.querySelectorAll('.category-filter').forEach(cb => cb.checked = cb.value === val); filterAndRender(); showToast(`Категория: ${name}`, 'success'); if (window.innerWidth <= 768) document.getElementById('filterPanel')?.classList.remove('open'); }
         });
     });
+
+
+// ========= ПРОВЕРКА СЕССИИ ПРИ ЗАГРУЗКЕ =========
+function checkUserSession() {
+    // Проверяем есть ли сохранённый пользователь
+    const savedUser = localStorage.getItem('currentUser');
+    
+    if (savedUser) {
+        try {
+            currentUser = JSON.parse(savedUser);
+            // Обновляем иконку
+            updateUserIcon();
+            console.log('✅ Сессия восстановлена для:', currentUser.name);
+        } catch(e) {
+            console.error('Ошибка восстановления сессии:', e);
+            localStorage.removeItem('currentUser');
+            currentUser = null;
+        }
+    } else {
+        currentUser = null;
+        updateUserIcon();
+    }
+}
+
+// Вызови эту функцию в самом начале DOMContentLoaded
+checkUserSession();
+
 });
 
 
 // ========= ЛИЧНЫЙ КАБИНЕТ (РЕГИСТРАЦИЯ/ВХОД) =========
+// ========= ЛИЧНЫЙ КАБИНЕТ (РЕГИСТРАЦИЯ/ВХОД) =========
 let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 let users = JSON.parse(localStorage.getItem('users')) || [];
 
-function saveUsers() { localStorage.setItem('users', JSON.stringify(users)); }
-function saveCurrentUser() { localStorage.setItem('currentUser', JSON.stringify(currentUser)); }
+function saveUsers() { 
+    localStorage.setItem('users', JSON.stringify(users)); 
+}
+
+function saveCurrentUser() { 
+    if (currentUser) {
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    } else {
+        localStorage.removeItem('currentUser');
+    }
+}
 
 function showAuthModal() {
     const modal = document.getElementById('authModal');
-    if (modal) { modal.classList.add('active'); document.body.style.overflow = 'hidden'; }
+    if (modal) { 
+        modal.classList.add('active'); 
+        document.body.style.overflow = 'hidden'; 
+    }
 }
+
 function closeAuthModal() {
     const modal = document.getElementById('authModal');
-    if (modal) { modal.classList.remove('active'); document.body.style.overflow = ''; }
+    if (modal) { 
+        modal.classList.remove('active'); 
+        document.body.style.overflow = ''; 
+    }
 }
+
 function showRegisterForm() {
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('registerForm').style.display = 'block';
     document.getElementById('authTitle').textContent = 'Регистрация';
 }
+
 function showLoginForm() {
     document.getElementById('registerForm').style.display = 'none';
     document.getElementById('loginForm').style.display = 'block';
@@ -701,16 +749,27 @@ function registerUser() {
     const confirmPassword = document.getElementById('registerConfirmPassword').value;
     
     if (!name || !email || !phone || !password) {
-        showToast('Заполните все поля', 'error'); return;
+        showToast('Заполните все поля', 'error'); 
+        return;
     }
     if (password !== confirmPassword) {
-        showToast('Пароли не совпадают', 'error'); return;
+        showToast('Пароли не совпадают', 'error'); 
+        return;
     }
     if (users.find(u => u.email === email)) {
-        showToast('Пользователь с таким email уже существует', 'error'); return;
+        showToast('Пользователь с таким email уже существует', 'error'); 
+        return;
     }
     
-    const newUser = { id: Date.now(), name, email, phone, password, orders: [] };
+    const newUser = { 
+        id: Date.now(), 
+        name, 
+        email, 
+        phone, 
+        password, 
+        orders: [],
+        createdAt: new Date().toISOString()
+    };
     users.push(newUser);
     saveUsers();
     showToast('Регистрация успешна! Теперь войдите', 'success');
@@ -723,31 +782,49 @@ function loginUser() {
     
     const user = users.find(u => u.email === email && u.password === password);
     if (!user) {
-        showToast('Неверный email или пароль', 'error'); return;
+        showToast('Неверный email или пароль', 'error'); 
+        return;
     }
     
+    // Сохраняем пользователя в localStorage
     currentUser = user;
     saveCurrentUser();
+    
     showToast(`Добро пожаловать, ${user.name}!`, 'success');
     closeAuthModal();
-    renderProfilePage();
+    
+    // Обновляем иконку в хедере
+    updateUserIcon();
+    
+    // Если нужно показать профиль
+    if (document.getElementById('profilePage') && document.getElementById('profilePage').style.display !== 'block') {
+        // Не показываем профиль автоматически, просто логиним
+    }
 }
 
 function logoutUser() {
-      if (confirm('Вы уверены, что хотите выйти?')) {
+    if (confirm('Вы уверены, что хотите выйти?')) {
         currentUser = null;
         localStorage.removeItem('currentUser');
         showToast('Вы вышли из аккаунта', 'info');
-        hideProfilePage();
-        updateUserIcon(); // ← Обновляем иконку в хедере
+        
+        // Прячем страницу профиля, если она открыта
+        const profilePage = document.getElementById('profilePage');
+        if (profilePage && profilePage.style.display === 'block') {
+            hideProfilePage();
+        }
+        
+        // Обновляем иконку в хедере
+        updateUserIcon();
     }
-    
 }
 
 function renderProfilePage() {
-
-    function renderProfilePage() {
-    if (!currentUser) return;
+    if (!currentUser) {
+        showToast('Сначала войдите в аккаунт', 'error');
+        showAuthModal();
+        return;
+    }
     
     const profilePage = document.getElementById('profilePage');
     const mainContent = document.querySelector('main');
@@ -771,67 +848,7 @@ function renderProfilePage() {
     
     const ordersContainer = document.getElementById('profileOrdersList');
     if (userOrders.length === 0) {
-        ordersContainer.innerHTML = '<div style="text-align:center; padding:40px;">У вас пока нет заказов</div>';
-    } else {
-        ordersContainer.innerHTML = userOrders.map(order => `
-            <div class="order-card">
-                <div class="order-card__header">
-                    <span><strong>Заказ #${order.id}</strong></span>
-                    <span>${order.date}</span>
-                    <span class="order-card__status ${order.status === 'paid' ? 'paid' : 'pending'}">
-                        ${order.status === 'paid' ? '✅ Оплачен' : '⏳ Ожидает оплаты'}
-                    </span>
-                </div>
-                <div class="order-card__items">
-                    Товары: ${order.items.map(i => `${i.name} x${i.quantity}`).join(', ')}
-                </div>
-                <div class="order-card__total">Сумма: ${order.totals?.total || order.items.reduce((s,i)=>s+i.price*i.quantity,0)} ₽</div>
-            </div>
-        `).join('');
-    }
-    
-    // Добавляем кнопки управления в профиль
-    const profileInfo = document.querySelector('.profile__info');
-    if (profileInfo && !document.querySelector('.profile__actions')) {
-        const actionsDiv = document.createElement('div');
-        actionsDiv.className = 'profile__actions';
-        actionsDiv.innerHTML = `
-            <button class="profile__clear-orders-btn" onclick="clearUserOrders()">
-                <i class="fas fa-trash-alt"></i> Очистить историю заказов
-            </button>
-            <button class="profile__forgot-password-btn" onclick="forgotPassword()">
-                <i class="fas fa-key"></i> Забыли пароль?
-            </button>
-        `;
-        profileInfo.insertAdjacentElement('afterend', actionsDiv);
-    }
-}
-
-    if (!currentUser) return;
-    
-    const profilePage = document.getElementById('profilePage');
-    const mainContent = document.querySelector('main');
-    const heroSection = document.querySelector('.hero');
-    const categoriesSection = document.querySelector('.categories');
-    const productsSection = document.querySelector('.products');
-    
-    if (profilePage) profilePage.style.display = 'block';
-    if (mainContent) mainContent.style.display = 'none';
-    if (heroSection) heroSection.style.display = 'none';
-    if (categoriesSection) categoriesSection.style.display = 'none';
-    if (productsSection) productsSection.style.display = 'none';
-    
-    document.getElementById('profileName').textContent = currentUser.name;
-    document.getElementById('profileEmail').textContent = currentUser.email;
-    document.getElementById('profilePhone').textContent = currentUser.phone;
-    
-    // Загружаем заказы пользователя
-    const allOrders = JSON.parse(localStorage.getItem('orders')) || [];
-    const userOrders = allOrders.filter(order => order.customer?.email === currentUser.email);
-    
-    const ordersContainer = document.getElementById('profileOrdersList');
-    if (userOrders.length === 0) {
-        ordersContainer.innerHTML = '<div style="text-align:center; padding:40px;">У вас пока нет заказов</div>';
+        ordersContainer.innerHTML = '<div style="text-align:center; padding:40px;">📦 У вас пока нет заказов</div>';
         return;
     }
     
@@ -840,16 +857,38 @@ function renderProfilePage() {
             <div class="order-card__header">
                 <span><strong>Заказ #${order.id}</strong></span>
                 <span>${order.date}</span>
-                <span class="order-card__status ${order.status === 'paid' ? 'paid' : 'pending'}">
-                    ${order.status === 'paid' ? '✅ Оплачен' : '⏳ Ожидает оплаты'}
+                <span class="order-card__status ${order.deliveryStatus === 'delivered' ? 'paid' : 'pending'}">
+                    ${order.deliveryStatus === 'delivered' ? '✅ Доставлен' : getStatusText(order.deliveryStatus)}
                 </span>
             </div>
             <div class="order-card__items">
                 Товары: ${order.items.map(i => `${i.name} x${i.quantity}`).join(', ')}
             </div>
             <div class="order-card__total">Сумма: ${order.totals?.total || order.items.reduce((s,i)=>s+i.price*i.quantity,0)} ₽</div>
+            <button class="order-card__track-btn" onclick="trackOrderByNumber(${order.id})">
+                <i class="fas fa-truck"></i> Отследить
+            </button>
         </div>
     `).join('');
+}
+
+function getStatusText(status) {
+    const statuses = {
+        'pending': '⏳ Ожидает',
+        'processing': '📦 На складе в Китае',
+        'customs': '🛃 Таможня',
+        'in_transit': '✈️ В пути',
+        'in_tajikistan': '🇹🇯 В Таджикистане',
+        'delivered': '✅ Доставлен'
+    };
+    return statuses[status] || '⏳ Ожидает';
+}
+
+function trackOrderByNumber(orderId) {
+    document.getElementById('trackingNumber').value = orderId;
+    trackOrder();
+    // Прокручиваем к отслеживанию
+    document.querySelector('.tracking-section')?.scrollIntoView({ behavior: 'smooth' });
 }
 
 function hideProfilePage() {
@@ -867,20 +906,25 @@ function hideProfilePage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Обновляем иконку в хедере для отображения статуса пользователя
+function showWishlistPage() { 
+    renderWishlistPage(); 
+}
+
 function updateUserIcon() {
     const userIcon = document.querySelector('.header__action-icon:not(.cart-icon):not(.wishlist-icon)');
     if (userIcon) {
         if (currentUser) {
             userIcon.innerHTML = '<i class="fas fa-user-check"></i>';
-            userIcon.removeAttribute('onclick');
             userIcon.onclick = () => renderProfilePage();
+            userIcon.title = currentUser.name;
         } else {
             userIcon.innerHTML = '<i class="far fa-user"></i>';
             userIcon.onclick = () => showAuthModal();
+            userIcon.title = 'Войти';
         }
     }
 }
+
 
 // Обновляем submitOrder, чтобы привязывать заказ к пользователю
 const originalSubmitOrderAuth = submitOrder;
@@ -1085,6 +1129,21 @@ window.logoutUser = logoutUser;
 window.renderProfilePage = renderProfilePage;
 window.hideProfilePage = hideProfilePage;
 window.clearAllData = clearAllData;
+window.trackOrder = trackOrder;
+window.setOrderStatus = setOrderStatus;
+window.sendDeliveryNotification = sendDeliveryNotification;
+window.checkAndSendDeliveryNotification = checkAndSendDeliveryNotification;
+window.goToHomePage = goToHomePage;
+window.openAdminPanel = openAdminPanel;
+window.closeAdminPanel = closeAdminPanel;
+window.updateOrderStatus = updateOrderStatus;
+window.deleteUser = deleteUser;
+window.deleteProduct = deleteProduct;
+window.showAddProductForm = showAddProductForm;
+window.closeProductForm = closeProductForm;
+window.addNewProduct = addNewProduct;
+window.sendMessage = sendMessage;
+window.addEmoji = addEmoji;
 
 // ========= ОЧИСТКА ВСЕХ ДАННЫХ (для тестирования) =========
 function clearAllData() {
@@ -1153,3 +1212,1118 @@ if ('serviceWorker' in navigator) {
             .catch(err => console.log('❌ SW ошибка:', err));
     });
 }
+
+
+// ========= ОТСЛЕЖИВАНИЕ ДОСТАВКИ =========
+function trackOrder() {
+    const trackingNumber = document.getElementById('trackingNumber').value.trim();
+    if (!trackingNumber) {
+        showToast('Введите номер заказа', 'error');
+        return;
+    }
+    
+    // Извлекаем номер заказа (убираем # если есть)
+    const orderId = parseInt(trackingNumber.replace('#', ''));
+    if (isNaN(orderId)) {
+        showToast('Неверный формат номера', 'error');
+        return;
+    }
+    
+    // Показываем анимацию загрузки
+    const resultDiv = document.getElementById('trackingResult');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = `
+        <div class="tracking-loading">
+            <div class="spinner"></div>
+            <p>Поиск заказа...</p>
+        </div>
+    `;
+    
+    // Имитируем задержку (можно убрать)
+    setTimeout(() => {
+        // Ищем заказ в localStorage
+        const orders = JSON.parse(localStorage.getItem('orders')) || [];
+        const order = orders.find(o => o.id === orderId);
+        
+        if (!order) {
+            resultDiv.innerHTML = `
+                <div class="tracking-error">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px;"></i>
+                    <h3>Заказ не найден</h3>
+                    <p>Проверьте номер заказа и попробуйте снова</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Генерируем статус доставки
+        const trackingData = generateTrackingData(order);
+        displayTrackingResult(trackingData);
+    }, 800);
+}
+
+function generateTrackingData(order) {
+    // Получаем дату заказа из order.date
+    let orderDate;
+    if (order.date) {
+        // Парсим дату из формата "02.05.2026, 12:52:52"
+        const dateParts = order.date.split(',')[0].split('.');
+        if (dateParts.length === 3) {
+            orderDate = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
+        } else {
+            orderDate = new Date(order.date);
+        }
+    } else {
+        orderDate = new Date();
+    }
+    
+    const today = new Date();
+    
+    // Рассчитываем этапы на основе ДАТЫ ЗАКАЗА (не текущей даты)
+    const day0 = new Date(orderDate);
+    const day2 = addDaysReal(day0, 2);
+    const day5 = addDaysReal(day0, 5);
+    const day8 = addDaysReal(day0, 8);
+    const day12 = addDaysReal(day0, 12);
+    const day18 = addDaysReal(day0, 18);
+    
+    // Определяем текущий этап на основе СРАВНЕНИЯ с датой заказа
+    let currentStatus = 'pending';
+    let currentStepIndex = 0;
+    
+    if (today >= day18) {
+        currentStatus = 'delivered';
+        currentStepIndex = 5;
+    } else if (today >= day12) {
+        currentStatus = 'in_tajikistan';
+        currentStepIndex = 4;
+    } else if (today >= day8) {
+        currentStatus = 'in_transit';
+        currentStepIndex = 3;
+    } else if (today >= day5) {
+        currentStatus = 'customs';
+        currentStepIndex = 2;
+    } else if (today >= day2) {
+        currentStatus = 'processing';
+        currentStepIndex = 1;
+    } else {
+        currentStatus = 'pending';
+        currentStepIndex = 0;
+    }
+    
+    // Шаги доставки с ВОЗМОЖНЫМИ датами (не показываем будущие даты)
+    const steps = [
+        { 
+            status: 'pending', 
+            title: 'Заказ оформлен', 
+            subtitle: 'Ожидание подтверждения',
+            icon: 'fas fa-clipboard-list',
+            date: formatDate(day0),
+            isCompleted: currentStepIndex >= 0
+        },
+        { 
+            status: 'processing', 
+            title: 'На складе в Китае', 
+            subtitle: 'Комплектация заказа',
+            icon: 'fas fa-boxes',
+            date: formatDate(day2),
+            isCompleted: currentStepIndex >= 1
+        },
+        { 
+            status: 'customs', 
+            title: 'Таможенное оформление', 
+            subtitle: 'Прохождение границы КНР',
+            icon: 'fas fa-passport',
+            date: formatDate(day5),
+            isCompleted: currentStepIndex >= 2
+        },
+        { 
+            status: 'in_transit', 
+            title: 'Авиаперевозка', 
+            subtitle: 'В пути из Китая',
+            icon: 'fas fa-plane',
+            date: formatDate(day8),
+            isCompleted: currentStepIndex >= 3
+        },
+        { 
+            status: 'in_tajikistan', 
+            title: 'Прибыл в Таджикистан', 
+            subtitle: 'Таможня Душанбе',
+            icon: 'fas fa-flag-checkered',
+            date: formatDate(day12),
+            isCompleted: currentStepIndex >= 4
+        },
+        { 
+            status: 'delivered', 
+            title: 'Доставлен', 
+            subtitle: 'Получен получателем',
+            icon: 'fas fa-home',
+            date: formatDate(day18),
+            isCompleted: currentStepIndex >= 5
+        }
+    ];
+    
+    // История — только выполненные шаги
+    const history = [];
+    for (let i = 0; i <= currentStepIndex; i++) {
+        if (steps[i]) {
+            history.push({
+                date: steps[i].date,
+                text: steps[i].title,
+                description: steps[i].subtitle,
+                status: steps[i].status
+            });
+        }
+    }
+    
+    // Обратный отсчёт (если не доставлен)
+    let daysLeft = null;
+    if (currentStatus !== 'delivered') {
+        const timeDiff = day18 - today;
+        daysLeft = Math.max(0, Math.ceil(timeDiff / (1000 * 60 * 60 * 24)));
+    }
+    
+    // Статус для отображения
+    const statusNames = {
+        pending: { text: 'Ожидает обработки', class: 'status-pending', icon: '⏳' },
+        processing: { text: 'На складе в Китае', class: 'status-processing', icon: '📦' },
+        customs: { text: 'Таможня Китая', class: 'status-processing', icon: '🛃' },
+        in_transit: { text: 'В пути из Китая', class: 'status-shipped', icon: '✈️' },
+        in_tajikistan: { text: 'В Таджикистане', class: 'status-shipped', icon: '🇹🇯' },
+        delivered: { text: 'Доставлен', class: 'status-delivered', icon: '✅' }
+    };
+    
+    return {
+        order: order,
+        status: currentStatus,
+        statusText: statusNames[currentStatus]?.text || 'В обработке',
+        statusClass: statusNames[currentStatus]?.class || 'status-pending',
+        statusIcon: statusNames[currentStatus]?.icon || '⏳',
+        steps: steps,
+        currentStep: currentStepIndex,
+        history: history,
+        daysLeft: daysLeft,
+        estimatedDate: formatDate(day18)
+    };
+}
+
+// Обновляем displayTrackingResult для правильного отображения прогресса
+function displayTrackingResult(data) {
+    const resultDiv = document.getElementById('trackingResult');
+    
+    // Определяем какой шаг сейчас активный
+    const activeStepIndex = data.currentStep;
+    
+    resultDiv.innerHTML = `
+        <div class="tracking-card">
+            <div class="tracking-header">
+                <div class="tracking-order-id">
+                    <i class="fas fa-hashtag"></i> Заказ #${data.order.id}
+                </div>
+                <div class="tracking-status ${data.statusClass}">
+                    <i class="${data.status === 'delivered' ? 'fas fa-check-circle' : 'fas fa-spinner fa-pulse'}"></i>
+                    ${data.statusText}
+                </div>
+            </div>
+            
+            ${data.daysLeft !== null && data.daysLeft > 0 && data.status !== 'delivered' ? `
+            <div class="tracking-countdown">
+                <div class="countdown-icon"><i class="fas fa-calendar-day"></i></div>
+                <div class="countdown-text">
+                    <span class="countdown-days">${data.daysLeft}</span>
+                    <span class="countdown-label">${getDaysWord(data.daysLeft)} до доставки</span>
+                </div>
+                <div class="countdown-date">Ожидается: ${data.estimatedDate}</div>
+            </div>
+            ` : data.status === 'delivered' ? `
+            <div class="tracking-delivered-badge">
+                <i class="fas fa-trophy"></i> Заказ доставлен! 🎉
+            </div>
+            ` : ''}
+            
+            <div class="tracking-steps">
+                ${data.steps.map((step, idx) => `
+                    <div class="step 
+                        ${idx < activeStepIndex ? 'completed' : ''} 
+                        ${idx === activeStepIndex ? 'active' : ''}
+                        ${idx > activeStepIndex && step.isCompleted ? '' : ''}
+                    ">
+                        <div class="step-icon">
+                            ${idx < activeStepIndex ? '<i class="fas fa-check"></i>' : `<i class="${step.icon}"></i>`}
+                        </div>
+                        <div class="step-title">${step.title}</div>
+                        <div class="step-subtitle">${step.subtitle || ''}</div>
+                        <div class="step-date">${step.date || '—'}</div>
+                        ${idx === activeStepIndex && data.daysLeft !== null && data.status !== 'delivered' ? `<div class="step-progress">Осталось ${data.daysLeft} дней</div>` : ''}
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="tracking-details">
+                <div class="detail-row">
+                    <span class="detail-label">Дата заказа:</span>
+                    <span class="detail-value">${data.order.date}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Сумма:</span>
+                    <span class="detail-value">${data.order.totals?.total || data.order.items.reduce((s,i)=>s+i.price*i.quantity,0)} ₽</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Способ доставки:</span>
+                    <span class="detail-value">✈️ Авиадоставка из Китая (14-18 дней)</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Адрес:</span>
+                    <span class="detail-value">${data.order.customer?.address || 'Не указан'}</span>
+                </div>
+            </div>
+            
+            <div class="tracking-history">
+                <h4>📋 История обновлений</h4>
+                ${data.history.map(h => `
+                    <div class="history-item">
+                        <div class="history-date">${h.date}</div>
+                        <div class="history-content">
+                            <div class="history-text">
+                                <i class="fas ${h.status === 'delivered' ? 'fa-check-circle' : 'fa-clock'}" style="color: #3b82f6; margin-right: 8px;"></i>
+                                ${h.text}
+                            </div>
+                            <div class="history-desc">${h.description}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="tracking-support">
+                <i class="fas fa-headset"></i> 
+                Вопросы по доставке из Китая? Свяжитесь: +992 XX XXX XX XX
+            </div>
+        </div>
+    `;
+}
+
+// Функция для обновления статуса заказа в хранилище
+function updateOrderStatusInStorage(orderId, newStatus) {
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const orderIndex = orders.findIndex(o => o.id === orderId);
+    if (orderIndex !== -1) {
+        orders[orderIndex].deliveryStatus = newStatus;
+        localStorage.setItem('orders', JSON.stringify(orders));
+    }
+}
+
+// Функция для ручного обновления статуса (для админа)
+function setOrderStatus(orderId, newStatus) {
+    const validStatuses = ['pending', 'processing', 'customs', 'in_transit', 'in_tajikistan', 'delivered'];
+    if (!validStatuses.includes(newStatus)) {
+        showToast('Неверный статус', 'error');
+        return;
+    }
+    
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const orderIndex = orders.findIndex(o => o.id === orderId);
+    if (orderIndex !== -1) {
+        orders[orderIndex].deliveryStatus = newStatus;
+        localStorage.setItem('orders', JSON.stringify(orders));
+        showToast(`Статус заказа #${orderId} обновлён на "${newStatus}"`, 'success');
+        
+        // Если сейчас открыто отслеживание этого заказа — обновляем
+        const trackingInput = document.getElementById('trackingNumber');
+        if (trackingInput && trackingInput.value == orderId) {
+            trackOrder();
+        }
+    } else {
+        showToast(`Заказ #${orderId} не найден`, 'error');
+    }
+}
+
+
+// Вспомогательная функция для добавления дней
+function addDaysReal(date, days) {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+}
+
+// Форматирование даты
+function formatDate(date) {
+    if (!date) return '—';
+    const d = new Date(date);
+    return d.toLocaleDateString('ru-RU', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    });
+}
+
+// Обновляем displayTrackingResult для отображения дней до доставки
+function displayTrackingResult(data) {
+    const resultDiv = document.getElementById('trackingResult');
+    
+    resultDiv.innerHTML = `
+        <div class="tracking-card">
+            <div class="tracking-header">
+                <div class="tracking-order-id">
+                    <i class="fas fa-hashtag"></i> Заказ #${data.order.id}
+                </div>
+                <div class="tracking-status ${data.statusClass}">
+                    <i class="${data.status === 'delivered' ? 'fas fa-check-circle' : (data.status === 'in_transit' ? 'fas fa-plane fa-fw' : 'fas fa-spinner fa-pulse')}"></i>
+                    ${data.statusText}
+                </div>
+            </div>
+            
+            ${data.daysLeft !== null ? `
+            <div class="tracking-countdown">
+                <div class="countdown-icon">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <div class="countdown-text">
+                    <span class="countdown-days">${data.daysLeft}</span>
+                    <span class="countdown-label">${getDaysWord(data.daysLeft)} до доставки</span>
+                </div>
+                <div class="countdown-date">
+                    Ожидается: ${data.estimatedDate}
+                </div>
+            </div>
+            ` : `
+            <div class="tracking-delivered-badge">
+                <i class="fas fa-trophy"></i> Заказ доставлен!
+            </div>
+            `}
+            
+            <div class="tracking-steps">
+                ${data.steps.map((step, idx) => `
+                    <div class="step ${idx <= data.currentStep ? (idx < data.currentStep ? 'completed' : 'active') : ''}">
+                        <div class="step-icon">
+                            <i class="${step.icon}"></i>
+                        </div>
+                        <div class="step-title">${step.title}</div>
+                        <div class="step-subtitle">${step.subtitle || ''}</div>
+                        <div class="step-date">${step.date || '—'}</div>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="tracking-details">
+                <div class="detail-row">
+                    <span class="detail-label">Дата заказа:</span>
+                    <span class="detail-value">${data.order.date}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Сумма:</span>
+                    <span class="detail-value">${data.order.totals?.total || data.order.items.reduce((s,i)=>s+i.price*i.quantity,0)} ₽</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Способ доставки:</span>
+                    <span class="detail-value">🚚 Авиадоставка из Китая (18 дней)</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Адрес:</span>
+                    <span class="detail-value">${data.order.customer?.address || 'Не указан'}</span>
+                </div>
+            </div>
+            
+            <div class="tracking-history">
+                <h4 style="margin-bottom: 16px;">📋 История обновлений</h4>
+                ${data.history.map(h => `
+                    <div class="history-item">
+                        <div class="history-date">${h.date}</div>
+                        <div class="history-content">
+                            <div class="history-text">
+                                <i class="fas ${h.status === 'delivered' ? 'fa-check-circle' : (h.status === 'in_transit' ? 'fa-plane' : 'fa-clock')}" style="color: #3b82f6; margin-right: 8px;"></i>
+                                ${h.text}
+                            </div>
+                            <div class="history-desc">${h.description || ''}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="tracking-support">
+                <i class="fas fa-headset"></i> 
+                Есть вопросы по доставке из Китая? Свяжитесь с нами: +992 XX XXX XX XX
+                <div class="support-note">Обычно доставка занимает 14-18 дней</div>
+            </div>
+        </div>
+    `;
+}
+
+function getDaysWord(days) {
+    if (days >= 11 && days <= 19) return 'дней';
+    const lastDigit = days % 10;
+    if (lastDigit === 1) return 'день';
+    if (lastDigit >= 2 && lastDigit <= 4) return 'дня';
+    return 'дней';
+   
+    
+    // Обрезаем шаги в зависимости от статуса
+    let currentStepIndex;
+    switch(randomStatus) {
+        case 'pending': currentStepIndex = 0; break;
+        case 'processing': currentStepIndex = 1; break;
+        case 'shipped': currentStepIndex = 2; break;
+        default: currentStepIndex = 3;
+    }
+    
+    const currentSteps = steps.slice(0, currentStepIndex + 1);
+    for (let i = currentStepIndex + 1; i < steps.length; i++) {
+        steps[i].date = null;
+    }
+    
+    // История обновлений
+    const history = [];
+    for (let i = 0; i <= currentStepIndex; i++) {
+        if (steps[i].date) {
+            history.push({
+                date: steps[i].date,
+                text: steps[i].title,
+                status: steps[i].status
+            });
+        }
+    }
+    
+    // Статус для отображения
+    const statusNames = {
+        pending: { text: 'Ожидает обработки', class: 'status-pending', icon: '⏳' },
+        processing: { text: 'В обработке', class: 'status-processing', icon: '🔄' },
+        shipped: { text: 'В пути', class: 'status-shipped', icon: '🚚' },
+        delivered: { text: 'Доставлен', class: 'status-delivered', icon: '✅' }
+    };
+    
+    return {
+        order: order,
+        status: randomStatus,
+        statusText: statusNames[randomStatus].text,
+        statusClass: statusNames[randomStatus].class,
+        statusIcon: statusNames[randomStatus].icon,
+        steps: steps,
+        currentStep: currentStepIndex,
+        history: history
+    };
+}
+
+function addDays(date, days) {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result.toLocaleDateString('ru-RU');
+}
+
+function displayTrackingResult(data) {
+    const resultDiv = document.getElementById('trackingResult');
+    
+    resultDiv.innerHTML = `
+        <div class="tracking-card">
+            <div class="tracking-header">
+                <div class="tracking-order-id">
+                    <i class="fas fa-hashtag"></i> Заказ #${data.order.id}
+                </div>
+                <div class="tracking-status ${data.statusClass}">
+                    <i class="${data.status === 'delivered' ? 'fas fa-check-circle' : 'fas fa-spinner fa-pulse'}"></i>
+                    ${data.statusText}
+                </div>
+            </div>
+            
+            <div class="tracking-steps">
+                ${data.steps.map((step, idx) => `
+                    <div class="step ${idx <= data.currentStep ? (idx < data.currentStep ? 'completed' : 'active') : ''}">
+                        <div class="step-icon">
+                            <i class="${step.icon}"></i>
+                        </div>
+                        <div class="step-title">${step.title}</div>
+                        <div class="step-date">${step.date || '—'}</div>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="tracking-details">
+                <div class="detail-row">
+                    <span class="detail-label">Дата заказа:</span>
+                    <span class="detail-value">${data.order.date}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Сумма:</span>
+                    <span class="detail-value">${data.order.totals?.total || data.order.items.reduce((s,i)=>s+i.price*i.quantity,0)} ₽</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Способ доставки:</span>
+                    <span class="detail-value">${getDeliveryName(data.order.delivery?.method)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Адрес:</span>
+                    <span class="detail-value">${data.order.customer?.address || 'Не указан'}</span>
+                </div>
+            </div>
+            
+            <div class="tracking-history">
+                <h4 style="margin-bottom: 16px;">История обновлений</h4>
+                ${data.history.map(h => `
+                    <div class="history-item">
+                        <div class="history-date">${h.date}</div>
+                        <div class="history-text">
+                            <i class="fas ${h.status === 'delivered' ? 'fa-check-circle' : (h.status === 'shipped' ? 'fa-truck' : 'fa-clock')}" style="color: #3b82f6; margin-right: 8px;"></i>
+                            ${h.text}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 13px; color: #94a3b8;">
+                <i class="fas fa-headset"></i> Есть вопросы? Свяжитесь с нами: +992 XX XXX XX XX
+            </div>
+        </div>
+    `;
+    
+    // Добавляем анимацию
+    resultDiv.style.animation = 'none';
+    resultDiv.offsetHeight; // reflow
+    resultDiv.style.animation = 'slideUp 0.4s ease';
+}
+
+// Дополнительная функция для обновления статусов заказов (админская)
+function updateOrderStatus(orderId, newStatus) {
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const orderIndex = orders.findIndex(o => o.id === orderId);
+    if (orderIndex !== -1) {
+        orders[orderIndex].deliveryStatus = newStatus;
+        localStorage.setItem('orders', JSON.stringify(orders));
+        showToast(`Статус заказа #${orderId} обновлён`, 'success');
+    }
+}
+
+
+// ========= УВЕДОМЛЕНИЕ В TELEGRAM О ДОСТАВКЕ =========
+async function sendDeliveryNotification(order) {
+    // Формируем красивое сообщение о доставке
+    let message = `✅ <b>ЗАКАЗ ДОСТАВЛЕН!</b>\n\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `🎉 <b>Ваш заказ успешно доставлен!</b>\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+    
+    message += `📋 <b>Детали заказа:</b>\n`;
+    message += `├ Номер: <b>#${order.id}</b>\n`;
+    message += `├ Дата заказа: ${order.date}\n`;
+    message += `├ Дата доставки: ${new Date().toLocaleString('ru-RU')}\n`;
+    message += `└ Статус: <b>✅ ПОЛУЧЕН</b>\n\n`;
+    
+    message += `👤 <b>Получатель:</b>\n`;
+    message += `├ Имя: <b>${escapeHtml(order.customer?.name)}</b>\n`;
+    message += `├ Телефон: <code>${order.customer?.phone}</code>\n`;
+    if (order.customer?.email) message += `├ Email: ${order.customer.email}\n`;
+    message += `└ Адрес: ${escapeHtml(order.customer?.address)}\n\n`;
+    
+    message += `📦 <b>Состав заказа:</b>\n`;
+    order.items.forEach((item, index) => {
+        const isLast = index === order.items.length - 1;
+        const prefix = isLast ? '└' : '├';
+        message += `${prefix} ${item.name} x${item.quantity} = ${(item.price * item.quantity).toLocaleString()} ₽\n`;
+    });
+    
+    message += `\n💰 <b>Финансы:</b>\n`;
+    message += `├ Сумма товаров: ${order.totals.subtotal.toLocaleString()} ₽\n`;
+    message += `├ Доставка: ${order.totals.delivery === 0 ? 'Бесплатно' : order.totals.delivery.toLocaleString() + ' ₽'}\n`;
+    message += `└ <b>ИТОГО: ${order.totals.total.toLocaleString()} ₽</b>\n\n`;
+    
+    message += `🚚 <b>Способ доставки:</b> ${getDeliveryName(order.delivery?.method)}\n`;
+    message += `💳 <b>Оплата:</b> ${getPaymentName(order.payment)}\n\n`;
+    
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `🙏 <b>Спасибо за покупку!</b>\n`;
+    message += `⭐ Оставьте отзыв о товаре на нашем сайте\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+    message += `📱 <i>Магазин ShopXand — доставка из Китая за 18 дней</i>`;
+    
+    try {
+        const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: message,
+                parse_mode: 'HTML'
+            })
+        });
+        const result = await response.json();
+        if (result.ok) {
+            console.log('✅ Уведомление о доставке отправлено в Telegram');
+            return true;
+        } else {
+            console.error('❌ Ошибка отправки уведомления:', result);
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Ошибка:', error);
+        return false;
+    }
+}
+
+// Функция для проверки и отправки уведомлений о доставке (вызывать при обновлении статуса)
+async function checkAndSendDeliveryNotification(orderId, newStatus) {
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const order = orders.find(o => o.id === orderId);
+    
+    if (order && newStatus === 'delivered' && order.deliveryNotified !== true) {
+        // Отправляем уведомление
+        await sendDeliveryNotification(order);
+        
+        // Отмечаем, что уведомление отправлено
+        order.deliveryNotified = true;
+        localStorage.setItem('orders', JSON.stringify(orders));
+    }
+}
+
+// Обновляем функцию setOrderStatus (добавляем отправку уведомления)
+window.setOrderStatus = async function(orderId, newStatus) {
+    const validStatuses = ['pending', 'processing', 'customs', 'in_transit', 'in_tajikistan', 'delivered'];
+    if (!validStatuses.includes(newStatus)) {
+        showToast('Неверный статус', 'error');
+        return false;
+    }
+    
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const orderIndex = orders.findIndex(o => o.id === orderId);
+    
+    if (orderIndex !== -1) {
+        const oldStatus = orders[orderIndex].deliveryStatus;
+        orders[orderIndex].deliveryStatus = newStatus;
+        localStorage.setItem('orders', JSON.stringify(orders));
+        
+        showToast(`Статус заказа #${orderId} обновлён на "${newStatus}"`, 'success');
+        
+        // Если новый статус "Доставлен" - отправляем уведомление
+        if (newStatus === 'delivered' && oldStatus !== 'delivered') {
+            await checkAndSendDeliveryNotification(orderId, newStatus);
+            showToast('✅ Уведомление о доставке отправлено в Telegram', 'success');
+        }
+        
+        // Если открыто отслеживание этого заказа - обновляем
+        const trackingInput = document.getElementById('trackingNumber');
+        if (trackingInput && trackingInput.value == orderId) {
+            trackOrder();
+        }
+        return true;
+    } else {
+        showToast(`Заказ #${orderId} не найден`, 'error');
+        return false;
+    }
+};
+
+// Функция для возврата на главную без выхода
+function goToHomePage() {
+    const profilePage = document.getElementById('profilePage');
+    const mainContent = document.querySelector('main');
+    const heroSection = document.querySelector('.hero');
+    const categoriesSection = document.querySelector('.categories');
+    const productsSection = document.querySelector('.products');
+    const footer = document.querySelector('.footer');
+    
+    // Скрываем профиль
+    if (profilePage) profilePage.style.display = 'none';
+    
+    // Показываем основной контент
+    if (mainContent) mainContent.style.display = 'block';
+    if (heroSection) heroSection.style.display = 'block';
+    if (categoriesSection) categoriesSection.style.display = 'block';
+    if (productsSection) productsSection.style.display = 'block';
+    if (footer) footer.style.display = 'block';
+    
+    // Плавный скролл к началу
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Обновляем иконку пользователя (она остаётся)
+    updateUserIcon();
+}
+
+// ========= АДМИН-ПАНЕЛЬ =========
+let adminLoggedIn = false;
+const ADMIN_PASSWORD = 'admin123'; // Пароль для входа в админку
+
+function openAdminPanel() {
+    if (!adminLoggedIn) {
+        const password = prompt('🔐 Введите пароль администратора:');
+        if (password === ADMIN_PASSWORD) {
+            adminLoggedIn = true;
+            showAdminPanel();
+        } else if (password !== null) {
+            showToast('Неверный пароль!', 'error');
+        }
+        return;
+    }
+    showAdminPanel();
+}
+
+function showAdminPanel() {
+    document.getElementById('adminOverlay').style.display = 'flex';
+    loadAdminStats();
+    loadAdminOrders();
+    loadAdminUsers();
+    loadAdminProducts();
+}
+
+function closeAdminPanel() {
+    document.getElementById('adminOverlay').style.display = 'none';
+}
+
+function loadAdminStats() {
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const products = productsData;
+    
+    const totalOrders = orders.length;
+    const totalRevenue = orders.reduce((sum, o) => sum + (o.totals?.total || 0), 0);
+    const totalUsers = users.length;
+    const totalProducts = products.length;
+    
+    document.getElementById('statsGrid').innerHTML = `
+        <div class="stat-card"><i class="fas fa-shopping-cart"></i><div class="stat-value">${totalOrders}</div><div class="stat-label">Всего заказов</div></div>
+        <div class="stat-card"><i class="fas fa-tenge"></i><div class="stat-value">${totalRevenue.toLocaleString()} ₽</div><div class="stat-label">Выручка</div></div>
+        <div class="stat-card"><i class="fas fa-users"></i><div class="stat-value">${totalUsers}</div><div class="stat-label">Пользователей</div></div>
+        <div class="stat-card"><i class="fas fa-boxes"></i><div class="stat-value">${totalProducts}</div><div class="stat-label">Товаров</div></div>
+    `;
+}
+
+function loadAdminOrders() {
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const container = document.getElementById('adminOrdersList');
+    
+    container.innerHTML = orders.map(order => `
+        <div class="admin-order-card">
+            <div class="admin-order-info">
+                <div class="admin-order-id">Заказ #${order.id}</div>
+                <div class="admin-order-customer">${order.customer?.name || 'Неизвестно'} | ${order.customer?.phone || '—'}</div>
+                <div>Сумма: ${(order.totals?.total || order.items.reduce((s,i)=>s+i.price*i.quantity,0)).toLocaleString()} ₽</div>
+            </div>
+            <div class="admin-order-status ${order.deliveryStatus || 'pending'}">
+                ${getStatusText(order.deliveryStatus)}
+            </div>
+            <div class="admin-order-actions">
+                <select onchange="updateOrderStatus(${order.id}, this.value)">
+                    <option value="pending" ${order.deliveryStatus === 'pending' ? 'selected' : ''}>⏳ Ожидает</option>
+                    <option value="processing" ${order.deliveryStatus === 'processing' ? 'selected' : ''}>📦 На складе в Китае</option>
+                    <option value="customs" ${order.deliveryStatus === 'customs' ? 'selected' : ''}>🛃 Таможня</option>
+                    <option value="in_transit" ${order.deliveryStatus === 'in_transit' ? 'selected' : ''}>✈️ В пути</option>
+                    <option value="in_tajikistan" ${order.deliveryStatus === 'in_tajikistan' ? 'selected' : ''}>🇹🇯 В Таджикистане</option>
+                    <option value="delivered" ${order.deliveryStatus === 'delivered' ? 'selected' : ''}>✅ Доставлен</option>
+                </select>
+            </div>
+        </div>
+    `).join('');
+}
+
+function loadAdminUsers() {
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const container = document.getElementById('adminUsersList');
+    
+    container.innerHTML = users.map(user => `
+        <div class="admin-user-card">
+            <div><strong>${user.name}</strong><br><small>${user.email}</small><br><small>${user.phone}</small></div>
+            <div>📦 Заказов: ${user.orders?.length || 0}</div>
+            <button onclick="deleteUser(${user.id})" style="background:#ef4444;color:white;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;">Удалить</button>
+        </div>
+    `).join('');
+}
+
+function loadAdminProducts() {
+    const container = document.getElementById('adminProductsList');
+    
+    container.innerHTML = productsData.map(product => `
+        <div class="admin-product-card">
+            <div><strong>${product.name}</strong><br><small>${product.price.toLocaleString()} ₽</small></div>
+            <button onclick="deleteProduct(${product.id})" style="background:#ef4444;color:white;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;">Удалить</button>
+        </div>
+    `).join('');
+}
+
+function updateOrderStatus(orderId, newStatus) {
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const orderIndex = orders.findIndex(o => o.id === orderId);
+    
+    if (orderIndex !== -1) {
+        orders[orderIndex].deliveryStatus = newStatus;
+        localStorage.setItem('orders', JSON.stringify(orders));
+        showToast(`Статус заказа #${orderId} обновлён`, 'success');
+        
+        // Если статус "Доставлен" — отправляем уведомление
+        if (newStatus === 'delivered') {
+            checkAndSendDeliveryNotification(orderId, newStatus);
+        }
+        
+        loadAdminOrders();
+        loadAdminStats();
+    }
+}
+
+function deleteUser(userId) {
+    if (confirm('Удалить пользователя? Все его заказы останутся.')) {
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        users = users.filter(u => u.id !== userId);
+        localStorage.setItem('users', JSON.stringify(users));
+        loadAdminUsers();
+        loadAdminStats();
+        showToast('Пользователь удалён', 'success');
+    }
+}
+
+function deleteProduct(productId) {
+    if (confirm('Удалить товар?')) {
+        const index = productsData.findIndex(p => p.id === productId);
+        if (index !== -1) {
+            productsData.splice(index, 1);
+            filterAndRender();
+            loadAdminProducts();
+            showToast('Товар удалён', 'success');
+        }
+    }
+}
+
+function showAddProductForm() {
+    document.getElementById('productFormModal').style.display = 'flex';
+}
+
+function closeProductForm() {
+    document.getElementById('productFormModal').style.display = 'none';
+    document.getElementById('productName').value = '';
+    document.getElementById('productPrice').value = '';
+    document.getElementById('productOldPrice').value = '';
+    document.getElementById('productImage').value = '';
+    document.getElementById('productBadge').value = '';
+}
+
+function addNewProduct() {
+    const name = document.getElementById('productName').value;
+    const price = parseInt(document.getElementById('productPrice').value);
+    const oldPrice = parseInt(document.getElementById('productOldPrice').value) || null;
+    const image = document.getElementById('productImage').value;
+    const category = document.getElementById('productCategory').value;
+    const badge = document.getElementById('productBadge').value;
+    
+    if (!name || !price || !image) {
+        showToast('Заполните название, цену и ссылку на изображение', 'error');
+        return;
+    }
+    
+    const newProduct = {
+        id: Date.now(),
+        name,
+        price,
+        oldPrice,
+        image,
+        badge,
+        category
+    };
+    
+    productsData.push(newProduct);
+    filterAndRender();
+    loadAdminProducts();
+    closeProductForm();
+    showToast('Товар добавлен!', 'success');
+}
+
+function getStatusText(status) {
+    const statuses = {
+        'pending': '⏳ Ожидает',
+        'processing': '📦 На складе в Китае',
+        'customs': '🛃 Таможня',
+        'in_transit': '✈️ В пути',
+        'in_tajikistan': '🇹🇯 В Таджикистане',
+        'delivered': '✅ Доставлен'
+    };
+    return statuses[status] || '⏳ Ожидает';
+}
+
+// Добавь в DOMContentLoaded
+const logo = document.querySelector('.header__logo');
+if (logo) {
+    logo.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        openAdminPanel();
+    });
+}
+
+// ========= ЧАТ ПОДДЕРЖКИ =========
+let chatOpen = false;
+let chatMessages = [];
+let isTyping = false;
+
+// Бот отвечает на сообщения
+function getBotReply(message) {
+    const msg = message.toLowerCase();
+    
+    const replies = {
+        'привет': 'Здравствуйте! 👋 Чем могу помочь?',
+        'здравствуй': 'Здравствуйте! 👋 Чем могу помочь?',
+        'ку': 'Здравствуйте! 👋 Чем могу помочь?',
+        'доставка': 'Доставка из Китая занимает 14-18 дней. Мы используем авиадоставку. Отследить заказ можно в личном кабинете! 🚚',
+        'скидка': 'Следите за нашими акциями в Telegram-канале! Подпишитесь, чтобы не пропустить скидки до 70%! 🎁',
+        'оплата': 'Можно оплатить наличными при получении, переводом на карту или через Alif. Скоро добавим оплату картами! 💳',
+        'возврат': 'Возврат товара возможен в течение 14 дней. Товар должен быть в оригинальной упаковке. Подробнее в разделе "Возврат" 📦',
+        'ошибка': 'Опишите проблему подробнее, я помогу разобраться! 🔧',
+        'спасибо': 'Пожалуйста! Рады помочь! 😊 Обращайтесь ещё!',
+        'товар': 'Все товары качественные, с гарантией. Можете посмотреть характеристики и отзывы на странице товара! ⭐',
+        'заказ': 'Оформить заказ можно через корзину. Нужно добавить товары и заполнить форму. Доставка по всему Таджикистану! 📝',
+        'как': 'Как я могу помочь? Уточните вопрос о доставке, оплате или товаре!',
+        'help': 'Я могу ответить на вопросы о: доставке (14-18 дней), оплате, возврате, товарах. Что вас интересует?'
+    };
+    
+    for (let key in replies) {
+        if (msg.includes(key)) {
+            return replies[key];
+        }
+    }
+    
+    return 'Спасибо за вопрос! Наш менеджер свяжется с вами в ближайшее время. А пока можете посмотреть FAQ на сайте 📚';
+}
+
+// Отправка сообщения в Telegram (для админа)
+async function sendToAdminTelegram(message, userName) {
+    try {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+        const userNameTelegram = currentUser ? currentUser.name : 'Гость';
+        
+        const text = `💬 НОВОЕ СООБЩЕНИЕ ИЗ ЧАТА!\n\n👤 Пользователь: ${userNameTelegram}\n📝 Сообщение: ${message}\n🕐 Время: ${new Date().toLocaleString('ru-RU')}`;
+        
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: text,
+                parse_mode: 'HTML'
+            })
+        });
+    } catch(e) {
+        console.log('Telegram уведомление не отправлено');
+    }
+}
+
+function addMessageToChat(text, isUser = true) {
+    const messagesContainer = document.getElementById('chatMessages');
+    if (!messagesContainer) return;
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
+    
+    const avatar = isUser ? '<i class="fas fa-user"></i>' : '<i class="fas fa-headset"></i>';
+    
+    messageDiv.innerHTML = `
+        <div class="message-avatar">
+            ${avatar}
+        </div>
+        <div class="message-bubble">
+            <div class="message-text">${escapeHtml(text)}</div>
+            <div class="message-time">${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+        </div>
+    `;
+    
+    messagesContainer.appendChild(messageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    
+    // Сохраняем сообщение
+    chatMessages.push({ text, isUser, time: new Date() });
+    
+    // Отправляем админу если это сообщение пользователя
+    if (isUser) {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+        const userName = currentUser ? currentUser.name : 'Гость';
+        sendToAdminTelegram(text, userName);
+    }
+}
+
+function showTyping() {
+    const typingDiv = document.getElementById('chatTyping');
+    if (typingDiv) {
+        typingDiv.style.display = 'block';
+        isTyping = true;
+    }
+}
+
+function hideTyping() {
+    const typingDiv = document.getElementById('chatTyping');
+    if (typingDiv) {
+        typingDiv.style.display = 'none';
+        isTyping = false;
+    }
+}
+
+function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    
+    if (!message) return;
+    
+    // Добавляем сообщение пользователя
+    addMessageToChat(message, true);
+    input.value = '';
+    
+    // Показываем печать бота
+    showTyping();
+    
+    // Имитация задержки ответа
+    setTimeout(() => {
+        hideTyping();
+        
+        // Получаем ответ бота
+        const reply = getBotReply(message);
+        addMessageToChat(reply, false);
+    }, 800 + Math.random() * 500);
+}
+
+function addEmoji(emoji) {
+    const input = document.getElementById('chatInput');
+    input.value += emoji;
+    input.focus();
+}
+
+function initChat() {
+    const toggleBtn = document.getElementById('chatToggle');
+    const closeBtn = document.getElementById('chatClose');
+    const chatWindow = document.getElementById('chatWindow');
+    const sendBtn = document.getElementById('chatSendBtn');
+    const input = document.getElementById('chatInput');
+    
+    if (!toggleBtn || !chatWindow) return;
+    
+    toggleBtn.addEventListener('click', () => {
+        if (chatWindow.style.display === 'none') {
+            chatWindow.style.display = 'flex';
+            // Скрываем бейдж
+            const badge = document.querySelector('.chat-badge');
+            if (badge) badge.style.display = 'none';
+        } else {
+            chatWindow.style.display = 'none';
+        }
+    });
+    
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            chatWindow.style.display = 'none';
+        });
+    }
+    
+    if (sendBtn) {
+        sendBtn.addEventListener('click', sendMessage);
+    }
+    
+    if (input) {
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        // Авто-высота textarea
+        input.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 80) + 'px';
+        });
+    }
+}
+
+// Запускаем чат
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initChat);
+} else {
+    initChat();
+}
+
+
