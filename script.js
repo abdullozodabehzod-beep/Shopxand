@@ -20,6 +20,7 @@ const itemsPerPage = 6;
 let totalPages = 1;
 let currentFilteredProducts = [];
 
+
 function getCurrentPageProducts() {
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
@@ -612,39 +613,6 @@ function showOrderConfirmation(order) {
     setTimeout(() => { if (confirmation) confirmation.remove(); }, 5000);
 }
 
-// ========= ГЛОБАЛЬНЫЕ ФУНКЦИИ =========
-window.addToCart = addToCart;
-window.addToWishlist = addToWishlist;
-window.openCart = openCart;
-window.closeCart = closeCart;
-window.removeFromCart = removeFromCart;
-window.updateQuantity = updateQuantity;
-window.clearCart = clearCart;
-window.sortProducts = sortProducts;
-window.goToPage = goToPage;
-window.openProductModal = openProductModal;
-window.closeProductModal = closeProductModal;
-window.changeMainImage = changeMainImage;
-window.changeQuantity = changeQuantity;
-window.addToCartFromDetail = addToCartFromDetail;
-window.buyNow = buyNow;
-window.removeFromWishlist = removeFromWishlist;
-window.hideWishlistPage = hideWishlistPage;
-window.showWishlistPage = showWishlistPage;
-window.clearWishlist = clearWishlist;
-window.addReview = addReview;
-window.likeReview = likeReview;
-window.openReviewForm = openReviewForm;
-window.closeReviewForm = closeReviewForm;
-window.updateRatingStars = updateRatingStars;
-window.initReviews = initReviews;
-window.submitReview = submitReview;
-window.renderReviews = renderReviews;
-window.generateStarRating = generateStarRating;
-window.submitOrder = submitOrder;
-window.openCheckoutModal = openCheckoutModal;
-window.closeCheckoutModal = closeCheckoutModal;
-
 // ========= ЗАПУСК =========
 document.addEventListener('DOMContentLoaded', () => {
     currentFilteredProducts = [...productsData];
@@ -659,6 +627,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initWishlistButtons();
     updatePagination();
     initReviews();
+    updateUserIcon();
+   if (currentUser) { renderProfilePage(); }
     
     const cartIcon = document.querySelector('.cart-icon');
     if (cartIcon) cartIcon.addEventListener('click', (e) => { e.preventDefault(); openCart(); });
@@ -695,3 +665,442 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+
+// ========= ЛИЧНЫЙ КАБИНЕТ (РЕГИСТРАЦИЯ/ВХОД) =========
+let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+let users = JSON.parse(localStorage.getItem('users')) || [];
+
+function saveUsers() { localStorage.setItem('users', JSON.stringify(users)); }
+function saveCurrentUser() { localStorage.setItem('currentUser', JSON.stringify(currentUser)); }
+
+function showAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) { modal.classList.add('active'); document.body.style.overflow = 'hidden'; }
+}
+function closeAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) { modal.classList.remove('active'); document.body.style.overflow = ''; }
+}
+function showRegisterForm() {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'block';
+    document.getElementById('authTitle').textContent = 'Регистрация';
+}
+function showLoginForm() {
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('authTitle').textContent = 'Вход в аккаунт';
+}
+
+function registerUser() {
+    const name = document.getElementById('registerName').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const phone = document.getElementById('registerPhone').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const confirmPassword = document.getElementById('registerConfirmPassword').value;
+    
+    if (!name || !email || !phone || !password) {
+        showToast('Заполните все поля', 'error'); return;
+    }
+    if (password !== confirmPassword) {
+        showToast('Пароли не совпадают', 'error'); return;
+    }
+    if (users.find(u => u.email === email)) {
+        showToast('Пользователь с таким email уже существует', 'error'); return;
+    }
+    
+    const newUser = { id: Date.now(), name, email, phone, password, orders: [] };
+    users.push(newUser);
+    saveUsers();
+    showToast('Регистрация успешна! Теперь войдите', 'success');
+    showLoginForm();
+}
+
+function loginUser() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    
+    const user = users.find(u => u.email === email && u.password === password);
+    if (!user) {
+        showToast('Неверный email или пароль', 'error'); return;
+    }
+    
+    currentUser = user;
+    saveCurrentUser();
+    showToast(`Добро пожаловать, ${user.name}!`, 'success');
+    closeAuthModal();
+    renderProfilePage();
+}
+
+function logoutUser() {
+      if (confirm('Вы уверены, что хотите выйти?')) {
+        currentUser = null;
+        localStorage.removeItem('currentUser');
+        showToast('Вы вышли из аккаунта', 'info');
+        hideProfilePage();
+        updateUserIcon(); // ← Обновляем иконку в хедере
+    }
+    
+}
+
+function renderProfilePage() {
+
+    function renderProfilePage() {
+    if (!currentUser) return;
+    
+    const profilePage = document.getElementById('profilePage');
+    const mainContent = document.querySelector('main');
+    const heroSection = document.querySelector('.hero');
+    const categoriesSection = document.querySelector('.categories');
+    const productsSection = document.querySelector('.products');
+    
+    if (profilePage) profilePage.style.display = 'block';
+    if (mainContent) mainContent.style.display = 'none';
+    if (heroSection) heroSection.style.display = 'none';
+    if (categoriesSection) categoriesSection.style.display = 'none';
+    if (productsSection) productsSection.style.display = 'none';
+    
+    document.getElementById('profileName').textContent = currentUser.name;
+    document.getElementById('profileEmail').textContent = currentUser.email;
+    document.getElementById('profilePhone').textContent = currentUser.phone;
+    
+    // Загружаем заказы пользователя
+    const allOrders = JSON.parse(localStorage.getItem('orders')) || [];
+    const userOrders = allOrders.filter(order => order.customer?.email === currentUser.email);
+    
+    const ordersContainer = document.getElementById('profileOrdersList');
+    if (userOrders.length === 0) {
+        ordersContainer.innerHTML = '<div style="text-align:center; padding:40px;">У вас пока нет заказов</div>';
+    } else {
+        ordersContainer.innerHTML = userOrders.map(order => `
+            <div class="order-card">
+                <div class="order-card__header">
+                    <span><strong>Заказ #${order.id}</strong></span>
+                    <span>${order.date}</span>
+                    <span class="order-card__status ${order.status === 'paid' ? 'paid' : 'pending'}">
+                        ${order.status === 'paid' ? '✅ Оплачен' : '⏳ Ожидает оплаты'}
+                    </span>
+                </div>
+                <div class="order-card__items">
+                    Товары: ${order.items.map(i => `${i.name} x${i.quantity}`).join(', ')}
+                </div>
+                <div class="order-card__total">Сумма: ${order.totals?.total || order.items.reduce((s,i)=>s+i.price*i.quantity,0)} ₽</div>
+            </div>
+        `).join('');
+    }
+    
+    // Добавляем кнопки управления в профиль
+    const profileInfo = document.querySelector('.profile__info');
+    if (profileInfo && !document.querySelector('.profile__actions')) {
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'profile__actions';
+        actionsDiv.innerHTML = `
+            <button class="profile__clear-orders-btn" onclick="clearUserOrders()">
+                <i class="fas fa-trash-alt"></i> Очистить историю заказов
+            </button>
+            <button class="profile__forgot-password-btn" onclick="forgotPassword()">
+                <i class="fas fa-key"></i> Забыли пароль?
+            </button>
+        `;
+        profileInfo.insertAdjacentElement('afterend', actionsDiv);
+    }
+}
+
+    if (!currentUser) return;
+    
+    const profilePage = document.getElementById('profilePage');
+    const mainContent = document.querySelector('main');
+    const heroSection = document.querySelector('.hero');
+    const categoriesSection = document.querySelector('.categories');
+    const productsSection = document.querySelector('.products');
+    
+    if (profilePage) profilePage.style.display = 'block';
+    if (mainContent) mainContent.style.display = 'none';
+    if (heroSection) heroSection.style.display = 'none';
+    if (categoriesSection) categoriesSection.style.display = 'none';
+    if (productsSection) productsSection.style.display = 'none';
+    
+    document.getElementById('profileName').textContent = currentUser.name;
+    document.getElementById('profileEmail').textContent = currentUser.email;
+    document.getElementById('profilePhone').textContent = currentUser.phone;
+    
+    // Загружаем заказы пользователя
+    const allOrders = JSON.parse(localStorage.getItem('orders')) || [];
+    const userOrders = allOrders.filter(order => order.customer?.email === currentUser.email);
+    
+    const ordersContainer = document.getElementById('profileOrdersList');
+    if (userOrders.length === 0) {
+        ordersContainer.innerHTML = '<div style="text-align:center; padding:40px;">У вас пока нет заказов</div>';
+        return;
+    }
+    
+    ordersContainer.innerHTML = userOrders.map(order => `
+        <div class="order-card">
+            <div class="order-card__header">
+                <span><strong>Заказ #${order.id}</strong></span>
+                <span>${order.date}</span>
+                <span class="order-card__status ${order.status === 'paid' ? 'paid' : 'pending'}">
+                    ${order.status === 'paid' ? '✅ Оплачен' : '⏳ Ожидает оплаты'}
+                </span>
+            </div>
+            <div class="order-card__items">
+                Товары: ${order.items.map(i => `${i.name} x${i.quantity}`).join(', ')}
+            </div>
+            <div class="order-card__total">Сумма: ${order.totals?.total || order.items.reduce((s,i)=>s+i.price*i.quantity,0)} ₽</div>
+        </div>
+    `).join('');
+}
+
+function hideProfilePage() {
+    const profilePage = document.getElementById('profilePage');
+    const mainContent = document.querySelector('main');
+    const heroSection = document.querySelector('.hero');
+    const categoriesSection = document.querySelector('.categories');
+    const productsSection = document.querySelector('.products');
+    
+    if (profilePage) profilePage.style.display = 'none';
+    if (mainContent) mainContent.style.display = 'block';
+    if (heroSection) heroSection.style.display = 'block';
+    if (categoriesSection) categoriesSection.style.display = 'block';
+    if (productsSection) productsSection.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Обновляем иконку в хедере для отображения статуса пользователя
+function updateUserIcon() {
+    const userIcon = document.querySelector('.header__action-icon:not(.cart-icon):not(.wishlist-icon)');
+    if (userIcon) {
+        if (currentUser) {
+            userIcon.innerHTML = '<i class="fas fa-user-check"></i>';
+            userIcon.removeAttribute('onclick');
+            userIcon.onclick = () => renderProfilePage();
+        } else {
+            userIcon.innerHTML = '<i class="far fa-user"></i>';
+            userIcon.onclick = () => showAuthModal();
+        }
+    }
+}
+
+// Обновляем submitOrder, чтобы привязывать заказ к пользователю
+const originalSubmitOrderAuth = submitOrder;
+window.submitOrder = async function(event) {
+    event.preventDefault();
+    if (cart.length === 0) { showToast('Корзина пуста', 'error'); return; }
+    
+    const order = {
+        id: Date.now(),
+        date: new Date().toLocaleString('ru-RU'),
+        customer: {
+            name: document.getElementById('userName').value,
+            phone: document.getElementById('userPhone').value,
+            email: document.getElementById('userEmail').value,
+            address: document.getElementById('userAddress').value,
+            comment: document.getElementById('userComment').value
+        },
+        delivery: { method: document.getElementById('deliveryMethod').value },
+        payment: document.getElementById('paymentMethod').value,
+        items: [...cart],
+        totals: {
+            subtotal: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+            delivery: 0,
+            total: 0
+        },
+        status: 'pending'
+    };
+    
+    switch(order.delivery.method) {
+        case 'courier': order.totals.delivery = 300; break;
+        case 'post': order.totals.delivery = 500; break;
+        default: order.totals.delivery = 0;
+    }
+    order.totals.total = order.totals.subtotal + order.totals.delivery;
+    
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    orders.push(order);
+    localStorage.setItem('orders', JSON.stringify(orders));
+    
+    // Если пользователь авторизован, добавляем заказ в его историю
+    if (currentUser) {
+        const usersList = JSON.parse(localStorage.getItem('users')) || [];
+        const userIndex = usersList.findIndex(u => u.id === currentUser.id);
+        if (userIndex !== -1) {
+            if (!usersList[userIndex].orders) usersList[userIndex].orders = [];
+            usersList[userIndex].orders.push(order);
+            currentUser = usersList[userIndex];
+            localStorage.setItem('users', JSON.stringify(usersList));
+            saveCurrentUser();
+        }
+    }
+    
+    await sendOrderToTelegram(order);
+    showOrderConfirmation(order);
+    cart = [];
+    saveCart();
+    updateCartBadge();
+    renderCartItems();
+    closeCheckoutModal();
+
+    // ========= ВОССТАНОВЛЕНИЕ ПАРОЛЯ =========
+function forgotPassword() {
+    const email = prompt('Введите ваш Email для восстановления пароля:');
+    if (!email) return;
+    
+    const user = users.find(u => u.email === email);
+    if (!user) {
+        showToast('Пользователь с таким Email не найден', 'error');
+        return;
+    }
+    
+    // В реальном проекте здесь отправка письма на почту
+    // Сейчас просто показываем пароль (для теста)
+    showToast(`Ваш пароль: ${user.password} (запишите его)`, 'info');
+}
+
+// Очистить историю заказов пользователя
+function clearUserOrders() {
+    if (!currentUser) {
+        showToast('Вы не авторизованы', 'error');
+        return;
+    }
+    
+    if (!confirm('Вы уверены, что хотите очистить всю историю заказов? Это действие нельзя отменить!')) {
+        return;
+    }
+    
+    // Очищаем заказы текущего пользователя
+    const allOrders = JSON.parse(localStorage.getItem('orders')) || [];
+    const otherUsersOrders = allOrders.filter(order => order.customer?.email !== currentUser.email);
+    localStorage.setItem('orders', JSON.stringify(otherUsersOrders));
+    
+    // Очищаем в массиве пользователей
+    const userIndex = users.findIndex(u => u.id === currentUser.id);
+    if (userIndex !== -1) {
+        users[userIndex].orders = [];
+        currentUser.orders = [];
+        localStorage.setItem('users', JSON.stringify(users));
+        saveCurrentUser();
+    }
+    
+    showToast('История заказов очищена', 'success');
+    renderProfilePage(); // Обновляем страницу
+}
+
+// Очистить ВСЕХ пользователей (только для админа)
+function clearAllUsers() {
+    if (!confirm('⚠️ ВНИМАНИЕ! Это удалит ВСЕХ пользователей и ВСЕ заказы. Продолжить?')) {
+        return;
+    }
+    
+    localStorage.removeItem('users');
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('orders');
+    
+    users = [];
+    currentUser = null;
+    
+    showToast('Все пользователи и заказы удалены', 'info');
+    location.reload(); // Перезагружаем страницу
+}
+};
+
+// ========= СЕКРЕТНАЯ АДМИН-ПАНЕЛЬ =========
+function initAdminPanel() {
+    const logo = document.querySelector('.header__logo');
+    if (!logo) return;
+    
+    let clickCount = 0;
+    let timer;
+    
+    logo.addEventListener('dblclick', () => {
+        const adminExists = document.querySelector('.admin-panel');
+        if (adminExists) {
+            adminExists.remove();
+            return;
+        }
+        
+        const panel = document.createElement('div');
+        panel.className = 'admin-panel';
+        panel.innerHTML = `
+            <button onclick="clearAllUsers()" style="background:#ef4444;">
+                <i class="fas fa-database"></i> Удалить всех пользователей
+            </button>
+            <button onclick="alert('Всего пользователей: ' + (JSON.parse(localStorage.getItem('users')) || []).length)" style="background:#3b82f6; margin-left:10px;">
+                <i class="fas fa-users"></i> Статистика
+            </button>
+        `;
+        document.body.appendChild(panel);
+        
+        setTimeout(() => {
+            if (panel) panel.remove();
+        }, 5000);
+    });
+}
+
+// Вызови эту функцию в инициализации
+// initAdminPanel(); - добавить в DOMContentLoaded или в конец файла
+
+
+
+
+// ========= ГЛОБАЛЬНЫЕ ФУНКЦИИ =========
+window.addToCart = addToCart;
+window.addToWishlist = addToWishlist;
+window.openCart = openCart;
+window.closeCart = closeCart;
+window.removeFromCart = removeFromCart;
+window.updateQuantity = updateQuantity;
+window.clearCart = clearCart;
+window.sortProducts = sortProducts;
+window.goToPage = goToPage;
+window.openProductModal = openProductModal;
+window.closeProductModal = closeProductModal;
+window.changeMainImage = changeMainImage;
+window.changeQuantity = changeQuantity;
+window.addToCartFromDetail = addToCartFromDetail;
+window.buyNow = buyNow;
+window.removeFromWishlist = removeFromWishlist;
+window.hideWishlistPage = hideWishlistPage;
+window.showWishlistPage = showWishlistPage;
+window.clearWishlist = clearWishlist;
+window.addReview = addReview;
+window.likeReview = likeReview;
+window.openReviewForm = openReviewForm;
+window.closeReviewForm = closeReviewForm;
+window.updateRatingStars = updateRatingStars;
+window.initReviews = initReviews;
+window.submitReview = submitReview;
+window.renderReviews = renderReviews;
+window.generateStarRating = generateStarRating;
+window.submitOrder = submitOrder;
+window.openCheckoutModal = openCheckoutModal;
+window.closeCheckoutModal = closeCheckoutModal;
+window.showAuthModal = showAuthModal;
+window.closeAuthModal = closeAuthModal;
+window.showRegisterForm = showRegisterForm;
+window.showLoginForm = showLoginForm;
+window.registerUser = registerUser;
+window.loginUser = loginUser;
+window.logoutUser = logoutUser;
+window.renderProfilePage = renderProfilePage;
+window.hideProfilePage = hideProfilePage;
+window.clearAllData = clearAllData;
+
+// ========= ОЧИСТКА ВСЕХ ДАННЫХ (для тестирования) =========
+function clearAllData() {
+    if (confirm('⚠️ Удалить ВСЕХ пользователей и ВСЕ заказы?')) {
+        localStorage.removeItem('users');
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('orders');
+        localStorage.removeItem('cart');
+        localStorage.removeItem('wishlist');
+        localStorage.removeItem('reviews');
+        showToast('Все данные удалены. Обновите страницу!', 'info');
+        setTimeout(() => location.reload(), 1500);
+    }
+}
+
+if (currentUser) {
+    renderProfilePage();
+}
+updateUserIcon();

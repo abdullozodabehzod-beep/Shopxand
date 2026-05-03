@@ -1,5 +1,8 @@
-# robots.txt
+# robots.txt для ShopXand
 User-agent: *
 Allow: /
+Disallow: /cart
+Disallow: /checkout
 
-Sitemap: https://abdullozodabehzod-beep.github.io/Shopxand/.xml
+Sitemap: https://abdullozodabehzod-beep.github.io/Shopxand/sitemap.xml
+Host: https://abdullozodabehzod-beep.github.io/Shopxand/
