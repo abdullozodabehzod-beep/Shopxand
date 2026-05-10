@@ -2346,7 +2346,7 @@ document.addEventListener('DOMContentLoaded', function() {
             price: 4999,
             oldPrice: 5500,
             discount: '-9%',
-            img: 'img/Часа.jpeg',
+            img: 'img/watch.jpeg',
             rating: 4.9,
             reviews: 678,
             desc: 'Мощный планшет с чипом M1.',
@@ -2356,7 +2356,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 ['Память', '256GB'],
                 ['Камера', '12 МП']
             ],
-            thumbs: ['img/Часа.jpeg', 'img/Часа.jpeg', 'img/Часа.jpeg']
+            thumbs: ['img/watch.jpeg', 'img/watch.jpeg', 'img/watch.jpeg']
         },
         '6': {
             id: '6',
