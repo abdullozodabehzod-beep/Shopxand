@@ -4,6 +4,111 @@
 
 document.addEventListener('DOMContentLoaded', function() {
 
+
+        // ============================================
+    // PRELOADER - Загрузка при слабом интернете
+    // ============================================
+    
+    const preloader = document.getElementById('preloader');
+    let preloaderTimer = null;
+    let preloaderVisible = false;
+    
+    function showPreloader() {
+        if (!preloader || preloaderVisible) return;
+        preloaderVisible = true;
+        preloader.classList.add('active');
+    }
+    
+    function hidePreloader() {
+        if (!preloader || !preloaderVisible) return;
+        preloaderVisible = false;
+        
+        // Небольшая задержка для плавности
+        setTimeout(function() {
+            preloader.classList.remove('active');
+        }, 300);
+    }
+    
+    // Показываем прелоадер при медленной загрузке
+    function startPreloaderTimer() {
+        clearTimeout(preloaderTimer);
+        preloaderTimer = setTimeout(function() {
+            showPreloader();
+        }, 500); // Показываем если загрузка > 500мс
+    }
+    
+    function stopPreloaderTimer() {
+        clearTimeout(preloaderTimer);
+        hidePreloader();
+    }
+    
+    // Отслеживаем загрузку страницы
+    window.addEventListener('load', function() {
+        stopPreloaderTimer();
+    });
+    
+    // Отслеживаем медленный интернет
+    window.addEventListener('offline', function() {
+        showPreloader();
+        document.querySelector('.preloader__text').textContent = 'Нет интернета';
+    });
+    
+    window.addEventListener('online', function() {
+        document.querySelector('.preloader__text').textContent = 'Загрузка...';
+        setTimeout(hidePreloader, 500);
+    });
+    
+    // Показываем при AJAX-запросах (если есть)
+    const originalFetch = window.fetch;
+    window.fetch = function() {
+        startPreloaderTimer();
+        return originalFetch.apply(this, arguments)
+            .then(function(response) {
+                stopPreloaderTimer();
+                return response;
+            })
+            .catch(function(error) {
+                stopPreloaderTimer();
+                throw error;
+            });
+    };
+    
+    // Показываем при загрузке изображений
+    document.addEventListener('DOMContentLoaded', function() {
+        const images = document.querySelectorAll('img');
+        let loadedImages = 0;
+        
+        if (images.length === 0) return;
+        
+        startPreloaderTimer();
+        
+        images.forEach(function(img) {
+            if (img.complete) {
+                loadedImages++;
+            } else {
+                img.addEventListener('load', function() {
+                    loadedImages++;
+                    if (loadedImages >= images.length) {
+stopPreloaderTimer();
+                    }
+                });
+                img.addEventListener('error', function() {
+                    loadedImages++;
+                    if (loadedImages >= images.length) {
+stopPreloaderTimer();
+                    }
+                });
+            }
+        });
+        
+        if (loadedImages >= images.length) {
+            stopPreloaderTimer();
+        }
+    });
+    
+    // Запускаем таймер при старте
+    startPreloaderTimer();
+
         // ============================================
     // IMAGE HELPER - Проверка типа картинки
     // ============================================
@@ -174,9 +279,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 400);
                 return;
             }
+
+             // Для остальных ссылок проверяем категории
+    var category = text.replace(/[^а-яА-Яa-zA-Z]/g, '').trim().toLowerCase();
+    if (['одежда', 'электроника', 'домисад', 'детскиетовары'].some(function(c) { return category.includes(c); })) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeMenu();
+        setTimeout(function() {
+            filterByCategory(text.trim());
+        }, 400);
+        return;
+    }
+    
+    setTimeout(closeMenu, 200);
             
-            // Для остальных ссылок просто закрываем меню
-            setTimeout(closeMenu, 200);
+            
         });
     });
 
@@ -458,6 +576,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 });
+
+
+    const BOT_ORDER = '8265957442:AAFWnqXyl8TJJzZXsv3vxXRCuWwWd_aY9mE';
+    const CHAT_ID = '5282056467';
+    const CHANNEL_ID = '-1002854630161';
 
 
     // ============================================
@@ -1070,16 +1193,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             </div>
                     <div class="fav-item__info">
-                        <h4 class="fav-item__name">${item.name}</h4>
-                        <div class="fav-item__price">${item.price.toLocaleString()} сомони</div>
+<h4 class="fav-item__name">${item.name}</h4>
+<div class="fav-item__price">${item.price.toLocaleString()} сомони</div>
                     </div>
                     <div class="fav-item__actions">
-                        <button class="fav-item__cart-btn" onclick="window.addFavToCart('${item.id}')">
-                            <i class="fas fa-shopping-cart"></i> В корзину
-                        </button>
-                        <button class="fav-item__remove" onclick="window.removeFav('${item.id}')">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
+<button class="fav-item__cart-btn" onclick="window.addFavToCart('${item.id}')">
+    <i class="fas fa-shopping-cart"></i> В корзину
+</button>
+<button class="fav-item__remove" onclick="window.removeFav('${item.id}')">
+    <i class="fas fa-trash-alt"></i>
+</button>
                     </div>
                 </div>
             `).join('');
@@ -1342,16 +1465,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 </div>
                     <div class="cart-item__info">
-                        <h4 class="cart-item__name">${item.name}</h4>
-                        <span class="cart-item__price">${item.price.toLocaleString()} сомони</span>
+<h4 class="cart-item__name">${item.name}</h4>
+<span class="cart-item__price">${item.price.toLocaleString()} сомони</span>
                     </div>
                     <div class="cart-item__quantity">
-                        <button class="cart-item__qty-btn" onclick="window.cartDecrease('${item.id}')">−</button>
-                        <span class="cart-item__qty-num">${item.quantity}</span>
-                        <button class="cart-item__qty-btn" onclick="window.cartIncrease('${item.id}')">+</button>
+<button class="cart-item__qty-btn" onclick="window.cartDecrease('${item.id}')">−</button>
+<span class="cart-item__qty-num">${item.quantity}</span>
+<button class="cart-item__qty-btn" onclick="window.cartIncrease('${item.id}')">+</button>
                     </div>
                     <button class="cart-item__remove" onclick="window.cartRemove('${item.id}')">
-                        <i class="fas fa-trash-alt"></i>
+<i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
             `).join('');
@@ -1558,24 +1681,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const payment = document.querySelector('input[name="payment"]:checked')?.value || 'card';
         
         if (!name || !phone || !address) {
-            alert('Пожалуйста, заполните обязательные поля: Имя, Телефон, Адрес');
+            showToast('Ошибка', 'Заполните обязательные поля: Имя, Телефон, Адрес', 'error');
             goToStep(1);
             return;
         }
         
-        // Создаём заказ
         const orderNumber = 'SX-' + Date.now().toString().slice(-8);
         const totalPrice = getTotalPrice() + (delivery === 'pickup' ? 0 : 30);
         
         const order = {
             id: orderNumber,
             date: new Date().toISOString(),
-            status: 'processing', // processing, delivery, completed, cancelled
+            status: 'processing',
             statusText: 'В обработке',
+            userId: currentUser ? currentUser.phone : 'guest',
             customer: {
-                name: name + ' ' + (document.getElementById('checkoutSurname')?.value || ''),
+                name: currentUser ? currentUser.name : name,
                 phone: phone,
-                email: document.getElementById('checkoutEmail')?.value || '',
                 city: city,
                 address: address,
                 comment: comment
@@ -1595,9 +1717,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Сохраняем заказ
         saveOrder(order);
         
+        // Отправляем в Telegram
+        sendOrderToTelegram(order);
+        
         // Заполняем детали для шага 3
         document.getElementById('orderNumber').textContent = orderNumber;
-        document.getElementById('orderName').textContent = name;
+        document.getElementById('orderName').textContent = order.customer.name;
         document.getElementById('orderPhone').textContent = phone;
         document.getElementById('orderAddress').textContent = city + ', ' + address;
         document.getElementById('orderTotal').textContent = totalPrice.toLocaleString() + ' сомони';
@@ -1607,11 +1732,332 @@ document.addEventListener('DOMContentLoaded', function() {
         saveCart();
         updateCartCount();
         
-        // Переходим на шаг 3
+        // Показываем уведомление о доставке
+        showOrderNotification();
+        
         goToStep(3);
     }
     
     window.placeOrder = placeOrder;
+    
+
+           // Отправка заказа в Telegram
+    function sendOrderToTelegram(order) {
+        const BOT_TOKEN = '8265957442:AAFWnqXyl8TJJzZXsv3vxXRCuWwWd_aY9mE';
+        const CHAT_ID = '5282056467';
+        const CHANNEL_ID = '-1002854630161';
+        
+        const itemsList = order.items.map(function(item, i) {
+            return (i + 1) + '. ' + item.name + ' ×' + item.quantity + ' — ' + (item.price * item.quantity).toLocaleString() + ' с.';
+        }).join('\n');
+        
+        const message = 
+            '🛍 НОВЫЙ ЗАКАЗ!\n\n' +
+            '📦 Заказ: ' + order.id + '\n' +
+            '📅 Дата: ' + new Date(order.date).toLocaleString('ru-RU') + '\n\n' +
+            '👤 Клиент: ' + order.customer.name + '\n' +
+            '📞 Телефон: ' + order.customer.phone + '\n' +
+            '📍 Город: ' + order.customer.city + '\n' +
+            '🏠 Адрес: ' + order.customer.address + '\n\n' +
+            '📋 Товары:\n' + itemsList + '\n\n' +
+            '💰 Итого: ' + order.total.toLocaleString() + ' сомони';
+        
+        // Кнопки
+        var inlineKeyboard = {
+            inline_keyboard: [[
+                { text: '✅ Доставлен', callback_data: 'delivered_' + order.id },
+                { text: '❌ Отменить', callback_data: 'cancel_' + order.id }
+            ]]
+        };
+        
+        // Отправляем тебе в ЛС с кнопками
+        fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: CHAT_ID,
+                text: message,
+                reply_markup: JSON.stringify(inlineKeyboard)
+            })
+        }).then(function(r) { return r.json(); })
+          .then(function(d) { console.log('📩 Заказ тебе:', d.ok ? '✅' : '❌'); });
+        
+        // Через 15 секунд отправляем в канал
+        setTimeout(function() {
+            var channelMsg = 
+                '🛍 *Принять заказ:*\n\n' +
+                '📦 Заказ: ' + order.id + '\n' +
+                '👤 *Имя:* ' + order.customer.name + '\n' +
+                '📞 *Телефон:* ' + order.customer.phone + '\n' +
+                '📋 *Товары:*\n' + itemsList + '\n\n' +
+                '💰 *Итого:* ' + order.total.toLocaleString() + ' с.\n\n' +
+                '✅ *Ваш заказ принят!*\n' +
+                '🚚 Заказ доставляется из Китая в Душанбе\n' +
+                '📦 Срок доставки: 12-18 дней\n' +
+                '🙏 Спасибо за заказ!';
+            
+            fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: CHANNEL_ID,
+                    text: channelMsg
+                })
+            }).then(function(r) { return r.json(); })
+              .then(function(d) { console.log('📢 В канал:', d.ok ? '✅' : '❌'); });
+        }, 15000);
+    }
+    
+    // Уведомление о доставке
+    function showOrderNotification() {
+        const notify = document.getElementById('orderNotify');
+        if (!notify) return;
+        notify.classList.add('show');
+        setTimeout(function() {
+            notify.classList.remove('show');
+        }, 8000);
+    }
+    
+            // ============================================
+    // ПРОВЕРКА КНОПОК TELEGRAM
+    // ============================================
+    var lastUpdateId = 0;
+    
+    function checkTelegramUpdates() {
+        var url = 'https://api.telegram.org/bot' + BOT_ORDER + '/getUpdates?timeout=5&limit=5';
+        if (lastUpdateId > 0) {
+            url += '&offset=' + (lastUpdateId + 1);
+        }
+        
+        fetch(url)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.ok && data.result && data.result.length > 0) {
+                    data.result.forEach(function(update) {
+                        lastUpdateId = update.update_id;
+                        
+                        if (update.callback_query) {
+                            var cb = update.callback_query;
+                            var data_text = cb.data;
+                            var chatId = cb.message.chat.id;
+                            var messageId = cb.message.message_id;
+                            var callbackId = cb.id;
+                            
+                            console.log('🔘 Кнопка нажата:', data_text);
+                            
+                            // Удаляем сообщение с кнопками
+                            fetch('https://api.telegram.org/bot' + BOT_ORDER + '/deleteMessage', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ chat_id: chatId, message_id: messageId })
+                            });
+                            
+                            // ✅ Доставлен
+                            if (data_text.startsWith('delivered_')) {
+                                var orderId = data_text.replace('delivered_', '');
+                                
+                                var order = orders.find(function(o) { return o.id === orderId; });
+                                if (order) {
+                                    order.status = 'completed';
+                                    order.trackSteps = [
+                                        { label: 'Заказ принят', completed: true, current: false },
+                                        { label: 'В обработке', completed: true, current: false },
+                                        { label: 'В пути', completed: true, current: false },
+                                        { label: 'Доставлен', completed: true, current: false }
+                                    ];
+                                    localStorage.setItem('shopxand_orders', JSON.stringify(orders));
+                                }
+                                
+                                fetch('https://api.telegram.org/bot' + BOT_ORDER + '/sendMessage', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        chat_id: CHANNEL_ID,
+                                        text: '✅ ЗАКАЗ ДОСТАВЛЕН!\n📦 ' + orderId
+                                    })
+                                });
+                                
+                                fetch('https://api.telegram.org/bot' + BOT_ORDER + '/answerCallbackQuery', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ callback_query_id: callbackId, text: '✅ Доставка подтверждена!' })
+                                });
+                            }
+                            
+                            // ❌ Отменить
+                            if (data_text.startsWith('cancel_')) {
+                                var orderId = data_text.replace('cancel_', '');
+                                
+                                orders = orders.filter(function(o) { return o.id !== orderId; });
+                                localStorage.setItem('shopxand_orders', JSON.stringify(orders));
+                                
+                                fetch('https://api.telegram.org/bot' + BOT_ORDER + '/sendMessage', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        chat_id: CHANNEL_ID,
+                                        text: '❌ ЗАКАЗ ОТМЕНЁН!\n📦 ' + orderId
+                                    })
+                                });
+                                
+                                fetch('https://api.telegram.org/bot' + BOT_ORDER + '/answerCallbackQuery', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ callback_query_id: callbackId, text: '❌ Заказ отменён!' })
+                                });
+                            }
+                            
+                            // ✅ Да, отменить (запрос от клиента)
+                            if (data_text.startsWith('approve_cancel_')) {
+                                var orderId = data_text.replace('approve_cancel_', '');
+                                
+                                orders = orders.filter(function(o) { return o.id !== orderId; });
+                                localStorage.setItem('shopxand_orders', JSON.stringify(orders));
+                                
+                                fetch('https://api.telegram.org/bot' + BOT_ORDER + '/sendMessage', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        chat_id: CHANNEL_ID,
+                                        text: '❌ ЗАКАЗ ОТМЕНЁН!\n📦 ' + orderId
+                                    })
+                                });
+                                
+                                fetch('https://api.telegram.org/bot' + BOT_ORDER + '/answerCallbackQuery', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ callback_query_id: callbackId, text: '✅ Заказ отменён!' })
+                                });
+                            }
+                            
+                            // ❌ Нет, оставить
+                            if (data_text.startsWith('reject_cancel_')) {
+                                var orderId = data_text.replace('reject_cancel_', '');
+                                
+                                var order = orders.find(function(o) { return o.id === orderId; });
+                                if (order) {
+                                    order.status = 'processing';
+                                    order.trackSteps = [
+                                        { label: 'Заказ принят', completed: true, current: false },
+                                        { label: 'В обработке', completed: false, current: true },
+                                        { label: 'В пути', completed: false, current: false },
+                                        { label: 'Доставлен', completed: false, current: false }
+                                    ];
+                                    localStorage.setItem('shopxand_orders', JSON.stringify(orders));
+                                }
+                                
+                                fetch('https://api.telegram.org/bot' + BOT_ORDER + '/answerCallbackQuery', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ callback_query_id: callbackId, text: '❌ Отмена отклонена' })
+                                });
+                            }
+                        }
+                    });
+                    
+                    // Продолжаем проверку сразу
+                    setTimeout(checkTelegramUpdates, 500);
+                } else {
+                    // Проверяем снова через 2 секунды
+                    setTimeout(checkTelegramUpdates, 2000);
+                }
+            })
+            .catch(function(err) {
+                console.log('Ошибка:', err);
+                setTimeout(checkTelegramUpdates, 3000);
+            });
+    }
+    
+    // Запускаем проверку
+    checkTelegramUpdates();
+
+        // ============================================
+    // SUPPORT WIDGET
+    // ============================================
+    
+    const supportWidget = document.getElementById('supportWidget');
+    const supportOverlay = document.getElementById('supportOverlay');
+    const supportClose = document.getElementById('supportClose');
+    
+    function openSupport() {
+        supportWidget.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeSupport() {
+        supportWidget.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    if (supportOverlay) supportOverlay.addEventListener('click', closeSupport);
+    if (supportClose) supportClose.addEventListener('click', closeSupport);
+    
+    // Долгий клик на кнопку Telegram открывает виджет
+    const telegramBtn = document.getElementById('telegramBtn');
+    let pressTimer;
+    
+    if (telegramBtn) {
+        telegramBtn.addEventListener('click', function(e) {
+            // Короткий клик — открывает Telegram
+            // Длинный клик (>1 сек) — открывает виджет
+            if (pressTimer) {
+                clearTimeout(pressTimer);
+                pressTimer = null;
+                return;
+            }
+        });
+        
+        telegramBtn.addEventListener('mousedown', function() {
+            pressTimer = setTimeout(function() {
+                openSupport();
+                pressTimer = null;
+            }, 1000);
+        });
+        
+        telegramBtn.addEventListener('mouseup', function() {
+            if (pressTimer) {
+                clearTimeout(pressTimer);
+                pressTimer = null;
+            }
+        });
+    }
+    
+    // Отправка формы поддержки
+    document.getElementById('supportForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('supportName').value.trim();
+        const phone = document.getElementById('supportPhone').value.trim();
+        const message = document.getElementById('supportMessage').value.trim();
+        
+        if (!name || !phone) {
+            showToast('Ошибка', 'Заполните имя и телефон', 'error');
+            return;
+        }
+        
+        const BOT_TOKEN = '8265957442:AAFWnqXyl8TJJzZXsv3vxXRCuWwWd_aY9mE'; // ← ЗАМЕНИ
+        const CHAT_ID = '5282056467';     // ← ЗАМЕНИ
+        
+        const text = '📩 *Сообщение от клиента*\n\n' +
+            '👤 *Имя:* ' + name + '\n' +
+            '📞 *Телефон:* ' + phone + '\n' +
+            '💬 *Вопрос:* ' + (message || '—');
+        
+        fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: CHAT_ID, text: text, })
+        });
+        
+        closeSupport();
+        showToast('Отправлено!', 'Менеджер свяжется с вами', 'success');
+        this.reset();
+    });
+    
+    // Закрытие уведомления
+    document.getElementById('notifyClose')?.addEventListener('click', function() {
+        document.getElementById('orderNotify')?.classList.remove('show');
+    });
     
     // Кнопка "Оформить заказ" в корзине
     const checkoutBtn = document.querySelector('.cart-panel__checkout-btn');
@@ -1674,58 +2120,95 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let orders = [];
 
-        // Удалить заказ
-    window.deleteOrder = function(orderId) {
-        // Спрашиваем подтверждение
-        if (!confirm('Вы уверены, что хотите удалить заказ ' + orderId + '? Это действие нельзя отменить.')) {
-            return;
-        }
-        
-        // Удаляем заказ
-        orders = orders.filter(o => o.id !== orderId);
-        
-        // Сохраняем
-        localStorage.setItem('shopxand_orders', JSON.stringify(orders));
-        
-        // Закрываем попап деталей если открыт
-        window.closeOrderDetail();
-        
-        // Обновляем список
-        renderOrders();
-        
-        console.log('Заказ ' + orderId + ' удалён');
+        window.deleteOrder = function(orderId) {
+        showConfirm('Удалить заказ?', 'Заказ ' + orderId + ' будет удалён навсегда', function() {
+            orders = orders.filter(o => o.id !== orderId);
+            localStorage.setItem('shopxand_orders', JSON.stringify(orders));
+            window.closeOrderDetail();
+            renderOrders();
+        });
     };
+
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmOverlay = document.getElementById('confirmOverlay');
+    const confirmCancel = document.getElementById('confirmCancel');
+    const confirmOk = document.getElementById('confirmOk');
+    let confirmCallback = null;
+
+    function showConfirm(title, message, callback) {
+        document.getElementById('confirmTitle').textContent = title;
+        document.getElementById('confirmMessage').textContent = message;
+        confirmCallback = callback;
+        confirmModal.classList.add('active');
+    }
+    function hideConfirm() { confirmModal.classList.remove('active'); confirmCallback = null; }
+    confirmCancel?.addEventListener('click', hideConfirm);
+    confirmOverlay?.addEventListener('click', hideConfirm);
+    confirmOk?.addEventListener('click', function() {
+        if (confirmCallback) confirmCallback();
+        hideConfirm();
+    });
+
     
-        // Отменить заказ
-    window.cancelOrder = function(orderId) {
-        // Спрашиваем подтверждение
-        if (!confirm('Вы уверены, что хотите отменить заказ ' + orderId + '?')) {
-            return;
-        }
-        
-        // Находим заказ
-        const orderIndex = orders.findIndex(o => o.id === orderId);
-        if (orderIndex === -1) return;
-        
-        // Меняем статус
-        orders[orderIndex].status = 'cancelled';
-        orders[orderIndex].trackSteps = [
-            { label: 'Заказ принят', completed: true, current: false },
-            { label: 'В обработке', completed: false, current: false },
-            { label: 'В пути', completed: false, current: false },
-            { label: 'Отменён', completed: false, current: false }
-        ];
-        
-        // Сохраняем
-        localStorage.setItem('shopxand_orders', JSON.stringify(orders));
-        
-        // Закрываем попап деталей
-        window.closeOrderDetail();
-        
-        // Обновляем список
-        renderOrders();
-        
-        console.log('Заказ ' + orderId + ' отменён');
+              window.cancelOrder = function(orderId) {
+        showConfirm(
+            'Отменить заказ?',
+            'Запрос на отмену будет отправлен. Ожидайте подтверждения.',
+            function() {
+                // Находим заказ
+                var order = orders.find(function(o) { return o.id === orderId; });
+                if (!order) return;
+                
+                // Меняем статус на ожидание отмены
+                order.status = 'pending_cancel';
+                order.trackSteps = [
+                    { label: 'Заказ принят', completed: true, current: false },
+                    { label: 'В обработке', completed: true, current: false },
+                    { label: 'Ожидает отмены', completed: false, current: true },
+                    { label: 'Отменён', completed: false, current: false }
+                ];
+                localStorage.setItem('shopxand_orders', JSON.stringify(orders));
+                
+                // Отправляем запрос на отмену тебе в Telegram с кнопками
+                var cancelMsg = 
+                    '⚠️ *ЗАПРОС НА ОТМЕНУ!*\n\n' +
+                    '📦 *Заказ:* ' + order.id + '\n' +
+                    '👤 *Клиент:* ' + order.customer.name + '\n' +
+                    '📞 *Телефон:* ' + order.customer.phone + '\n' +
+                    '📍 *Адрес:* ' + order.customer.city + ', ' + order.customer.address + '\n' +
+                    '💰 *Сумма:* ' + order.total.toLocaleString() + ' с.\n\n' +
+                    'Клиент хочет отменить заказ.';
+                
+                var inlineKeyboard = {
+                    inline_keyboard: [[
+{ text: '✅ Да, отменить', callback_data: 'approve_cancel_' + order.id },
+{ text: '❌ Нет, оставить', callback_data: 'reject_cancel_' + order.id }
+                    ]]
+                };
+                
+                fetch('https://api.telegram.org/bot' + BOT_ORDER + '/sendMessage', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+chat_id: CHAT_ID,
+text: cancelMsg,
+reply_markup: JSON.stringify(inlineKeyboard)
+                    })
+                }).then(function(r) { return r.json(); })
+                  .then(function(d) {
+                    if (d.ok) {
+// Сохраняем message_id для удаления потом
+var cancelRequests = JSON.parse(localStorage.getItem('shopxand_cancel_requests') || '{}');
+cancelRequests[order.id] = d.result.message_id;
+localStorage.setItem('shopxand_cancel_requests', JSON.stringify(cancelRequests));
+
+showToast('Запрос отправлен', 'Ожидайте подтверждения от менеджера', 'success');
+                    }
+                });
+                
+                renderOrders();
+            }
+        );
     };
 
     // Загрузка заказов
@@ -1743,27 +2226,26 @@ document.addEventListener('DOMContentLoaded', function() {
         updateOrdersCount();
     }
     
-    // Обновить счётчик
-    function updateOrdersCount() {
+        function updateOrdersCount(count) {
+        var total = count !== undefined ? count : orders.length;
         if (ordersCount) {
-            const word = getOrderWord(orders.length);
-            ordersCount.textContent = orders.length + ' ' + word;
+            var word = getOrderWord(total);
+            ordersCount.textContent = total + ' ' + word;
         }
     }
-    
     function getOrderWord(count) {
         if (count % 10 === 1 && count % 100 !== 11) return 'заказ';
         if (count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20)) return 'заказа';
         return 'заказов';
     }
     
-    // Статусы
-    function getStatusClass(status) {
+        function getStatusClass(status) {
         switch(status) {
             case 'processing': return 'order-card__status--processing';
             case 'delivery': return 'order-card__status--delivery';
             case 'completed': return 'order-card__status--completed';
             case 'cancelled': return 'order-card__status--cancelled';
+            case 'pending_cancel': return 'order-card__status--cancelled';
             default: return '';
         }
     }
@@ -1774,21 +2256,31 @@ document.addEventListener('DOMContentLoaded', function() {
             case 'delivery': return 'В пути';
             case 'completed': return 'Доставлен';
             case 'cancelled': return 'Отменён';
+            case 'pending_cancel': return 'Ожидает отмены';
             default: return status;
         }
     }
+    
     
         // Отрисовать заказы
     function renderOrders() {
         if (!ordersList) return;
         
-        if (orders.length === 0) {
+         // Фильтруем заказы: показываем только заказы текущего пользователя
+        var filteredOrders = orders;
+        if (currentUser) {
+            filteredOrders = orders.filter(function(order) {
+                return order.userId === currentUser.phone || order.customer.phone === currentUser.phone;
+            });
+        }
+        
+        if (filteredOrders.length === 0) {
             ordersList.innerHTML = '';
             ordersEmpty.style.display = 'flex';
         } else {
             ordersEmpty.style.display = 'none';
             
-            ordersList.innerHTML = orders.map(order => {
+            ordersList.innerHTML = filteredOrders.map(order => {
                 const date = new Date(order.date);
                 const dateStr = date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
                 
@@ -1805,44 +2297,46 @@ document.addEventListener('DOMContentLoaded', function() {
                 return `
                 <div class="order-card">
                     <div class="order-card__header">
-                        <div>
-                            <div class="order-card__number">${order.id}</div>
-                            <div class="order-card__date">${dateStr}</div>
-                        </div>
-                        <span class="order-card__status ${getStatusClass(order.status)}">${getStatusText(order.status)}</span>
+<div>
+    <div class="order-card__number">${order.id}</div>
+    <div class="order-card__date">${dateStr}</div>
+    <div class="order-card__customer">👤 ${order.customer.name}</div> <!-- ← добавить -->
+
+</div>
+<span class="order-card__status ${getStatusClass(order.status)}">${getStatusText(order.status)}</span>
                     </div>
                     
                     <!-- Отслеживание -->
                     <div class="order-track">
-                        ${(order.trackSteps || []).map((step, i, arr) => `
-                            <div class="order-track__step ${step.completed ? 'completed' : ''} ${step.current ? 'current' : ''}">
-                                <div class="order-track__dot"></div>
-                                ${i < arr.length - 1 ? '<div class="order-track__line"></div>' : ''}
-                                <div class="order-track__label">${step.label}</div>
-                            </div>
-                        `).join('')}
+${(order.trackSteps || []).map((step, i, arr) => `
+    <div class="order-track__step ${step.completed ? 'completed' : ''} ${step.current ? 'current' : ''}">
+        <div class="order-track__dot"></div>
+        ${i < arr.length - 1 ? '<div class="order-track__line"></div>' : ''}
+        <div class="order-track__label">${step.label}</div>
+    </div>
+`).join('')}
                     </div>
                     
                     <!-- Информация о доставке -->
                     <div class="order-card__delivery-info">
-                        <i class="fas fa-truck"></i>
-                        <span>${deliveryInfo}</span>
+<i class="fas fa-truck"></i>
+<span>${deliveryInfo}</span>
                     </div>
                     
                     <!-- Товары -->
                     <div class="order-card__items">
-                        ${order.items.map(item => `
-                            <div class="order-card__item">
-                            <span class="order-card__item-icon">
-                            ${item.img && (item.img.endsWith('.png') || item.img.endsWith('.jpg') || item.img.endsWith('.jpeg') || item.img.endsWith('.webp'))
-                                ? `<img src="${item.img}" alt="${item.name}" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;">`
-                                : item.img || '📦'
-                            }
-                        </span>
-                                <span class="order-card__item-name">${item.name}</span>
-                                <span class="order-card__item-qty">×${item.quantity}</span>
-                            </div>
-                        `).join('')}
+${order.items.map(item => `
+    <div class="order-card__item">
+    <span class="order-card__item-icon">
+    ${item.img && (item.img.endsWith('.png') || item.img.endsWith('.jpg') || item.img.endsWith('.jpeg') || item.img.endsWith('.webp'))
+        ? `<img src="${item.img}" alt="${item.name}" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;">`
+        : item.img || '📦'
+    }
+</span>
+        <span class="order-card__item-name">${item.name}</span>
+        <span class="order-card__item-qty">×${item.quantity}</span>
+    </div>
+`).join('')}
                     </div>
                     
                      <div class="order-card__footer">
@@ -1866,7 +2360,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }).join('');
         }
         
-        updateOrdersCount();
+        updateOrdersCount(filteredOrders.length);
     }
 
     
@@ -2058,10 +2552,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Через 1 час - в пути
                     newStatus = 'delivery';
                     trackSteps = [
-                        { label: 'Заказ принят', completed: true, current: false },
-                        { label: 'В обработке', completed: true, current: false },
-                        { label: 'В пути', completed: false, current: true },
-                        { label: 'Доставлен', completed: false, current: false }
+{ label: 'Заказ принят', completed: true, current: false },
+{ label: 'В обработке', completed: true, current: false },
+{ label: 'В пути', completed: false, current: true },
+{ label: 'Доставлен', completed: false, current: false }
                     ];
                     hasChanges = true;
                 }
@@ -2070,10 +2564,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Через 3 часа - доставлен
                     newStatus = 'completed';
                     trackSteps = [
-                        { label: 'Заказ принят', completed: true, current: false },
-                        { label: 'В обработке', completed: true, current: false },
-                        { label: 'В пути', completed: true, current: false },
-                        { label: 'Доставлен', completed: true, current: false }
+{ label: 'Заказ принят', completed: true, current: false },
+{ label: 'В обработке', completed: true, current: false },
+{ label: 'В пути', completed: true, current: false },
+{ label: 'Доставлен', completed: true, current: false }
                     ];
                     hasChanges = true;
                 }
@@ -2097,6 +2591,67 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Проверяем при загрузке
     updateOrderStatusAutomatically();
+
+        // ============================================
+    // TELEGRAM NOTIFY — Уведомление через 18 дней
+    // ============================================
+    
+    function checkDeliveryNotifications() {
+        const now = new Date();
+        const BOT_TOKEN = '8265957442:AAFWnqXyl8TJJzZXsv3vxXRCuWwWd_aY9mE';
+        const CHAT_ID = '-1002854630161';
+        
+        orders.forEach(function(order) {
+            if (order.status === 'completed' || order.status === 'cancelled') return;
+            
+            const orderDate = new Date(order.date);
+            const daysPassed = (now - orderDate) / (1000 * 60 * 60 * 24);
+            
+            // Через 18 дней — уведомление
+            if (daysPassed >= 18 && !order.notified18days) {
+                order.notified18days = true;
+                order.status = 'completed';
+                order.trackSteps = [
+                    { label: 'Заказ принят', completed: true, current: false },
+                    { label: 'В обработке', completed: true, current: false },
+                    { label: 'В пути', completed: true, current: false },
+                    { label: 'Доставлен', completed: true, current: false }
+                ];
+                
+                // Сохраняем
+                localStorage.setItem('shopxand_orders', JSON.stringify(orders));
+                
+                // Отправляем в Telegram
+                var message = 
+                    '✅ ЗАКАЗ ДОСТАВЛЕН!\n\n' +
+                    '📦 Заказ: ' + order.id + '\n' +
+                    '👤 Клиент: ' + order.customer.name + '\n' +
+                    '📞 Телефон: ' + order.customer.phone + '\n' +
+                    '📍 Адрес: ' + order.customer.city + ', ' + order.customer.address + '\n' +
+                    '💰 Сумма: ' + order.total.toLocaleString() + ' с.\n\n' +
+                    'Прошло 18 дней с момента заказа.';
+                
+                fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+chat_id: CHAT_ID,
+text: message
+                    })
+                });
+                
+                console.log('✅ Уведомление о доставке заказа ' + order.id);
+            }
+        });
+    }
+    
+    // Проверяем каждый час
+    setInterval(function() {
+        checkDeliveryNotifications();
+    }, 3600000); // каждый час
+    
+    // Проверяем при загрузке
+    checkDeliveryNotifications();
 
     
 
@@ -2265,66 +2820,69 @@ document.addEventListener('DOMContentLoaded', function() {
         '1': {
             id: '1',
             name: 'Вельветовая рубашка с длинными руковами',
-            cat: 'Электроника',
-            price: 2560,
-            oldPrice: 3200,
-            discount: '-20%',
+            cat: 'Одежда',
+            price: 120,
+            oldPrice: 180,
+            discount: '-8%',
             img: 'img/Рубашка.jpeg',
             rating: 4.8,
             reviews: 324,
-            desc: 'Отличный смартфон с AMOLED-дисплеем 6.4", камерой 50 МП и аккумулятором на 5000 мАч.',
+            desc: 'Вельветовая рубашка с длинными руковами',
+            sizes: ['X', 'XL', '2XL', '3XL'],
             specs: [
-                ['Дисплей', '6.4" AMOLED'],
-                ['Процессор', 'Exynos 1380'],
-                ['Память', '128GB / 8GB'],
-                ['Камера', '50 МП + 12 МП'],
-                ['Аккумулятор', '5000 мАч']
+                ['Материал', 'Вельвет 100%'],
+                ['Размеры', 'X, XL, 2XL, 3XL'],
+                ['Качество', 'Премиум'],
+                ['Сезон', 'Весна-Осень'],
+                ['Цвет', 'Чёрный']
             ],
             thumbs: ['img/Рубашка.jpeg', 'img/Рубашка.jpeg', 'img/Рубашка.jpeg']
         },
         '2': {
             id: '2',
-            name: 'Ноутбук Lenovo IdeaPad 3 15.6"',
-            cat: 'Электроника',
-            price: 4800,
+            name: 'Крассовка AF1 Air Force 1',
+            cat: 'Одежда',
+            price: 110,
             oldPrice: null,
             discount: null,
             img: 'img/Крассовка.jpeg',
             rating: 4.6,
             reviews: 189,
-            desc: 'Мощный ноутбук для работы и учёбы.',
+            desc: 'Крассовка AF1 Air Force 1, лучший модель белый',
+            shoeSizes: ['38', '39', '40', '41', '42', '43', '44'],
             specs: [
-                ['Дисплей', '15.6" IPS'],
-                ['Процессор', 'Intel Core i5'],
-                ['Память', '512GB SSD / 16GB'],
-                ['Видеокарта', 'Intel Iris Xe']
+                ['Материал', 'Кожа'],
+                ['Размер', '38', '39', '40', '41', '42', '43', '44'],
+                ['Стиль', 'Повседневный'],
+                ['Сизон', 'Все сезоны']
             ],
             thumbs: ['img/Крассовка.jpeg', 'img/Крассовка.jpeg', 'img/Крассовка.jpeg']
         },
         '3': {
             id: '3',
-            name: 'Наушники Sony WH-1000XM5 Black',
-            cat: 'Электроника',
-            price: 1499,
-            oldPrice: 1800,
-            discount: '-17%',
+            name: 'Крассовка в британском стиле',
+            cat: 'Одежда',
+            price: 140,
+            oldPrice: 250,
+            discount: '-14%',
             img: 'img/Крассовка-2.jpeg',
             rating: 4.9,
             reviews: 512,
-            desc: 'Премиальные наушники с шумоподавлением.',
+            desc: 'Крассовка в британском стиле',
+            shoeSizes: ['38', '39', '40', '41', '42', '43', '44'],
             specs: [
-                ['Тип', 'Полноразмерные'],
-                ['Подключение', 'Bluetooth 5.2'],
-                ['Автономность', '30 часов'],
-                ['Шумоподавление', 'Active ANC']
+                ['Материал', 'Прастой'],
+                ['Размер', '38', '39', '40', '41', '42', '43', '44'],
+                ['Стиль', 'Повседневный'],
+                ['Сизон', 'Весна-осень']
             ],
             thumbs: ['img/Крассовка-2.jpeg', 'img/Крассовка-2.jpeg', 'img/Крассовка-2.jpeg']
         },
         '4': {
             id: '4',
-            name: 'Умные часы Apple Watch SE 2 2023',
+            name: 'Провадной наушник',
             cat: 'Электроника',
-            price: 2100,
+            price: 30,
             oldPrice: null,
             discount: null,
             img: 'img/Наушник.jpeg',
@@ -2332,90 +2890,115 @@ document.addEventListener('DOMContentLoaded', function() {
             reviews: 256,
             desc: 'Современные умные часы с широким функционалом.',
             specs: [
-                ['Дисплей', 'OLED 1.78"'],
-                ['Память', '32GB'],
-                ['Водозащита', 'WR50'],
-                ['Датчики', 'Пульс, SpO2']
+            ['Коннект', 'Проводные'],
+            ['Конектор', '3.5мм'],
+            ['Длина кабеля', '1.2м'],
+            ['Микрофон', 'Есть'],
+            ['Частота', '20Hz - 20000Hz'],
+            ['Сопротивление', '32Ω'],
+            ['Материал', 'ABS + TPE'],
+            ['Цвет', 'Черный']
             ],
             thumbs: ['img/Наушник.jpeg', 'img/Наушник.jpeg', 'img/Наушник.jpeg']
         },
         '5': {
             id: '5',
-            name: 'Планшет iPad Air 10.9" 256GB Wi-Fi',
+            name: 'Часы "CHENXI"',
             cat: 'Электроника',
-            price: 4999,
-            oldPrice: 5500,
+            price: 230,
+            oldPrice: 300,
             discount: '-9%',
             img: 'img/watch.jpeg',
             rating: 4.9,
             reviews: 678,
-            desc: 'Мощный планшет с чипом M1.',
+            desc: 'Часы "CHENXI"',
             specs: [
-                ['Дисплей', '10.9" Liquid Retina'],
-                ['Чип', 'Apple M1'],
-                ['Память', '256GB'],
-                ['Камера', '12 МП']
+            ['Бренд', 'CHENXI'],
+            ['Тип', 'Кварцевые'],
+            ['Ремешок', 'Нержавеющая сталь'],
+            ['Стекло', 'Hardlex'],
+            ['Водозащита', '3ATM'],
+            ['Функции', 'Дата, Хронограф'],
+            ['Диаметр', '45мм'],
+            ['Стиль', 'Business / Luxury']
             ],
             thumbs: ['img/watch.jpeg', 'img/watch.jpeg', 'img/watch.jpeg']
         },
         '6': {
             id: '6',
-            name: 'Портативная колонка JBL Flip 6',
-            cat: 'Электроника',
-            price: 890,
+            name: 'Кожаные тапочки',
+            cat: 'Одежда',
+            price: 100,
             oldPrice: null,
             discount: null,
             img: 'img/Шилопка-2.jpeg',
             rating: 4.7,
             reviews: 432,
-            desc: 'Компактная колонка с мощным звуком.',
+            desc: 'Кожаные тапочки',
+            shoeSizes: ['38', '39', '40', '41', '42', '43', '44'],
             specs: [
-                ['Мощность', '20 Вт'],
-                ['Защита', 'IP67'],
-                ['Автономность', '12 часов'],
-                ['Bluetooth', '5.1']
+            ['Материал', 'Натуральная кожа'],
+            ['Подошва', 'Резиновая'],
+            ['Тип', 'Домашние тапочки'],
+            ['Пол', 'Мужские'],
+            ['Размеры', '38,39,40, 41, 42, 43, 44'],
+            ['Цвет', 'Черный'],
+            ['Сезон', 'Все сезоны'],
+            ['Особенности', 'Антискользящие']
             ],
             thumbs: ['img/Шилопка-2.jpeg', 'img/Шилопка-2.jpeg', 'img/Шилопка-2.jpeg']
         },
         '7': {
             id: '7',
-            name: 'Телевизор LG 55" OLED 4K Smart TV',
+            name: 'Знак Mercedes Benz',
             cat: 'Электроника',
-            price: 7565,
-            oldPrice: 8900,
-            discount: '-15%',
+            price: 80,
+            oldPrice: 90,
+            discount: '-1.5%',
             img: 'img/Знак Мерса.jpeg',
             rating: 4.8,
             reviews: 156,
-            desc: 'OLED-телевизор с идеальным чёрным.',
+
+            desc: 'Металлический знак Mercedes-Benz для автомобиля с премиальным дизайном.',
             specs: [
-                ['Дисплей', '55" OLED 4K'],
-                ['Smart TV', 'webOS'],
-                ['HDR', 'Dolby Vision'],
-                ['HDMI', '4 порта']
+            ['Бренд', 'Mercedes-Benz'],
+            ['Материал', 'Металл'],
+            ['Цвет', 'Серебристый'],
+            ['Тип', 'Эмблема / Логотип'],
+            ['Крепление', 'Клейкая основа'],
+            ['Размер', '8см'],
+            ['Совместимость', 'Mercedes-Benz'],
+            ['Особенности', 'Устойчив к воде и солнцу']
             ],
             thumbs: ['img/Знак Мерса.jpeg', 'img/Знак Мерса.jpeg', 'img/Знак Мерса.jpeg']
         },
         '8': {
             id: '8',
-            name: 'Клавиатура Logitech MX Keys Mini',
-            cat: 'Электроника',
-            price: 650,
+            name: 'Кочественноя рубашка с длинными руковами',
+            cat: 'Одежда',
+            price: 120,
             oldPrice: null,
             discount: null,
             img: 'img/Рубашка-3.jpeg',
             rating: 4.5,
             reviews: 89,
-            desc: 'Компактная беспроводная клавиатура.',
+            desc: 'Кочественноя рубашка с длинными руковами',
+            sizes: ['X', 'XL', '2XL', '3XL'],
             specs: [
-                ['Тип', 'Беспроводная'],
-                ['Подключение', 'Bluetooth / USB'],
-                ['Подсветка', 'Есть'],
-                ['Совместимость', 'Windows / Mac']
+            ['Материал', 'Хлопок + Полиэстер'],
+            ['Тип', 'Рубашка с длинными рукавами'],
+            ['Пол', 'Мужская'],
+            ['Размеры', ['X', 'XL', '2XL', '3XL']],
+            ['Цвет', 'Белый'],
+            ['Стиль', 'Casual / Classic'],
+            ['Сезон', 'Весна, Осень'],
+            ['Особенности', 'Дышащая ткань']
             ],
             thumbs: ['img/Рубашка-3.jpeg', 'img/Рубашка-3.jpeg', 'img/Рубашка-3.jpeg']
         }
     };
+
+    
 
         // Смена главного изображения при клике на миниатюру
     window.changeQvThumb = function(imgSrc, thumbBtn) {
@@ -2506,7 +3089,106 @@ document.addEventListener('DOMContentLoaded', function() {
 
         document.title = product.name + ' — купить в ShopXand | Цена ' + product.price + ' сомони';
 
+        
+                // === ВЫБОР РАЗМЕРА (только для Одежды) ===
+    var sizeBlock = document.getElementById('quickviewSizeBlock');
+    if (sizeBlock) {
+        var sizesContainer = document.getElementById('quickviewSizes');
+        
+        if (product.cat === 'Одежда') {
+            if (product.shoeSizes && product.shoeSizes.length > 0) {
+                sizeBlock.style.display = 'flex';
+                sizeBlock.querySelector('span').textContent = 'Размер обуви:';
+                sizesContainer.innerHTML = '';
+                product.shoeSizes.forEach(function(size, i) {
+                    var btn = document.createElement('button');
+                    btn.className = 'quickview__size-btn';
+                    if (i === 0) btn.classList.add('active');
+                    btn.setAttribute('data-size', size);
+                    btn.textContent = size;
+                    btn.onclick = function() {
+sizesContainer.querySelectorAll('.quickview__size-btn').forEach(function(b) { b.classList.remove('active'); });
+this.classList.add('active');
+                    };
+                    sizesContainer.appendChild(btn);
+                });
+            } else if (product.sizes && product.sizes.length > 0) {
+                sizeBlock.style.display = 'flex';
+                sizeBlock.querySelector('span').textContent = 'Размер:';
+                sizesContainer.innerHTML = '';
+                product.sizes.forEach(function(size, i) {
+                    var btn = document.createElement('button');
+                    btn.className = 'quickview__size-btn';
+                    if (i === 0) btn.classList.add('active');
+                    btn.setAttribute('data-size', size);
+                    btn.textContent = size;
+                    btn.onclick = function() {
+sizesContainer.querySelectorAll('.quickview__size-btn').forEach(function(b) { b.classList.remove('active'); });
+this.classList.add('active');
+                    };
+                    sizesContainer.appendChild(btn);
+                });
+            } else {
+                sizeBlock.style.display = 'none';
+            }
+        } else {
+            sizeBlock.style.display = 'none';
+        }
     }
+
+            // === ПОХОЖИЕ ТОВАРЫ ===
+        renderRelatedProducts(product);
+
+
+    }
+
+        // Похожие товары
+    function renderRelatedProducts(currentProduct) {
+        var relatedContainer = document.getElementById('quickviewRelated');
+        if (!relatedContainer) return;
+        
+        // Находим товары той же категории, исключая текущий
+        var related = [];
+        for (var key in productsData) {
+            var p = productsData[key];
+            if (p.cat === currentProduct.cat && p.id !== currentProduct.id) {
+                related.push(p);
+            }
+        }
+        
+        // Если в категории мало товаров, добавляем из других категорий
+        if (related.length < 4) {
+            for (var key2 in productsData) {
+                var p2 = productsData[key2];
+                if (p2.id !== currentProduct.id && !related.find(function(r) { return r.id === p2.id; })) {
+                    related.push(p2);
+                }
+                if (related.length >= 4) break;
+            }
+        }
+        
+        // Ограничиваем 4 товарами
+        related = related.slice(0, 4);
+        
+        // Отрисовываем
+        relatedContainer.innerHTML = related.map(function(item) {
+            return `
+                <div class="related-card" onclick="window.openQuickview('${item.id}')">
+                    <div class="related-card__img">
+${item.img && (item.img.startsWith('http') || item.img.startsWith('img/') || item.img.endsWith('.png') || item.img.endsWith('.jpg') || item.img.endsWith('.jpeg'))
+    ? '<img src="' + item.img + '" alt="' + item.name + '">'
+    : '<span>' + (item.img || '📦') + '</span>'
+}
+                    </div>
+                    <div class="related-card__name">${item.name}</div>
+                    <div class="related-card__price">${item.price.toLocaleString()} с.</div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // Делаем openQuickview глобальной
+    window.openQuickview = openQuickview;
     
     // Закрыть быстрый просмотр
     function closeQuickview() {
@@ -2578,15 +3260,23 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Добавить в корзину из быстрого просмотра
-    if (qvAddToCart) {
+        if (qvAddToCart) {
         qvAddToCart.addEventListener('click', function() {
             if (!currentQvProduct) return;
+            
+            // Получаем выбранный размер
+            let selectedSize = '';
+            const activeSizeBtn = document.querySelector('.quickview__size-btn.active');
+            if (activeSizeBtn) {
+                selectedSize = ' (' + activeSizeBtn.getAttribute('data-size') + ')';
+            }
+            
+            console.log('Добавляем в корзину с размером:', selectedSize);
             
             for (let i = 0; i < qvQuantity; i++) {
                 addToCart({
                     id: currentQvProduct.id,
-                    name: currentQvProduct.name,
+                    name: currentQvProduct.name + selectedSize,
                     price: currentQvProduct.price,
                     img: currentQvProduct.img,
                     cat: currentQvProduct.cat
@@ -2594,14 +3284,60 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Анимация
-            this.textContent = '✓ Добавлено (' + qvQuantity + ')';
+            this.textContent = '✓ Добавлено';
             this.style.background = '#00c853';
             setTimeout(() => {
                 this.innerHTML = '<i class="fas fa-shopping-cart"></i> В корзину';
                 this.style.background = '';
             }, 1500);
         });
+
+        
     }
+
+    
+        // ============================================
+    // TOAST - Уведомления
+    // ============================================
+    
+    function showToast(title, message, type) {
+        const toast = document.getElementById('toast');
+        const toastTitle = document.getElementById('toastTitle');
+        const toastMessage = document.getElementById('toastMessage');
+        const toastIcon = document.getElementById('toastIcon');
+        
+        if (!toast) return;
+        
+        toastTitle.textContent = title;
+        toastMessage.textContent = message;
+        
+        // Иконка
+        if (type === 'success') {
+            toastIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+            toastIcon.className = 'toast__icon';
+        } else if (type === 'error') {
+            toastIcon.innerHTML = '<i class="fas fa-times-circle"></i>';
+            toastIcon.className = 'toast__icon error';
+        } else {
+            toastIcon.innerHTML = '<i class="fas fa-info-circle"></i>';
+            toastIcon.className = 'toast__icon';
+        }
+        
+        // Показываем
+        toast.classList.add('show');
+        
+        // Авто-скрытие
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(function() {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+    
+    // Закрытие по кнопке
+    document.getElementById('toastClose')?.addEventListener('click', function() {
+        document.getElementById('toast')?.classList.remove('show');
+    });
+  
     
     // Избранное в быстром просмотре
     if (qvFavorite) {
@@ -2621,13 +3357,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Escape' && quickview.classList.contains('active')) {
             closeQuickview();
         }
-    });
-    
-    console.log('Модуль быстрого просмотра загружен');
 
-    // ============================================
+        
+    });
+
+    
+        // ============================================
     // AUTH - Вход / Регистрация
     // ============================================
+    
     
     const authModal = document.getElementById('authModal');
     const authOverlay = document.getElementById('authOverlay');
@@ -2648,11 +3386,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Сохранение пользователя
-    function saveUser(user) {
+       function saveUser(user) {
         currentUser = user;
         isLoggedIn = true;
         localStorage.setItem('shopxand_user', JSON.stringify(user));
+        // Сохраняем ID пользователя для привязки заказов
+        localStorage.setItem('shopxand_current_user_phone', user.phone);
         updateUserUI();
     }
     
@@ -2661,38 +3400,37 @@ document.addEventListener('DOMContentLoaded', function() {
         currentUser = null;
         isLoggedIn = false;
         localStorage.removeItem('shopxand_user');
+        localStorage.removeItem('shopxand_current_user_phone');
         updateUserUI();
+        renderOrders();
+    }
+    
+    // Проверка авторизации
+    function requireAuth(callback) {
+        if (isLoggedIn) {
+            callback();
+        } else {
+            openAuth();
+        }
     }
     
     // Обновление интерфейса
     function updateUserUI() {
-        const loginBtn = document.querySelector('.header__action--login, .header__action:first-child');
+        const loginBtn = document.querySelector('.header__action--login, .header__action:first-of-type');
         const mobileLoginBtn = document.querySelector('.mobile-menu__login-btn');
         
         if (isLoggedIn && currentUser) {
-            // Пользователь вошёл
             if (loginBtn) {
                 loginBtn.querySelector('i').className = 'fas fa-user-check';
                 loginBtn.querySelector('span').textContent = currentUser.name || 'Профиль';
-                loginBtn.href = '#';
-                loginBtn.onclick = function(e) {
-                    e.preventDefault();
-                    showUserMenu();
-                };
             }
             if (mobileLoginBtn) {
                 mobileLoginBtn.textContent = currentUser.name || 'Мой профиль';
             }
         } else {
-            // Пользователь не вошёл
             if (loginBtn) {
                 loginBtn.querySelector('i').className = 'fas fa-user';
                 loginBtn.querySelector('span').textContent = 'Войти';
-                loginBtn.href = '#';
-                loginBtn.onclick = function(e) {
-                    e.preventDefault();
-                    openAuth();
-                };
             }
             if (mobileLoginBtn) {
                 mobileLoginBtn.textContent = 'Войти или зарегистрироваться';
@@ -2700,27 +3438,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    function showUserMenu() {
-        // Простое меню пользователя
-        if (confirm('Вы хотите выйти из аккаунта?')) {
-            logout();
-        }
-    }
-    
     // Открыть окно входа
     function openAuth() {
+        if (!authModal) return;
         authModal.classList.add('active');
         document.body.style.overflow = 'hidden';
         showLoginForm();
     }
     
     function closeAuth() {
+        if (!authModal) return;
         authModal.classList.remove('active');
         if (!cartPanel.classList.contains('active') &&
             !favPanel.classList.contains('active') &&
             !ordersPanel.classList.contains('active') &&
             !mobileMenu.classList.contains('active') &&
-            !quickView.classList.contains('active')) {
+            !quickview.classList.contains('active')) {
             document.body.style.overflow = '';
         }
     }
@@ -2735,34 +3468,42 @@ document.addEventListener('DOMContentLoaded', function() {
         registerForm.classList.add('active');
     }
     
-    // Кнопка "Войти" в хедере
-    const headerLoginBtn = document.querySelector('.header__action--login, .header__action:first-child');
+        const headerLoginBtn = document.querySelector('.header__action--login, .header__action:first-of-type');
     if (headerLoginBtn) {
         headerLoginBtn.addEventListener('click', function(e) {
-            if (!isLoggedIn) {
-                e.preventDefault();
+            e.preventDefault();
+            if (isLoggedIn) {
+                logoutModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
                 openAuth();
             }
         });
     }
     
-    // Кнопка в мобильном меню
-    const mobileLoginBtn = document.querySelector('.mobile-menu__login-btn');
+        const mobileLoginBtn = document.querySelector('.mobile-menu__login-btn');
     if (mobileLoginBtn) {
         mobileLoginBtn.addEventListener('click', function(e) {
-            if (!isLoggedIn) {
-                e.preventDefault();
-                closeMenu();
-                setTimeout(openAuth, 350);
-            }
+            e.preventDefault();
+            closeMenu();
+            setTimeout(function() {
+                if (isLoggedIn) {
+                    logoutModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    openAuth();
+                }
+            }, 350);
         });
     }
+   
     
     // Закрытие
     if (authOverlay) authOverlay.addEventListener('click', closeAuth);
     if (authClose) authClose.addEventListener('click', closeAuth);
+   
     
-    // Переключение форм
+       // Переключение форм
     document.getElementById('showRegister')?.addEventListener('click', function(e) {
         e.preventDefault();
         showRegisterForm();
@@ -2772,6 +3513,36 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         showLoginForm();
     });
+    
+    // Забыли пароль
+    document.querySelector('.auth-form__forgot')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        showForgotForm();
+    });
+    
+    document.getElementById('showLoginFromForgot')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        showLoginForm();
+    });
+    
+    function showLoginForm() {
+        loginForm.classList.add('active');
+        registerForm.classList.remove('active');
+        document.getElementById('forgotForm').classList.remove('active');
+    }
+    
+    function showRegisterForm() {
+        loginForm.classList.remove('active');
+        registerForm.classList.add('active');
+        document.getElementById('forgotForm').classList.remove('active');
+    }
+    
+    function showForgotForm() {
+        loginForm.classList.remove('active');
+        registerForm.classList.remove('active');
+        document.getElementById('forgotForm').classList.add('active');
+        document.getElementById('codeBlock').style.display = 'none';
+    }
     
     // Показать/скрыть пароль
     document.querySelectorAll('.auth-form__toggle-password').forEach(function(btn) {
@@ -2788,27 +3559,65 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // ============================================
+    // РЕАЛЬНЫЙ ВХОД
+    // ============================================
+    
+    // Загружаем всех пользователей
+    function getAllUsers() {
+        const users = localStorage.getItem('shopxand_users');
+        return users ? JSON.parse(users) : [];
+    }
+    
+    // Сохраняем пользователя в общую базу
+    function saveUserToBase(user) {
+        const users = getAllUsers();
+        const existingIndex = users.findIndex(function(u) {
+            return u.phone === user.phone || u.email === user.email;
+        });
+        
+        if (existingIndex >= 0) {
+            users[existingIndex] = user;
+        } else {
+            users.push(user);
+        }
+        
+        localStorage.setItem('shopxand_users', JSON.stringify(users));
+    }
+    
+    // Найти пользователя
+    function findUser(phoneOrEmail, password) {
+        const users = getAllUsers();
+        return users.find(function(u) {
+            return (u.phone === phoneOrEmail || u.email === phoneOrEmail) && u.password === password;
+        });
+    }
+    
     // Вход
     document.getElementById('loginBtn')?.addEventListener('click', function() {
         const phone = document.getElementById('loginPhone').value.trim();
         const password = document.getElementById('loginPassword').value;
         
-        if (!phone || !password) {
-            alert('Заполните все поля');
+        if (!phone) {
+            alert('Введите телефон или email');
             return;
         }
         
-        // Демо-вход
-        const user = {
-            name: phone.includes('@') ? phone.split('@')[0] : 'Пользователь',
-            phone: phone,
-            email: phone.includes('@') ? phone : '',
-            registeredAt: new Date().toISOString()
-        };
+        if (!password) {
+            alert('Введите пароль');
+            return;
+        }
         
-        saveUser(user);
-        closeAuth();
-        alert('Добро пожаловать, ' + user.name + '!');
+        // Ищем пользователя
+        const user = findUser(phone, password);
+        
+        if (user) {
+            saveUser(user);
+            closeAuth();
+            showToast('С возвращением!', user.name + ', вы вошли в аккаунт', 'success');
+        } else {
+            showToast('Ошибка входа', 'Неверный телефон/email или пароль', 'error');
+        }
     });
     
     // Регистрация
@@ -2825,7 +3634,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        if (password && password.length < 6) {
+        if (!password || password.length < 6) {
             alert('Пароль должен быть минимум 6 символов');
             return;
         }
@@ -2840,16 +3649,89 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Проверяем, не занят ли телефон
+        const users = getAllUsers();
+        const exists = users.find(function(u) {
+            return u.phone === phone || (email && u.email === email);
+        });
+        
+        if (exists) {
+            showToast('Ошибка', 'Пользователь с таким телефоном или email уже зарегистрирован', 'error');
+            return;
+        }
+        
         const user = {
             name: name,
             phone: phone,
             email: email,
+            password: password,
             registeredAt: new Date().toISOString()
         };
         
+        saveUserToBase(user);
         saveUser(user);
         closeAuth();
-        alert('Регистрация успешна! Добро пожаловать, ' + name + '!');
+       showToast('Регистрация успешна!', 'Добро пожаловать, ' + name + '!', 'success');
+    });
+    
+           // Забыли пароль — проверка телефона
+    document.getElementById('forgotBtn')?.addEventListener('click', function() {
+        const phone = document.getElementById('forgotPhone').value.trim();
+        
+        if (!phone) {
+            showToast('Ошибка', 'Введите номер телефона', 'error');
+            return;
+        }
+        
+        // Ищем пользователя с таким телефоном
+        const users = getAllUsers();
+        const user = users.find(function(u) { return u.phone === phone; });
+        
+        if (!user) {
+            showToast('Не найдено', 'Пользователь с номером ' + phone + ' не зарегистрирован', 'error');
+            return;
+        }
+        
+        // Сохраняем телефон для смены пароля
+        localStorage.setItem('shopxand_reset_phone', phone);
+        
+        // Показываем поле для нового пароля
+        document.getElementById('codeBlock').style.display = 'block';
+        this.textContent = 'Телефон подтверждён';
+        this.disabled = true;
+        
+        showToast('Телефон найден', 'Введите новый пароль', 'success');
+    });
+    
+          // Сохранить новый пароль
+    document.getElementById('resetPasswordBtn')?.addEventListener('click', function() {
+        const newPassword = document.getElementById('newPassword').value;
+        const phone = localStorage.getItem('shopxand_reset_phone');
+        
+        if (!newPassword || newPassword.length < 6) {
+            showToast('Ошибка', 'Пароль должен быть минимум 6 символов', 'error');
+            return;
+        }
+        
+        // Обновляем пароль
+        const users = getAllUsers();
+        const userIndex = users.findIndex(function(u) { return u.phone === phone; });
+        
+        if (userIndex >= 0) {
+            users[userIndex].password = newPassword;
+            localStorage.setItem('shopxand_users', JSON.stringify(users));
+            
+            localStorage.removeItem('shopxand_reset_phone');
+            
+            document.getElementById('codeBlock').style.display = 'none';
+            document.getElementById('forgotBtn').textContent = 'Отправить код';
+            document.getElementById('forgotBtn').disabled = false;
+            document.getElementById('forgotPhone').value = '';
+            document.getElementById('newPassword').value = '';
+            
+            showToast('Пароль изменён!', 'Теперь войдите с новым паролем', 'success');
+            showLoginForm();
+        }
     });
     
     // Escape
@@ -2858,12 +3740,96 @@ document.addEventListener('DOMContentLoaded', function() {
             closeAuth();
         }
     });
+
+        // ============================================
+    // ОКНО ВЫХОДА
+    // ============================================
+    
+    const logoutModal = document.getElementById('logoutModal');
+    const logoutOverlay = document.getElementById('logoutOverlay');
+    const logoutCancel = document.getElementById('logoutCancel');
+    const logoutConfirm = document.getElementById('logoutConfirm');
+    
+    function openLogoutConfirm() {
+        if (!logoutModal) return;
+        logoutModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeLogoutConfirm() {
+        if (!logoutModal) return;
+        logoutModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    // Отмена
+    if (logoutCancel) {
+        logoutCancel.addEventListener('click', closeLogoutConfirm);
+    }
+    
+    // Подтверждение выхода
+    if (logoutConfirm) {
+        logoutConfirm.addEventListener('click', function() {
+            logout();
+            closeLogoutConfirm();
+            showToast('Вы вышли', 'До новых встреч!', 'success');
+        });
+    }
+    
+    // Оверлей
+    if (logoutOverlay) {
+        logoutOverlay.addEventListener('click', closeLogoutConfirm);
+    }
+    
+    // Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && logoutModal && logoutModal.classList.contains('active')) {
+            closeLogoutConfirm();
+        }
+    });
+    
+    // ============================================
+    // ЗАЩИТА ДЕЙСТВИЙ
+    // ============================================
+    
+    const originalOpenCart = openCart;
+    openCart = function() {
+        if (!isLoggedIn) { openAuth(); return; }
+        originalOpenCart();
+    };
+    
+    const originalOpenFavorites = openFavorites;
+    openFavorites = function() {
+        if (!isLoggedIn) { openAuth(); return; }
+        originalOpenFavorites();
+    };
+    
+    const originalOpenOrders = openOrders;
+    openOrders = function() {
+        if (!isLoggedIn) { openAuth(); return; }
+        originalOpenOrders();
+    };
+    
+    const originalAddToCart = addToCart;
+    addToCart = function(product) {
+        if (!isLoggedIn) { openAuth(); return; }
+        originalAddToCart(product);
+    };
+    
+    const originalToggleFavorite = toggleFavorite;
+    toggleFavorite = function(product) {
+        if (!isLoggedIn) { openAuth(); return false; }
+        return originalToggleFavorite(product);
+    };
     
     // Загрузка
     loadUser();
+
+    
     
     console.log('Модуль авторизации загружен');
 
+    
 
     // ============================================
     // CATEGORY FILTER - Фильтр по категориям
@@ -2970,50 +3936,86 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Модуль фильтрации загружен');
     
 
-    // ============================================
-    // PWA INSTALL
+      // ============================================
+    // PWA - Кнопка установки
     // ============================================
     
     let deferredPrompt;
-    const pwaInstall = document.getElementById('pwaInstall');
     const pwaInstallBtn = document.getElementById('pwaInstallBtn');
-    const pwaInstallClose = document.getElementById('pwaInstallClose');
+    const pwaInstallAction = document.getElementById('pwaInstallAction');
+    const pwaInstallDismiss = document.getElementById('pwaInstallDismiss');
     
-    // Слушаем событие beforeinstallprompt
+    // Ждём событие установки
     window.addEventListener('beforeinstallprompt', function(e) {
-        // Предотвращаем автоматическое появление
+        console.log('PWA: можно установить!');
+        
+        // Отменяем автоматический баннер браузера
         e.preventDefault();
+        
         // Сохраняем событие
         deferredPrompt = e;
-        // Показываем кнопку установки
-        if (pwaInstall) {
-            pwaInstall.style.display = 'block';
+        
+        // Показываем нашу кнопку
+        if (pwaInstallBtn) {
+            pwaInstallBtn.style.display = 'block';
         }
     });
     
-    // Кнопка Установить
-    if (pwaInstallBtn) {
-        pwaInstallBtn.addEventListener('click', function() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then(function(result) {
-                    console.log('PWA:', result.outcome);
-                    deferredPrompt = null;
-                    if (pwaInstall) pwaInstall.style.display = 'none';
-                });
+    // Нажатие на кнопку "Установить"
+    if (pwaInstallAction) {
+        pwaInstallAction.addEventListener('click', function() {
+            if (!deferredPrompt) {
+                alert('Установка пока недоступна. Попробуйте открыть сайт в браузере Chrome.');
+                return;
             }
+            
+            // Запускаем установку
+            deferredPrompt.prompt();
+            
+            // Ждём ответ
+            deferredPrompt.userChoice.then(function(result) {
+                console.log('PWA результат:', result.outcome);
+                
+                if (result.outcome === 'accepted') {
+                    // Установлено!
+                    if (pwaInstallBtn) {
+pwaInstallBtn.innerHTML = '<div class="pwa-install-btn__content" style="background:#e8f5e9;border-color:#00c853;"><span style="font-size:24px;">✅</span><div class="pwa-install-btn__text"><strong>Приложение установлено!</strong><span>ShopXand на вашем устройстве</span></div></div>';
+setTimeout(function() {
+    pwaInstallBtn.style.display = 'none';
+}, 3000);
+                    }
+                }
+                
+                deferredPrompt = null;
+            });
         });
     }
     
     // Закрыть баннер
-    if (pwaInstallClose) {
-        pwaInstallClose.addEventListener('click', function() {
-            if (pwaInstall) pwaInstall.style.display = 'none';
+    if (pwaInstallDismiss) {
+        pwaInstallDismiss.addEventListener('click', function() {
+            if (pwaInstallBtn) {
+                pwaInstallBtn.style.display = 'none';
+            }
         });
     }
     
     // Скрыть если уже установлено
     window.addEventListener('appinstalled', function() {
-        console.log('PWA установлено!');
-        if (pwaInstall) pwaInstall.style.display = 'none';
+        console.log('PWA: установлено!');
+        if (pwaInstallBtn) {
+            pwaInstallBtn.innerHTML = '<div class="pwa-install-btn__content" style="background:#e8f5e9;border-color:#00c853;"><span style="font-size:24px;">✅</span><div class="pwa-install-btn__text"><strong>Приложение установлено!</strong><span>Спасибо что выбрали ShopXand</span></div></div>';
+            setTimeout(function() {
+                pwaInstallBtn.style.display = 'none';
+            }, 3000);
+        }
     });
+    
+    // Проверяем, не установлено ли уже
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('PWA: уже запущено как приложение');
+        if (pwaInstallBtn) pwaInstallBtn.style.display = 'none';
+    }
+    
+
+

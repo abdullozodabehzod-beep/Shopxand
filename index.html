@@ -86,6 +86,30 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+
+        <!-- Прелоадер -->
+    <div class="preloader" id="preloader">
+        <div class="preloader__content">
+            <div class="preloader__logo">
+                <svg viewBox="0 0 500 500" width="60" height="60">
+                    <defs>
+<clipPath id="pl-xclip">
+    <rect x="320" y="0" width="250" height="500"/>
+</clipPath>
+                    </defs>
+                    <text x="320" y="410" font-family="Arial Black" font-weight="900" font-size="400" fill="#1a6df0" text-anchor="middle" clip-path="url(#pl-xclip)">X</text>
+                    <text x="170" y="410" font-family="Arial Black" font-weight="900" font-size="400" fill="#111" text-anchor="middle">S</text>
+                </svg>
+            </div>
+            <div class="preloader__spinner">
+                <div class="preloader__dot"></div>
+                <div class="preloader__dot"></div>
+                <div class="preloader__dot"></div>
+            </div>
+            <p class="preloader__text">Загрузка...</p>
+        </div>
+    </div>
+
     <h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;">
     ShopXand — интернет-магазин товаров в Таджикистане
 </h1>
@@ -114,67 +138,67 @@
                 <div class="header__main-inner">
                     <!-- Burger Menu (Mobile) -->
                     <button class="header__burger" aria-label="Меню" id="burgerBtn">
-                        <span></span>
-                        <span></span>
-                        <span></span>
+<span></span>
+<span></span>
+<span></span>
                     </button>
 
                     <!-- Logo -->
                     <a href="/" class="header__logo">
-                        <span class="header__logo-icon">
-                            <svg viewBox="0 0 500 500" width="45" height="45">
-                                <defs>
-                                    <clipPath id="xclip2">
-                                        <rect x="320" y="0" width="250" height="500"/>
-                                    </clipPath>
-                                </defs>
-                                <text x="320" y="410" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="400" fill="#1a6df0" text-anchor="middle" clip-path="url(#xclip2)">X</text>
-                                <text x="170" y="410" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="400" fill="#111111" text-anchor="middle">S</text>
-                            </svg>
-                        </span>
-                        <span class="header__logo-text">
-                            Shop<span class="header__logo-accent">Xand</span>
-                        </span>
+<span class="header__logo-icon">
+    <svg viewBox="0 0 500 500" width="45" height="45">
+        <defs>
+            <clipPath id="xclip2">
+                <rect x="320" y="0" width="250" height="500"/>
+            </clipPath>
+        </defs>
+        <text x="320" y="410" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="400" fill="#1a6df0" text-anchor="middle" clip-path="url(#xclip2)">X</text>
+        <text x="170" y="410" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="400" fill="#111111" text-anchor="middle">S</text>
+    </svg>
+</span>
+<span class="header__logo-text">
+    Shop<span class="header__logo-accent">Xand</span>
+</span>
                     </a>
 
                     <!-- Catalog Button (Desktop) -->
                     <button class="header__catalog-btn">
-                        <i class="fas fa-bars"></i>
-                        <span>Каталог</span>
+<i class="fas fa-bars"></i>
+<span>Каталог</span>
                     </button>
 
                     <!-- Search -->
                     <div class="header__search" id="searchBlock">
-                        <input type="text" class="header__search-input" placeholder="Я ищу..." id="searchInput">
-                        <button class="header__search-btn">
-                            <i class="fas fa-search"></i>
-                        </button>
+<input type="text" class="header__search-input" placeholder="Я ищу..." id="searchInput">
+<button class="header__search-btn">
+    <i class="fas fa-search"></i>
+</button>
                     </div>
 
                     <!-- User Actions -->
                     <div class="header__actions">
-                        <a href="#" class="header__action">
-                            <i class="fas fa-user"></i>
-                            <span>Войти</span>
-                        </a>
-                        <a href="#" class="header__action">
-                            <i class="fas fa-box"></i>
-                            <span>Заказы</span>
-                        </a>
-                        <a href="#" class="header__action">
-                            <i class="fas fa-heart"></i>
-                            <span>Избранное</span>
-                        </a>
-                        <a href="#" class="header__action header__action--cart">
-                            <i class="fas fa-shopping-cart"></i>
-                            <span>Корзина</span>
-                            <span class="header__cart-count">3</span>
-                        </a>
+<a href="#" class="header__action">
+    <i class="fas fa-user"></i>
+    <span>Войти</span>
+</a>
+<a href="#" class="header__action">
+    <i class="fas fa-box"></i>
+    <span>Заказы</span>
+</a>
+<a href="#" class="header__action">
+    <i class="fas fa-heart"></i>
+    <span>Избранное</span>
+</a>
+<a href="#" class="header__action header__action--cart">
+    <i class="fas fa-shopping-cart"></i>
+    <span>Корзина</span>
+    <span class="header__cart-count">3</span>
+</a>
                     </div>
 
                     <!-- Mobile Search Toggle -->
                     <button class="header__search-toggle" aria-label="Поиск" id="searchToggle">
-                        <i class="fas fa-search"></i>
+<i class="fas fa-search"></i>
                     </button>
                 </div>
             </div>
@@ -197,37 +221,37 @@
                 <div class="catalog-dropdown__grid">
                     <!-- Колонка 1: Одежда -->
                     <div class="catalog-dropdown__col">
-                        <a href="#" class="catalog-dropdown__category">
-                            <i class="fas fa-tshirt"></i>
-                            <span>Одежда</span>
-                        </a>
-                        <ul class="catalog-dropdown__sub">
-                            <li><a href="#">Мужская одежда</a></li>
-                        </ul>
+<a href="#" class="catalog-dropdown__category">
+    <i class="fas fa-tshirt"></i>
+    <span>Одежда</span>
+</a>
+<ul class="catalog-dropdown__sub">
+    <li><a href="#">Мужская одежда</a></li>
+</ul>
                     </div>
                     
                     <!-- Колонка 2: Электроника -->
                     <div class="catalog-dropdown__col">
-                        <a href="#" class="catalog-dropdown__category">
-                            <i class="fas fa-laptop"></i>
-                            <span>Электроника</span>
-                        </a>
-                        <ul class="catalog-dropdown__sub">
-                            <li><a href="#">Наушники</a></li>
-                            <li><a href="#">Умные часы</a></li>
-                            <li><a href="#">Аксессуары</a></li>
-                        </ul>
+<a href="#" class="catalog-dropdown__category">
+    <i class="fas fa-laptop"></i>
+    <span>Электроника</span>
+</a>
+<ul class="catalog-dropdown__sub">
+    <li><a href="#">Наушники</a></li>
+    <li><a href="#">Умные часы</a></li>
+    <li><a href="#">Аксессуары</a></li>
+</ul>
                     </div>
                     
                     <!-- Колонка 3: Дом и сад -->
                     <div class="catalog-dropdown__col">
-                        <a href="#" class="catalog-dropdown__category">
-                            <i class="fas fa-home"></i>
-                            <span>Дом и сад</span>
-                        </a>
-                        <ul class="catalog-dropdown__sub">
-                            <li><a href="#">Инструменты</a></li>
-                        </ul>
+<a href="#" class="catalog-dropdown__category">
+    <i class="fas fa-home"></i>
+    <span>Дом и сад</span>
+</a>
+<ul class="catalog-dropdown__sub">
+    <li><a href="#">Инструменты</a></li>
+</ul>
                     </div> 
                 </div>
             </div>
@@ -241,12 +265,12 @@
                 <!-- Заголовок меню -->
                 <div class="mobile-menu__top">
                     <div class="mobile-menu__user">
-                        <div class="mobile-menu__avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="mobile-menu__user-info">
-                            <a href="#" class="mobile-menu__login-btn">Войти или зарегистрироваться</a>
-                        </div>
+<div class="mobile-menu__avatar">
+    <i class="fas fa-user"></i>
+</div>
+<div class="mobile-menu__user-info">
+    <a href="#" class="mobile-menu__login-btn">Войти или зарегистрироваться</a>
+</div>
                     </div>
                 </div>
 
@@ -254,90 +278,90 @@
                 <div class="mobile-menu__categories">
                     <div class="mobile-menu__section-title">Каталог</div>
                     <ul class="mobile-menu__nav">
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-tshirt"></i>
-                                <span>Одежда</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-laptop"></i>
-                                <span>Электроника</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-home"></i>
-                                <span>Дом и сад</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-baby"></i>
-                                <span>Детские товары</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-heart"></i>
-                                <span>Красота и здоровье</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-futbol"></i>
-                                <span>Спорт и отдых</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-shopping-basket"></i>
-                                <span>Продукты</span>
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-percent"></i>
-                                <span>Акции и скидки</span>
-                                <span class="mobile-menu__badge">Hot</span>
-                            </a>
-                        </li>
+<li>
+    <a href="#">
+        <i class="fas fa-tshirt"></i>
+        <span>Одежда</span>
+        <i class="fas fa-chevron-right"></i>
+    </a>
+</li>
+<li>
+    <a href="#">
+        <i class="fas fa-laptop"></i>
+        <span>Электроника</span>
+        <i class="fas fa-chevron-right"></i>
+    </a>
+</li>
+<li>
+    <a href="#">
+        <i class="fas fa-home"></i>
+        <span>Дом и сад</span>
+        <i class="fas fa-chevron-right"></i>
+    </a>
+</li>
+<li>
+    <a href="#">
+        <i class="fas fa-baby"></i>
+        <span>Детские товары</span>
+        <i class="fas fa-chevron-right"></i>
+    </a>
+</li>
+<li>
+    <a href="#">
+        <i class="fas fa-heart"></i>
+        <span>Красота и здоровье</span>
+        <i class="fas fa-chevron-right"></i>
+    </a>
+</li>
+<li>
+    <a href="#">
+        <i class="fas fa-futbol"></i>
+        <span>Спорт и отдых</span>
+        <i class="fas fa-chevron-right"></i>
+    </a>
+</li>
+<li>
+    <a href="#">
+        <i class="fas fa-shopping-basket"></i>
+        <span>Продукты</span>
+        <i class="fas fa-chevron-right"></i>
+    </a>
+</li>
+<li>
+    <a href="#">
+        <i class="fas fa-percent"></i>
+        <span>Акции и скидки</span>
+        <span class="mobile-menu__badge">Hot</span>
+    </a>
+</li>
                     </ul>
                 </div>
 
                 <!-- Другие разделы -->
                     <ul class="mobile-menu__secondary-list">
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-box"></i>
-                                <span>Мои заказы</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-heart"></i>
-                                <span>Избранное</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-shopping-cart"></i>
-                                <span>Корзина</span>
-                                <span class="mobile-menu__cart-count">3</span>
-                            </a>
-                        </li>
+<li>
+    <a href="#">
+        <i class="fas fa-box"></i>
+        <span>Мои заказы</span>
+    </a>
+</li>
+<li>
+    <a href="#">
+        <i class="fas fa-heart"></i>
+        <span>Избранное</span>
+    </a>
+</li>
+<li>
+    <a href="#">
+        <i class="fas fa-shopping-cart"></i>
+        <span>Корзина</span>
+        <span class="mobile-menu__cart-count">3</span>
+    </a>
+</li>
                   <li>
                     <a href="#" id="mobileCitySelector">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>Душанбе</span>
+<i class="fas fa-map-marker-alt"></i>
+<span>Душанбе</span>
                     </a>
                  </li>
              <li>
@@ -373,16 +397,16 @@
                 <div class="city-modal__group">
                     <div class="city-modal__group-title">Крупные города</div>
                     <div class="city-modal__item active" data-city="Душанбе">
-                        <span>Душанбе</span>
-                        <i class="fas fa-check"></i>
+<span>Душанбе</span>
+<i class="fas fa-check"></i>
                     </div>
                     <div class="city-modal__item" data-city="Худжанд">
-                        <span>Худжанд</span>
-                        <i class="fas fa-check"></i>
+<span>Худжанд</span>
+<i class="fas fa-check"></i>
                     </div>
                     <div class="city-modal__item" data-city="Куляб">
-                        <span>Куляб</span>
-                        <i class="fas fa-check"></i>
+<span>Куляб</span>
+<i class="fas fa-check"></i>
                     </div>              
             <!-- Нет результатов -->
             <div class="city-modal__empty" id="cityEmpty">
@@ -412,8 +436,8 @@
                     <div class="lang-modal__item active" data-lang="ru" data-code="RU" data-name="Русский"> 
                      <div class="lang-modal__flag">🇷🇺</div>
                     <div class="lang-modal__info">
-                        <div class="lang-modal__name">Русский</div>
-                        <div class="lang-modal__native">Russian</div>
+<div class="lang-modal__name">Русский</div>
+<div class="lang-modal__native">Russian</div>
                     </div>
                     <i class="fas fa-check-circle"></i>
                 </div>
@@ -421,8 +445,8 @@
                     <div class="lang-modal__item" data-lang="tg" data-code="TJ" data-name="Тоҷикӣ"> 
                     <div class="lang-modal__flag">🇹🇯</div>
                     <div class="lang-modal__info">
-                        <div class="lang-modal__name">Тоҷикӣ</div>
-                        <div class="lang-modal__native">Tajik</div>
+<div class="lang-modal__name">Тоҷикӣ</div>
+<div class="lang-modal__native">Tajik</div>
                     </div>
                     <i class="fas fa-check-circle"></i>
                 </div>
@@ -430,8 +454,8 @@
                     <div class="lang-modal__item" data-lang="en" data-code="EN" data-name="English">
                    <div class="lang-modal__flag">🇺🇸</div>
                     <div class="lang-modal__info">
-                        <div class="lang-modal__name">English</div>
-                        <div class="lang-modal__native">Английский</div>
+<div class="lang-modal__name">English</div>
+<div class="lang-modal__native">Английский</div>
                     </div>
                     <i class="fas fa-check-circle"></i>
                 </div>
@@ -447,82 +471,84 @@
                 <!-- Главный баннер-слайдер -->
                 <div class="hero__main">
                     <div class="hero__slider" id="heroSlider">
-                        <!-- Слайд 1 -->
-                        <div class="hero__slide active" style="background: linear-gradient(135deg, #e8f4fd, #c5e3f6);">
-                            <div class="hero__slide-info">
-                                <h2 class="hero__slide-title">Смартфоны и гаджеты</h2>
-                                <p class="hero__slide-text">Скидки до 30% на популярные модели</p>
-                                <a href="#" class="hero__slide-btn">Посмотреть</a>
-                            </div>
-                            <div class="hero__slide-img">
-                                <img src="img/Електроника.png" alt="for_home">
-                            </div>
-                        </div>
-                        <!-- Слайд 2 -->
-                        <div class="hero__slide" style="background: linear-gradient(135deg, #fff3e0, #ffe0b2);">
-                            <div class="hero__slide-info">
-                                <h2 class="hero__slide-title">Бытовая техника</h2>
-                                <p class="hero__slide-text">Всё для дома от 500 сомони</p>
-                                <a href="#" class="hero__slide-btn">Посмотреть</a>
-                            </div>
-                            <div class="hero__slide-img">
-                                <img src="img/Битовая техника.png" alt="for_home">
-                            </div>
-                        </div>
-                        <!-- Слайд 3 -->
-                        <div class="hero__slide" style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9);">
-                            <div class="hero__slide-info">
-                                <h2 class="hero__slide-title">Национальная одежда</h2>
-                                <p class="hero__slide-text">Традиции и стиль в каждой детали</p>
-                                <a href="#" class="hero__slide-btn">Посмотреть</a>
-                            </div>
-                            <div class="hero__slide-img">
-                                <img src="img/Одежда.png" alt="for_home">
+<!-- Слайд 1 -->
+<div class="hero__slide active" style="background: linear-gradient(135deg, #e8f4fd, #c5e3f6);">
+    <div class="hero__slide-info">
+        <h2 class="hero__slide-title">Смартфоны и гаджеты</h2>
+        <p class="hero__slide-text">Скидки до 30% на популярные модели</p>
+        <a href="#" class="hero__slide-btn">Посмотреть</a>
+    </div>
+    <div class="hero__slide-img">
+        <img src="img/Електроника.png" alt="for_home">
+    </div>
+</div>
+<!-- Слайд 2 -->
+<div class="hero__slide" style="background: linear-gradient(135deg, #fff3e0, #ffe0b2);">
+    <div class="hero__slide-info">
+        <h2 class="hero__slide-title">Бытовая техника</h2>
+        <p class="hero__slide-text">Всё для дома от 500 сомони</p>
+        <a href="#" class="hero__slide-btn">Посмотреть</a>
+    </div>
+    <div class="hero__slide-img">
+        <img src="img/Битовая техника.png" alt="for_home">
+    </div>
+</div>
+<!-- Слайд 3 -->
+<div class="hero__slide" style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9);">
+    <div class="hero__slide-info">
+        <h2 class="hero__slide-title">Национальная одежда</h2>
+        <p class="hero__slide-text">Традиции и стиль в каждой детали</p>
+        <a href="#" class="hero__slide-btn">Посмотреть</a>
+    </div>
+    <div class="hero__slide-img">
+        <img src="img/Одежда.png" alt="for_home">
 
-                            </div>
-                        </div>
+    </div>
+</div>
                     </div>
                     <!-- Точки -->
                     <div class="hero__dots" id="heroDots">
-                        <span class="hero__dot active" data-index="0"></span>
-                        <span class="hero__dot" data-index="1"></span>
-                        <span class="hero__dot" data-index="2"></span>
+<span class="hero__dot active" data-index="0"></span>
+<span class="hero__dot" data-index="1"></span>
+<span class="hero__dot" data-index="2"></span>
                     </div>
                 </div>
                 
                 <!-- Баннеры справа -->
                 <div class="hero__banners">
                     <div class="hero__banner" style="background: linear-gradient(135deg, #e3f2fd, #bbdefb);">
-                        <div class="hero__banner-info">
-                            <h4>Электроника</h4>
-                            <p>Скидки до 50%</p>
-                        </div>
-                        <span class="hero__banner-icon"><img src="img/Наушник.svg" alt="electric"></span>
+<div class="hero__banner-info">
+    <h4>Электроника</h4>
+    <p>Скидки до 50%</p>
+</div>
+<span class="hero__banner-icon"><img src="img/Наушник.svg" alt="electric"></span>
                     </div>
                     <div class="hero__banner" style="background: linear-gradient(135deg, #fce4ec, #f8bbd0);">
-                        <div class="hero__banner-info">
-                            <h4>Детские товары</h4>
-                            <p>Новое поступление</p>
-                        </div>
-                        <span class="hero__banner-icon"><img src="img/Детский.svg" alt="electric"></span>
+<div class="hero__banner-info">
+    <h4>Детские товары</h4>
+    <p>Новое поступление</p>
+</div>
+<span class="hero__banner-icon"><img src="img/Детский.svg" alt="electric"></span>
                     </div>
                     <div class="hero__banner" style="background: linear-gradient(135deg, #f3e5f5, #e1bee7);">
-                        <div class="hero__banner-info">
-                            <h4>Красота</h4>
-                            <p>Бесплатная доставка</p>
-                        </div>
-                        <span class="hero__banner-icon"><img src="img/Косметика.svg" alt="electric"></span>
+<div class="hero__banner-info">
+    <h4>Красота</h4>
+    <p>Бесплатная доставка</p>
+</div>
+<span class="hero__banner-icon"><img src="img/Косметика.svg" alt="electric"></span>
                     </div>
                     <div class="hero__banner" style="background: linear-gradient(135deg, #e8eaf6, #c5cae9);">
-                        <div class="hero__banner-info">
-                            <h4>Для дома</h4>
-                            <p>от 100 сомони</p>
-                        </div>
-                        <span class="hero__banner-icon"><img src="img/mansion.png" alt="electric"></span>
+<div class="hero__banner-info">
+    <h4>Для дома</h4>
+    <p>от 100 сомони</p>
+</div>
+<span class="hero__banner-icon"><img src="img/mansion.png" alt="electric"></span>
                     </div>
                 </div>
             </div>
     </section>
+
+
 
 
         <!-- Популярные товары -->
@@ -540,300 +566,302 @@
                 <!-- Товар 1 -->
                 <div class="product-card" data-cat="Одежда">
                     <div class="product-card__img">
-                        <img src="img/Рубашка.jpeg" alt="Смартфон" onerror="this.parentElement.innerHTML='📱'">
-                        <button class="product-card__fav"
-                         data-id="1"
-                        data-name="Вельветовая рубашка с длинными руковами"
-                        data-price="2560"
-                        data-img="img/Рубашка.jpeg"
-                        data-cat="Одежда">
-                            <i class="far fa-heart"></i>
+<img src="img/Рубашка.jpeg" alt="Смартфон" onerror="this.parentElement.innerHTML='📱'">
+<button class="product-card__fav"
+ data-id="1"
+data-name="Вельветовая рубашка с длинными руковами"
+data-price="2560"
+data-img="img/Рубашка.jpeg"
+data-cat="Одежда">
+    <i class="far fa-heart"></i>
 
-                        </button>
+</button>
                     </div>
                     <div class="product-card__body">
-                        <span class="product-card__cat">Одежда</span>
-                        <h3 class="product-card__name">Вельветовая рубашка с длинными руковами</h3>
-                        <div class="product-card__rating">
-                            <i class="fas fa-star"></i>
-                            <span>4.8</span>
-                            <span class="product-card__reviews">(324 отзыва)</span>
-                        </div>
-                        <div class="product-card__price">
-                            <span class="product-card__price-old">180 сомони</span>
-                            <span class="product-card__price-current">120 сомони</span>
-                        </div>
-                        <button class="product-card__cart-btn"
-                        data-id="1"
-                        data-name="Вельветовая рубашка с длинными руковами"
-                        data-price="120"
-                        data-img="img/Рубашка.jpeg"
-                        data-cat="Электроника">
-                            
-                            <i class="fas fa-shopping-cart"></i>
-                            В корзину
-                        </button>
+<span class="product-card__cat">Одежда</span>
+<h3 class="product-card__name">Вельветовая рубашка с длинными руковами</h3>
+<div class="product-card__rating">
+    <i class="fas fa-star"></i>
+    <span>4.8</span>
+    <span class="product-card__reviews">(324 отзыва)</span>
+</div>
+<div class="product-card__price">
+    <span class="product-card__price-old">180 сомони</span>
+    <span class="product-card__price-current">120 сомони</span>
+</div>
+<button class="product-card__cart-btn"
+data-id="1"
+data-name="Вельветовая рубашка с длинными руковами"
+data-price="120"
+data-img="img/Рубашка.jpeg"
+data-cat="Электроника">
+    
+    <i class="fas fa-shopping-cart"></i>
+    В корзину
+</button>
                     </div>
                 </div>
                 
                 <!-- Товар 2 -->
                 <div class="product-card"  data-cat="Одежда">
                     <div class="product-card__img">
-                        <img src="img/Крассовка.jpeg" alt="Ноутбук" onerror="this.parentElement.innerHTML='💻'">
-                        <button class="product-card__fav" 
-                         data-id="2"
-                        data-name="Крассовка AF1 Air Force 1"
-                        data-price="110"
-                        data-img="img/Крассовка.jpeg"
-                        data-cat="Одежда">
-                            <i class="far fa-heart"></i>
-                        </button>
+<img src="img/Крассовка.jpeg" alt="Ноутбук" onerror="this.parentElement.innerHTML='💻'">
+<button class="product-card__fav" 
+ data-id="2"
+data-name="Крассовка AF1 Air Force 1"
+data-price="110"
+data-img="img/Крассовка.jpeg"
+data-cat="Одежда">
+    <i class="far fa-heart"></i>
+</button>
                     </div>
                     <div class="product-card__body">
-                        <span class="product-card__cat">Одежда</span>
-                        <h3 class="product-card__name">Крассовка AF1 Air Force 1</h3>
-                        <div class="product-card__rating">
-                            <i class="fas fa-star"></i>
-                            <span>4.6</span>
-                            <span class="product-card__reviews">(189 отзывов)</span>
-                        </div>
-                        <div class="product-card__price">
-                            <span class="product-card__price-current">110 сомони</span>
-                        </div>
-                        <button class="product-card__cart-btn"
-                        data-id="2"
-                        data-name="Крассовка AF1 Air Force 1"
-                        data-price="110"
-                        data-img="img/Крассовка.jpeg"
-                        data-cat="Одежда">
-                            <i class="fas fa-shopping-cart"></i>
-                            В корзину
-                        </button>
+<span class="product-card__cat">Одежда</span>
+<h3 class="product-card__name">Крассовка AF1 Air Force 1</h3>
+<div class="product-card__rating">
+    <i class="fas fa-star"></i>
+    <span>4.6</span>
+    <span class="product-card__reviews">(189 отзывов)</span>
+</div>
+<div class="product-card__price">
+    <span class="product-card__price-current">110 сомони</span>
+</div>
+<button class="product-card__cart-btn"
+data-id="2"
+data-name="Крассовка AF1 Air Force 1"
+data-price="110"
+data-img="img/Крассовка.jpeg"
+data-cat="Одежда">
+    <i class="fas fa-shopping-cart"></i>
+    В корзину
+</button>
                     </div>
                 </div>
                 
                 <!-- Товар 3 -->
                 <div class="product-card"  data-cat="Одежда">
                     <div class="product-card__img">
-                        <img src="img/Крассовка-2.jpeg" alt="Наушники" onerror="this.parentElement.innerHTML='🎧'">
-                        <button class="product-card__fav"
-                         data-id="3"
-                        data-name="Крассовка в британском стиле"
-                        data-price="140"
-                        data-img="img/Крассовка-2.jpeg"
-                        data-cat="Одежда">
-                            <i class="far fa-heart"></i>
-                        </button>
+<img src="img/Крассовка-2.jpeg" alt="Наушники" onerror="this.parentElement.innerHTML='🎧'">
+<button class="product-card__fav"
+ data-id="3"
+data-name="Крассовка в британском стиле"
+data-price="140"
+data-img="img/Крассовка-2.jpeg"
+data-cat="Одежда">
+    <i class="far fa-heart"></i>
+</button>
                     </div>
                     <div class="product-card__body">
-                        <span class="product-card__cat">Одежда</span>
-                        <h3 class="product-card__name">Крассовка в британском стиле</h3>
-                        <div class="product-card__rating">
-                            <i class="fas fa-star"></i>
-                            <span>4.9</span>
-                            <span class="product-card__reviews">(512 отзывов)</span>
-                        </div>
-                        <div class="product-card__price">
-                            <span class="product-card__price-old">250 сомони</span>
-                            <span class="product-card__price-current">140 сомони</span>
-                        </div>
-                        <button class="product-card__cart-btn"
-                        data-id="3"
-                        data-name="Крассовка в британском стиле"
-                        data-price="140"
-                        data-img="img/Крассовка-2.jpeg"
-                        data-cat="Одежда">
+<span class="product-card__cat">Одежда</span>
+<h3 class="product-card__name">Крассовка в британском стиле</h3>
+<div class="product-card__rating">
+    <i class="fas fa-star"></i>
+    <span>4.9</span>
+    <span class="product-card__reviews">(512 отзывов)</span>
+</div>
+<div class="product-card__price">
+    <span class="product-card__price-old">250 сомони</span>
+    <span class="product-card__price-current">140 сомони</span>
+</div>
+<button class="product-card__cart-btn"
+data-id="3"
+data-name="Крассовка в британском стиле"
+data-price="140"
+data-img="img/Крассовка-2.jpeg"
+data-cat="Одежда">
 
-                            <i class="fas fa-shopping-cart"></i>
-                            В корзину
-                        </button>
+    <i class="fas fa-shopping-cart"></i>
+    В корзину
+</button>
                     </div>
                 </div>
                 
                 <!-- Товар 4 -->
                 <div class="product-card" data-cat="Электроника">
                     <div class="product-card__img">
-                        <img src="img/Наушник.jpeg" alt="Часы" onerror="this.parentElement.innerHTML='⌚'">
-                        <button class="product-card__fav"
-                         data-id="4"
-                        data-name="Провадной наушник"
-                        data-price="30"
-                        data-img="img/Наушник.jpeg"
-                        data-cat="Электроника">
-                            <i class="far fa-heart"></i>
-                        </button>
+<img src="img/Наушник.jpeg" alt="Часы" onerror="this.parentElement.innerHTML='⌚'">
+<button class="product-card__fav"
+ data-id="4"
+data-name="Провадной наушник"
+data-price="30"
+data-img="img/Наушник.jpeg"
+data-cat="Электроника">
+    <i class="far fa-heart"></i>
+</button>
                     </div>
                     <div class="product-card__body">
-                        <span class="product-card__cat">Электроника</span>
-                        <h3 class="product-card__name">Провадной наушник</h3>
-                        <div class="product-card__rating">
-                            <i class="fas fa-star"></i>
-                            <span>4.7</span>
-                            <span class="product-card__reviews">(256 отзывов)</span>
-                        </div>
-                        <div class="product-card__price">
-                            <span class="product-card__price-current">30 сомони</span>
-                        </div>
-                        <button class="product-card__cart-btn"
-                            data-id="4"
-                            data-name="Провадной наушник"
-                            data-price="30"
-                            data-img="img/Наушник.jpeg"
-                            data-cat="Электроника">
-                            <i class="fas fa-shopping-cart"></i>
-                            В корзину
-                        </button>
+<span class="product-card__cat">Электроника</span>
+<h3 class="product-card__name">Провадной наушник</h3>
+<div class="product-card__rating">
+    <i class="fas fa-star"></i>
+    <span>4.7</span>
+    <span class="product-card__reviews">(256 отзывов)</span>
+</div>
+<div class="product-card__price">
+    <span class="product-card__price-current">30 сомони</span>
+</div>
+<button class="product-card__cart-btn"
+    data-id="4"
+    data-name="Провадной наушник"
+    data-price="30"
+    data-img="img/Наушник.jpeg"
+    data-cat="Электроника">
+    <i class="fas fa-shopping-cart"></i>
+    В корзину
+</button>
                     </div>
                 </div>
                 
                 <!-- Товар 5 -->
                 <div class="product-card" data-cat="Электроника">
                     <div class="product-card__img">
-                        <img src="img/watch.jpeg" alt="Планшет" onerror="this.parentElement.innerHTML='📱'">
-                        <button class="product-card__fav active"
-                         data-id="5"
-                        data-name="Смартфон Samsung Galaxy A54 5G 128GB"
-                        data-price="230"
-                        data-img="img/watch.jpeg"
-                        data-cat="Электроника">
-                            <i class="fas fa-heart"></i>
-                        </button>
+<img src="img/watch.jpeg" alt="Планшет" onerror="this.parentElement.innerHTML='📱'">
+<button class="product-card__fav active"
+ data-id="5"
+data-name="Часы CHENXI"
+data-price="230"
+data-img="img/watch.jpeg"
+data-cat="Электроника">
+    <i class="fas fa-heart"></i>
+</button>
                     </div>
                     <div class="product-card__body">
-                        <span class="product-card__cat">Электроника</span>
-                        <h3 class="product-card__name">Часы "CHENXI"</h3>
-                        <div class="product-card__rating">
-                            <i class="fas fa-star"></i>
-                            <span>4.9</span>
-                            <span class="product-card__reviews">(678 отзывов)</span>
-                        </div>
-                        <div class="product-card__price">
-                            <span class="product-card__price-old">300 сомони</span>
-                            <span class="product-card__price-current">230 сомони</span>
-                        </div>
-                        <button class="product-card__cart-btn"
-                        data-id="5"
-                        data-name="Планшет iPad Air 10.9\" 256GB Wi-Fi
-                        data-price="230"
-                        data-img="img/watch.jpeg"
-                        data-cat="Электроника">
-                            <i class="fas fa-shopping-cart"></i>
-                            В корзину
-                        </button>
+<span class="product-card__cat">Электроника</span>
+<h3 class="product-card__name">Часы "CHENXI"</h3>
+<div class="product-card__rating">
+    <i class="fas fa-star"></i>
+    <span>4.9</span>
+    <span class="product-card__reviews">(678 отзывов)</span>
+</div>
+<div class="product-card__price">
+    <span class="product-card__price-old">300 сомони</span>
+    <span class="product-card__price-current">230 сомони</span>
+</div>
+<button class="product-card__cart-btn"
+data-id="5"
+data-name="Планшет iPad Air 10.9\" 256GB Wi-Fi
+data-price="230"
+data-img="img/watch.jpeg"
+data-cat="Электроника">
+    <i class="fas fa-shopping-cart"></i>
+    В корзину
+</button>
                     </div>
                 </div>
                 
                 <!-- Товар 6 -->
                 <div class="product-card" data-cat="Одежда">
                     <div class="product-card__img">
-                        <img src="img/Шилопка-2.jpeg" alt="Колонка" onerror="this.parentElement.innerHTML='🔊'">
-                        <button class="product-card__fav" 
-                         data-id="6"
-                        data-name="Кожаные тапочки"
-                        data-price="100"
-                        data-img="img/Шилопка-2.jpeg"
-                        data-cat="Одежда">
-                            <i class="far fa-heart"></i>
-                        </button>
+<img src="img/Шилопка-2.jpeg" alt="Колонка" onerror="this.parentElement.innerHTML='🔊'">
+<button class="product-card__fav" 
+ data-id="6"
+data-name="Кожаные тапочки"
+data-price="100"
+data-img="img/Шилопка-2.jpeg"
+data-cat="Одежда">
+    <i class="far fa-heart"></i>
+</button>
                     </div>
                     <div class="product-card__body">
-                        <span class="product-card__cat">Одежда</span>
-                        <h3 class="product-card__name">Кожаные тапочки</h3>
-                        <div class="product-card__rating">
-                            <i class="fas fa-star"></i>
-                            <span>4.7</span>
-                            <span class="product-card__reviews">(432 отзыва)</span>
-                        </div>
-                        <div class="product-card__price">
-                            <span class="product-card__price-current">100 сомони</span>
-                        </div>
-                        <button class="product-card__cart-btn"
-                            data-id="6"
-                            data-name="Кожаные тапочки"
-                            data-price="100"
-                            data-img="img/Шилопка-2.jpeg"
-                            data-cat="Одежда">
-                            <i class="fas fa-shopping-cart"></i>
-                            В корзину
-                        </button>
+<span class="product-card__cat">Одежда</span>
+<h3 class="product-card__name">Кожаные тапочки</h3>
+<div class="product-card__rating">
+    <i class="fas fa-star"></i>
+    <span>4.7</span>
+    <span class="product-card__reviews">(432 отзыва)</span>
+</div>
+<div class="product-card__price">
+    <span class="product-card__price-current">100 сомони</span>
+</div>
+<button class="product-card__cart-btn"
+    data-id="6"
+    data-name="Кожаные тапочки"
+    data-price="100"
+    data-img="img/Шилопка-2.jpeg"
+    data-cat="Одежда">
+    <i class="fas fa-shopping-cart"></i>
+    В корзину
+</button>
                     </div>
                 </div>
                 
                 <!-- Товар 7 -->
                 <div class="product-card"  data-cat="Электроника">
                     <div class="product-card__img">
-                        <img src="img/Знак Мерса.jpeg" alt="Телевизор" onerror="this.parentElement.innerHTML='📺'">
-                        <button class="product-card__fav" 
-                         data-id="7"
-                        data-name="Знак Mercedes Benz"
-                        data-price="80"
-                        data-img="img/Знак Мерса.jpeg"
-                        data-cat="Электроника">
-                            <i class="far fa-heart"></i>
-                        </button>
+<img src="img/Знак Мерса.jpeg" alt="Телевизор" onerror="this.parentElement.innerHTML='📺'">
+<button class="product-card__fav" 
+ data-id="7"
+data-name="Знак Mercedes Benz"
+data-price="80"
+data-img="img/Знак Мерса.jpeg"
+data-cat="Электроника">
+    <i class="far fa-heart"></i>
+</button>
                     </div>
                     <div class="product-card__body">
-                        <span class="product-card__cat">Электроника</span>
-                        <h3 class="product-card__name">Знак Mercedes Benz</h3>
-                        <div class="product-card__rating">
-                            <i class="fas fa-star"></i>
-                            <span>4.8</span>
-                            <span class="product-card__reviews">(156 отзывов)</span>
-                        </div>
-                        <div class="product-card__price">
-                            <span class="product-card__price-old">90 сомони</span>
-                            <span class="product-card__price-current">80 сомони</span>
-                        </div>
-                        <button class="product-card__cart-btn"
-                        data-id="7"
-                        data-name="Знак Mercedes Benz"
-                        data-price="80"
-                        data-img="img/Знак Мерса.jpeg"
-                        data-cat="Электроника">
-                            <i class="fas fa-shopping-cart"></i>
-                            В корзину
-                        </button>
+<span class="product-card__cat">Электроника</span>
+<h3 class="product-card__name">Знак Mercedes Benz</h3>
+<div class="product-card__rating">
+    <i class="fas fa-star"></i>
+    <span>4.8</span>
+    <span class="product-card__reviews">(156 отзывов)</span>
+</div>
+<div class="product-card__price">
+    <span class="product-card__price-old">90 сомони</span>
+    <span class="product-card__price-current">80 сомони</span>
+</div>
+<button class="product-card__cart-btn"
+data-id="7"
+data-name="Знак Mercedes Benz"
+data-price="80"
+data-img="img/Знак Мерса.jpeg"
+data-cat="Электроника">
+    <i class="fas fa-shopping-cart"></i>
+    В корзину
+</button>
                     </div>
                 </div>
                 
                 <!-- Товар 8 -->
                 <div class="product-card" data-cat="Одежда">
                     <div class="product-card__img">
-                        <img src="img/Рубашка-3.jpeg" alt="Клавиатура" onerror="this.parentElement.innerHTML='⌨️'">
-                        <button class="product-card__fav" 
-                         data-id="8"
-                        data-name="Кочественноя рубашка с длинными руковами"
-                        data-price="120"
-                        data-img="img/Рубашка-3.jpeg"
-                        data-cat="Одежда">
-                            <i class="far fa-heart"></i>
-                        </button>
+<img src="img/Рубашка-3.jpeg" alt="Клавиатура" onerror="this.parentElement.innerHTML='⌨️'">
+<button class="product-card__fav" 
+ data-id="8"
+data-name="Кочественноя рубашка с длинными руковами"
+data-price="120"
+data-img="img/Рубашка-3.jpeg"
+data-cat="Одежда">
+    <i class="far fa-heart"></i>
+</button>
                     </div>
                     <div class="product-card__body">
-                        <span class="product-card__cat">Одежда</span>
-                        <h3 class="product-card__name">Кочественноя рубашка с длинными руковами</h3>
-                        <div class="product-card__rating">
-                            <i class="fas fa-star"></i>
-                            <span>4.5</span>
-                            <span class="product-card__reviews">(89 отзывов)</span>
-                        </div>
-                        <div class="product-card__price">
-                            <span class="product-card__price-current">120 сомони</span>
-                        </div>
-                        <button class="product-card__cart-btn"
-                            data-id="8"
-                            data-name="Кочественноя рубашка с длинными руковами"
-                            data-price="120"
-                            data-img="img/Рубашка-3.jpeg"
-                            data-cat="Одежда">
-                            <i class="fas fa-shopping-cart"></i>
-                            В корзину
-                        </button>
+<span class="product-card__cat">Одежда</span>
+<h3 class="product-card__name">Кочественноя рубашка с длинными руковами</h3>
+<div class="product-card__rating">
+    <i class="fas fa-star"></i>
+    <span>4.5</span>
+    <span class="product-card__reviews">(89 отзывов)</span>
+</div>
+<div class="product-card__price">
+    <span class="product-card__price-current">120 сомони</span>
+</div>
+<button class="product-card__cart-btn"
+    data-id="8"
+    data-name="Кочественноя рубашка с длинными руковами"
+    data-price="120"
+    data-img="img/Рубашка-3.jpeg"
+    data-cat="Одежда">
+    <i class="fas fa-shopping-cart"></i>
+    В корзину
+</button>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+   
 
         <!-- Корзина (выезжающая панель) -->
                 <!-- Корзина -->
@@ -952,72 +980,72 @@
                 <div class="checkout-step-content active" id="step1">
                     <h3 class="checkout-section__title">Контактные данные</h3>
                     <div class="checkout-form__row">
-                        <div class="checkout-form__group">
-                            <label>Имя *</label>
-                            <input type="text" placeholder="Ваше имя" id="checkoutName">
-                        </div>
-                        <div class="checkout-form__group">
-                            <label>Фамилия *</label>
-                            <input type="text" placeholder="Ваша фамилия" id="checkoutSurname">
-                        </div>
+<div class="checkout-form__group">
+    <label>Имя *</label>
+    <input type="text" placeholder="Ваше имя" id="checkoutName">
+</div>
+<div class="checkout-form__group">
+    <label>Фамилия *</label>
+    <input type="text" placeholder="Ваша фамилия" id="checkoutSurname">
+</div>
                     </div>
                     <div class="checkout-form__group">
-                        <label>Номер телефона *</label>
-                        <input type="tel" placeholder="+992 XXX XXX XXX" id="checkoutPhone">
+<label>Номер телефона *</label>
+<input type="tel" placeholder="+992 XXX XXX XXX" id="checkoutPhone">
                     </div>
                     <div class="checkout-form__group">
-                        <label>Email</label>
-                        <input type="email" placeholder="example@mail.com" id="checkoutEmail">
+<label>Email</label>
+<input type="email" placeholder="example@mail.com" id="checkoutEmail">
                     </div>
                     
                     <h3 class="checkout-section__title">Адрес доставки</h3>
                     <div class="checkout-form__group">
-                        <label>Город *</label>
-                        <select id="checkoutCity">
-                            <option value="">Выберите город</option>
-                            <option value="Душанбе">Душанбе</option>
-                            <option value="Худжанд">Худжанд</option>
-                            <option value="Куляб">Куляб</option>
-                            <option value="Бохтар">Бохтар</option>
-                            <option value="Хорог">Хорог</option>
-                        </select>
+<label>Город *</label>
+<select id="checkoutCity">
+    <option value="">Выберите город</option>
+    <option value="Душанбе">Душанбе</option>
+    <option value="Худжанд">Худжанд</option>
+    <option value="Куляб">Куляб</option>
+    <option value="Бохтар">Бохтар</option>
+    <option value="Хорог">Хорог</option>
+</select>
                     </div>
                     <div class="checkout-form__group">
-                        <label>Адрес *</label>
-                        <input type="text" placeholder="Улица, дом, квартира" id="checkoutAddress">
+<label>Адрес *</label>
+<input type="text" placeholder="Улица, дом, квартира" id="checkoutAddress">
                     </div>
                     <div class="checkout-form__group">
-                        <label>Комментарий к заказу</label>
-                        <textarea placeholder="Дополнительная информация..." rows="2" id="checkoutComment"></textarea>
+<label>Комментарий к заказу</label>
+<textarea placeholder="Дополнительная информация..." rows="2" id="checkoutComment"></textarea>
                     </div>
                     
                     <h3 class="checkout-section__title">Способ доставки</h3>
                     <div class="checkout-delivery__options">
-                        <label class="checkout-delivery__option active">
-                            <input type="radio" name="delivery" value="courier" checked>
-                            <div class="checkout-delivery__info">
-                                <span class="checkout-delivery__name">
-                                    <i class="fas fa-truck"></i> Курьерская доставка
-                                </span>
-                                <span class="checkout-delivery__desc">Доставка на дом, 1-3 дня</span>
-                                <span class="checkout-delivery__price">30 сомони</span>
-                            </div>
-                        </label>
-                        <label class="checkout-delivery__option">
-                            <input type="radio" name="delivery" value="pickup">
-                            <div class="checkout-delivery__info">
-                                <span class="checkout-delivery__name">
-                                    <i class="fas fa-store"></i> Самовывоз
-                                </span>
-                                <span class="checkout-delivery__desc">Забрать из пункта выдачи</span>
-                                <span class="checkout-delivery__price">Бесплатно</span>
-                            </div>
-                        </label>
+<label class="checkout-delivery__option active">
+    <input type="radio" name="delivery" value="courier" checked>
+    <div class="checkout-delivery__info">
+        <span class="checkout-delivery__name">
+            <i class="fas fa-truck"></i> Курьерская доставка
+        </span>
+        <span class="checkout-delivery__desc">Доставка на дом, 1-3 дня</span>
+        <span class="checkout-delivery__price">30 сомони</span>
+    </div>
+</label>
+<label class="checkout-delivery__option">
+    <input type="radio" name="delivery" value="pickup">
+    <div class="checkout-delivery__info">
+        <span class="checkout-delivery__name">
+            <i class="fas fa-store"></i> Самовывоз
+        </span>
+        <span class="checkout-delivery__desc">Забрать из пункта выдачи</span>
+        <span class="checkout-delivery__price">Бесплатно</span>
+    </div>
+</label>
                     </div>
                     
                     <button class="checkout-btn" onclick="window.goToStep(2)">
-                        Далее: Оплата
-                        <i class="fas fa-arrow-right"></i>
+Далее: Оплата
+<i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
                 
@@ -1025,88 +1053,88 @@
                 <div class="checkout-step-content" id="step2">
                     <h3 class="checkout-section__title">Ваш заказ</h3>
                     <div class="checkout-order__items" id="checkoutOrderItems">
-                        <!-- Заполняется через JS -->
+<!-- Заполняется через JS -->
                     </div>
                     
                     <div class="checkout-order__summary">
-                        <div class="checkout-order__row">
-                            <span>Товары (<span id="checkoutItemCount">0</span>)</span>
-                            <span id="checkoutSubtotal">0 сомони</span>
-                        </div>
-                        <div class="checkout-order__row">
-                            <span>Доставка</span>
-                            <span id="checkoutDeliveryCost">30 сомони</span>
-                        </div>
-                        <div class="checkout-order__row checkout-order__row--total">
-                            <span>Итого</span>
-                            <span id="checkoutFinalTotal">0 сомони</span>
-                        </div>
+<div class="checkout-order__row">
+    <span>Товары (<span id="checkoutItemCount">0</span>)</span>
+    <span id="checkoutSubtotal">0 сомони</span>
+</div>
+<div class="checkout-order__row">
+    <span>Доставка</span>
+    <span id="checkoutDeliveryCost">30 сомони</span>
+</div>
+<div class="checkout-order__row checkout-order__row--total">
+    <span>Итого</span>
+    <span id="checkoutFinalTotal">0 сомони</span>
+</div>
                     </div>
                     
                     <h3 class="checkout-section__title">Способ оплаты</h3>
                     <div class="checkout-payment__options">
-                        <label class="checkout-payment__option active">
-                            <input type="radio" name="payment" value="card" checked>
-                            <div class="checkout-payment__info">
-                                <span class="checkout-payment__name">
-                                    <i class="fas fa-credit-card"></i> Банковская карта
-                                </span>
-                                <span class="checkout-payment__desc">Visa, Mastercard, Элсом, Корти Милли</span>
-                            </div>
-                        </label>
-                        <label class="checkout-payment__option">
-                            <input type="radio" name="payment" value="cash">
-                            <div class="checkout-payment__info">
-                                <span class="checkout-payment__name">
-                                    <i class="fas fa-money-bill-wave"></i> Наличные при получении
-                                </span>
-                                <span class="checkout-payment__desc">Оплата при доставке курьеру</span>
-                            </div>
-                        </label>
+<label class="checkout-payment__option active">
+    <input type="radio" name="payment" value="card" checked>
+    <div class="checkout-payment__info">
+        <span class="checkout-payment__name">
+            <i class="fas fa-credit-card"></i> Банковская карта
+        </span>
+        <span class="checkout-payment__desc">Visa, Mastercard, Элсом, Корти Милли</span>
+    </div>
+</label>
+<label class="checkout-payment__option">
+    <input type="radio" name="payment" value="cash">
+    <div class="checkout-payment__info">
+        <span class="checkout-payment__name">
+            <i class="fas fa-money-bill-wave"></i> Наличные при получении
+        </span>
+        <span class="checkout-payment__desc">Оплата при доставке курьеру</span>
+    </div>
+</label>
                     </div>
                     
                     <div style="display: flex; gap: 10px;">
-                        <button class="checkout-btn checkout-btn--outline" onclick="window.goToStep(1)">
-                            <i class="fas fa-arrow-left"></i>
-                            Назад
-                        </button>
-                        <button class="checkout-btn checkout-btn--success" onclick="window.placeOrder()">
-                            Подтвердить заказ
-                            <i class="fas fa-check"></i>
-                        </button>
+<button class="checkout-btn checkout-btn--outline" onclick="window.goToStep(1)">
+    <i class="fas fa-arrow-left"></i>
+    Назад
+</button>
+<button class="checkout-btn checkout-btn--success" onclick="window.placeOrder()">
+    Подтвердить заказ
+    <i class="fas fa-check"></i>
+</button>
                     </div>
                 </div>
                 
                 <!-- Шаг 3: Готово -->
                 <div class="checkout-step-content" id="step3">
                     <div class="checkout-success">
-                        <div class="checkout-success__icon">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <h2>Заказ оформлен!</h2>
-                        <p>Номер вашего заказа: <strong id="orderNumber">#00000</strong></p>
-                        <p>Мы свяжемся с вами для подтверждения</p>
-                        <div class="checkout-success__details">
-                            <div class="checkout-success__row">
-                                <span>Имя:</span>
-                                <span id="orderName">—</span>
-                            </div>
-                            <div class="checkout-success__row">
-                                <span>Телефон:</span>
-                                <span id="orderPhone">—</span>
-                            </div>
-                            <div class="checkout-success__row">
-                                <span>Адрес:</span>
-                                <span id="orderAddress">—</span>
-                            </div>
-                            <div class="checkout-success__row">
-                                <span>Сумма:</span>
-                                <span id="orderTotal">—</span>
-                            </div>
-                        </div>
-                        <button class="checkout-btn" onclick="window.closeCheckout()">
-                            Вернуться в магазин
-                        </button>
+<div class="checkout-success__icon">
+    <i class="fas fa-check-circle"></i>
+</div>
+<h2>Заказ оформлен!</h2>
+<p>Номер вашего заказа: <strong id="orderNumber">#00000</strong></p>
+<p>Мы свяжемся с вами для подтверждения</p>
+<div class="checkout-success__details">
+    <div class="checkout-success__row">
+        <span>Имя:</span>
+        <span id="orderName">—</span>
+    </div>
+    <div class="checkout-success__row">
+        <span>Телефон:</span>
+        <span id="orderPhone">—</span>
+    </div>
+    <div class="checkout-success__row">
+        <span>Адрес:</span>
+        <span id="orderAddress">—</span>
+    </div>
+    <div class="checkout-success__row">
+        <span>Сумма:</span>
+        <span id="orderTotal">—</span>
+    </div>
+</div>
+<button class="checkout-btn" onclick="window.closeCheckout()">
+    Вернуться в магазин
+</button>
                     </div>
                 </div>
             </div>
@@ -1157,18 +1185,18 @@
                 <!-- Галерея фото -->
                 <div class="quickview__gallery">
                     <div class="quickview__main-img" id="quickviewMainImg">
-                        <span>📱</span>
+<span>📱</span>
                     </div>
                     <div class="quickview__thumbs" id="quickviewThumbs">
-                        <button class="quickview__thumb active">
-                            <span>📱</span>
-                        </button>
-                        <button class="quickview__thumb">
-                            <span>📱</span>
-                        </button>
-                        <button class="quickview__thumb">
-                            <span>📱</span>
-                        </button>
+<button class="quickview__thumb active">
+    <span>📱</span>
+</button>
+<button class="quickview__thumb">
+    <span>📱</span>
+</button>
+<button class="quickview__thumb">
+    <span>📱</span>
+</button>
                     </div>
                 </div>
                 
@@ -1179,87 +1207,101 @@
                     
                     <!-- Рейтинг -->
                     <div class="quickview__rating">
-                        <div class="quickview__stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                        </div>
-                        <span class="quickview__rating-num">4.8</span>
-                        <span class="quickview__reviews">324 отзыва</span>
+<div class="quickview__stars">
+    <i class="fas fa-star"></i>
+    <i class="fas fa-star"></i>
+    <i class="fas fa-star"></i>
+    <i class="fas fa-star"></i>
+    <i class="fas fa-star-half-alt"></i>
+</div>
+<span class="quickview__rating-num">4.8</span>
+<span class="quickview__reviews">324 отзыва</span>
                     </div>
                     
                     <!-- Цена -->
                     <div class="quickview__prices">
-                        <span class="quickview__price-old" id="quickviewPriceOld" style="display:none;">3 200 сомони</span>
-                        <span class="quickview__price-current" id="quickviewPrice">2 560 сомони</span>
-                        <span class="quickview__discount" id="quickviewDiscount" style="display:none;">-20%</span>
+<span class="quickview__price-old" id="quickviewPriceOld" style="display:none;">3 200 сомони</span>
+<span class="quickview__price-current" id="quickviewPrice">2 560 сомони</span>
+<span class="quickview__discount" id="quickviewDiscount" style="display:none;">-20%</span>
                     </div>
                     
                     <!-- Краткое описание -->
                     <p class="quickview__desc" id="quickviewDesc">
-                        Отличный смартфон с AMOLED-дисплеем 6.4", камерой 50 МП и аккумулятором на 5000 мАч. Идеальный выбор для повседневного использования.
+Отличный смартфон с AMOLED-дисплеем 6.4", камерой 50 МП и аккумулятором на 5000 мАч. Идеальный выбор для повседневного использования.
                     </p>
                     
                     <!-- Характеристики -->
                     <div class="quickview__specs">
-                        <div class="quickview__spec">
-                            <span>Дисплей</span>
-                            <span>6.4" AMOLED</span>
-                        </div>
-                        <div class="quickview__spec">
-                            <span>Память</span>
-                            <span>128GB / 8GB</span>
-                        </div>
-                        <div class="quickview__spec">
-                            <span>Камера</span>
-                            <span>50 МП + 12 МП</span>
-                        </div>
-                        <div class="quickview__spec">
-                            <span>Аккумулятор</span>
-                            <span>5000 мАч</span>
-                        </div>
+<div class="quickview__spec">
+    <span>Дисплей</span>
+    <span>6.4" AMOLED</span>
+</div>
+<div class="quickview__spec">
+    <span>Память</span>
+    <span>128GB / 8GB</span>
+</div>
+<div class="quickview__spec">
+    <span>Камера</span>
+    <span>50 МП + 12 МП</span>
+</div>
+<div class="quickview__spec">
+    <span>Аккумулятор</span>
+    <span>5000 мАч</span>
+</div>
+
                     </div>
+                
+                <!-- Выбор размера -->
+                <div class="quickview__size" id="quickviewSizeBlock" style="display:none;">
+                    <span>Размер:</span>
+                    <div class="quickview__size-options" id="quickviewSizes"></div>
+                </div>
                     
                     <!-- Выбор количества -->
                     <div class="quickview__quantity">
-                        <span>Количество:</span>
-                        <div class="quickview__qty-controls">
-                            <button class="quickview__qty-btn" id="qvQtyMinus">−</button>
-                            <span class="quickview__qty-num" id="qvQty">1</span>
-                            <button class="quickview__qty-btn" id="qvQtyPlus">+</button>
-                        </div>
+<span>Количество:</span>
+<div class="quickview__qty-controls">
+    <button class="quickview__qty-btn" id="qvQtyMinus">−</button>
+    <span class="quickview__qty-num" id="qvQty">1</span>
+    <button class="quickview__qty-btn" id="qvQtyPlus">+</button>
+</div>
                     </div>
                     
                     <!-- Кнопки -->
                     <div class="quickview__actions">
-                        <button class="quickview__cart-btn" id="qvAddToCart">
-                            <i class="fas fa-shopping-cart"></i>
-                            В корзину
-                        </button>
-                        <button class="quickview__fav-btn" id="qvFavorite">
-                            <i class="far fa-heart"></i>
-                        </button>
+<button class="quickview__cart-btn" id="qvAddToCart">
+    <i class="fas fa-shopping-cart"></i>
+    В корзину
+</button>
+<button class="quickview__fav-btn" id="qvFavorite">
+    <i class="far fa-heart"></i>
+</button>
                     </div>
                     
                     <!-- Доставка -->
                     <div class="quickview__delivery">
-                        <div class="quickview__delivery-item">
-                            <i class="fas fa-truck"></i>
-                            <div>
-                                <strong>Курьерская доставка</strong>
-                                <span>от 1 до 3 дней, 30 сомони</span>
-                            </div>
-                        </div>
-                        <div class="quickview__delivery-item">
-                            <i class="fas fa-store"></i>
-                            <div>
-                                <strong>Самовывоз</strong>
-                                <span>сегодня, бесплатно</span>
-                            </div>
-                        </div>
+<div class="quickview__delivery-item">
+    <i class="fas fa-truck"></i>
+    <div>
+        <strong>Курьерская доставка</strong>
+        <span>от 1 до 3 дней, 30 сомони</span>
+    </div>
+</div>
+<div class="quickview__delivery-item">
+    <i class="fas fa-store"></i>
+    <div>
+        <strong>Самовывоз</strong>
+        <span>сегодня, бесплатно</span>
+    </div>
+</div>
                     </div>
+                      <!-- Похожие товары -->
+            <div class="quickview__related">
+                <h3 class="quickview__related-title">Похожие товары</h3>
+                <div class="quickview__related-grid" id="quickviewRelated">
+                    <!-- Заполняется через JS -->
+                </div>
+            </div>
                 </div>
             </div>
         </div>
@@ -1278,8 +1320,8 @@
             <div class="auth-form active" id="loginForm">
                 <div class="auth-form__header">
                     <div class="auth-form__logo">
-                        <span class="auth-form__logo-icon">SX</span>
-                        <span>ShopXand</span>
+<span class="auth-form__logo-icon">SX</span>
+<span>ShopXand</span>
                     </div>
                     <h2>Вход в аккаунт</h2>
                     <p>Войдите, чтобы отслеживать заказы и сохранять избранное</p>
@@ -1287,47 +1329,47 @@
                 
                 <div class="auth-form__body">
                     <div class="auth-form__group">
-                        <label>Телефон или Email</label>
-                        <div class="auth-form__input-wrap">
-                            <i class="fas fa-envelope"></i>
-                            <input type="text" placeholder="+992 XXX XXX XXX" id="loginPhone">
-                        </div>
+<label>Телефон или Email</label>
+<div class="auth-form__input-wrap">
+    <i class="fas fa-envelope"></i>
+    <input type="text" placeholder="+992 XXX XXX XXX" id="loginPhone">
+</div>
                     </div>
                     
                     <div class="auth-form__group">
-                        <label>Пароль</label>
-                        <div class="auth-form__input-wrap">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" placeholder="Введите пароль" id="loginPassword">
-                            <button type="button" class="auth-form__toggle-password">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
+<label>Пароль</label>
+<div class="auth-form__input-wrap">
+    <i class="fas fa-lock"></i>
+    <input type="password" placeholder="Введите пароль" id="loginPassword">
+    <button type="button" class="auth-form__toggle-password">
+    </button>
+</div>
                     </div>
                     
                     <div class="auth-form__row">
-                        <label class="auth-form__checkbox">
-                            <input type="checkbox" checked>
-                            <span>Запомнить меня</span>
-                        </label>
-                        <a href="#" class="auth-form__forgot">Забыли пароль?</a>
+<label class="auth-form__checkbox">
+    <input type="checkbox" checked>
+    <span>Запомнить меня</span>
+</label>
+<a href="#" class="auth-form__forgot">Забыли пароль?</a>
                     </div>
                     
+                    
                     <button class="auth-form__submit" id="loginBtn">
-                        Войти
+Войти
                     </button>
                     
                     <div class="auth-form__divider">
-                        <span>или</span>
+<span>или</span>
                     </div>
                     
                     <div class="auth-form__social">
-                        <button class="auth-form__social-btn">
-                            <i class="fab fa-google"></i> Google
-                        </button>
-                        <button class="auth-form__social-btn">
-                            <i class="fab fa-facebook"></i> Facebook
-                        </button>
+<button class="auth-form__social-btn">
+    <i class="fab fa-google"></i> Google
+</button>
+<button class="auth-form__social-btn">
+    <i class="fab fa-facebook"></i> Facebook
+</button>
                     </div>
                 </div>
                 
@@ -1335,13 +1377,46 @@
                     <p>Нет аккаунта? <a href="#" id="showRegister">Зарегистрироваться</a></p>
                 </div>
             </div>
+
+<!-- Форма восстановления пароля -->
+            <div class="auth-form" id="forgotForm">
+                <div class="auth-form__header">
+                    <div class="auth-form__logo">
+<span class="auth-form__logo-icon">SX</span>
+<span>ShopXand</span>
+                    </div>
+                     <h2>Забыли пароль?</h2>
+        <p>Введите ваш номер телефона</p>
+    </div>
+    <div class="auth-form__body">
+        <div class="auth-form__group">
+            <label>Телефон</label>
+            <input type="tel" placeholder="+992 XXX XXX XXX" id="forgotPhone">
+        </div>
+        <button class="auth-form__submit" id="forgotBtn">Проверить</button>
+        
+        <div id="codeBlock" style="display:none;">
+            <div class="auth-form__group">
+                <label>Новый пароль</label>
+                <input type="password" placeholder="Минимум 6 символов" id="newPassword">
+            </div>
+            <button class="auth-form__submit" id="resetPasswordBtn">Сохранить пароль</button>
+        </div>
+    </div>
+    <div class="auth-form__footer">
+        <p><a href="#" id="showLoginFromForgot">← Вернуться ко входу</a></p>
+    </div>
+</div>
+</div>
+    </div>
+                
             
             <!-- Форма регистрации -->
             <div class="auth-form" id="registerForm">
                 <div class="auth-form__header">
                     <div class="auth-form__logo">
-                        <span class="auth-form__logo-icon">SX</span>
-                        <span>ShopXand</span>
+<span class="auth-form__logo-icon">SX</span>
+<span>ShopXand</span>
                     </div>
                     <h2>Регистрация</h2>
                     <p>Создайте аккаунт для быстрых покупок</p>
@@ -1349,49 +1424,49 @@
                 
                 <div class="auth-form__body">
                     <div class="auth-form__row-inputs">
-                        <div class="auth-form__group">
-                            <label>Имя</label>
-                            <input type="text" placeholder="Ваше имя" id="regName">
-                        </div>
-                        <div class="auth-form__group">
-                            <label>Фамилия</label>
-                            <input type="text" placeholder="Ваша фамилия" id="regSurname">
-                        </div>
+<div class="auth-form__group">
+    <label>Имя</label>
+    <input type="text" placeholder="Ваше имя" id="regName">
+</div>
+<div class="auth-form__group">
+    <label>Фамилия</label>
+    <input type="text" placeholder="Ваша фамилия" id="regSurname">
+</div>
                     </div>
                     
                     <div class="auth-form__group">
-                        <label>Телефон</label>
-                        <input type="tel" placeholder="+992 XXX XXX XXX" id="regPhone">
+<label>Телефон</label>
+<input type="tel" placeholder="+992 XXX XXX XXX" id="regPhone">
                     </div>
                     
                     <div class="auth-form__group">
-                        <label>Email</label>
-                        <input type="email" placeholder="example@mail.com" id="regEmail">
+<label>Email</label>
+<input type="email" placeholder="example@mail.com" id="regEmail">
                     </div>
                     
                     <div class="auth-form__group">
-                        <label>Пароль</label>
-                        <div class="auth-form__input-wrap">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" placeholder="Минимум 6 символов" id="regPassword">
-                            <button type="button" class="auth-form__toggle-password">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
+<label>Пароль</label>
+<div class="auth-form__input-wrap">
+    <i class="fas fa-lock"></i>
+    <input type="password" placeholder="Минимум 6 символов" id="regPassword">
+    <button type="button" class="auth-form__toggle-password">
+        <i class="fas fa-eye"></i>
+    </button>
+</div>
                     </div>
                     
                     <div class="auth-form__group">
-                        <label>Подтвердите пароль</label>
-                        <input type="password" placeholder="Повторите пароль" id="regPasswordConfirm">
+<label>Подтвердите пароль</label>
+<input type="password" placeholder="Повторите пароль" id="regPasswordConfirm">
                     </div>
                     
                     <label class="auth-form__checkbox">
-                        <input type="checkbox" id="regAgree">
-                        <span>Я согласен с <a href="#">условиями использования</a></span>
+<input type="checkbox" id="regAgree">
+<span>Я согласен с <a href="#">условиями использования</a></span>
                     </label>
                     
                     <button class="auth-form__submit" id="registerBtn">
-                        Зарегистрироваться
+Зарегистрироваться
                     </button>
                 </div>
                 
@@ -1409,37 +1484,157 @@
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('/sw.js')
                     .then(function(reg) {
-                        console.log('Service Worker зарегистрирован:', reg.scope);
+console.log('Service Worker зарегистрирован:', reg.scope);
                     })
                     .catch(function(err) {
-                        console.log('Service Worker ошибка:', err);
+console.log('Service Worker ошибка:', err);
                     });
             });
         }
     </script>
-    
-    <!-- Кнопка установки PWA -->
-    <div class="pwa-install" id="pwaInstall" style="display:none;">
-        <div class="pwa-install__content">
-            <div class="pwa-install__icon">
-                <svg width="40" height="40" viewBox="0 0 500 500">
-                    <defs>
-                        <clipPath id="pwa-xclip">
-                            <rect x="320" y="0" width="250" height="500"/>
-                        </clipPath>
-                    </defs>
-                    <text x="320" y="410" font-family="Arial Black" font-weight="900" font-size="400" fill="#1a6df0" text-anchor="middle" clip-path="url(#pwa-xclip)">X</text>
-                    <text x="170" y="410" font-family="Arial Black" font-weight="900" font-size="400" fill="#111" text-anchor="middle">S</text>
-                </svg>
+
+      <!-- Кнопка установки PWA -->
+<div class="pwa-install-btn" id="pwaInstallBtn" style="display:none;">
+    <div class="pwa-install-btn__content">
+        <div class="pwa-install-btn__icon">
+            <svg width="32" height="32" viewBox="0 0 500 500">
+                <rect width="500" height="500" fill="#0066ff" rx="80"/>
+                <text x="250" y="380" font-family="Arial Black" font-weight="900" font-size="350" fill="white" text-anchor="middle">SX</text>
+            </svg>
+        </div>
+        <div class="pwa-install-btn__text">
+            <strong>Установить приложение</strong>
+            <span>Быстрый доступ как на телефоне</span>
+        </div>
+        <button class="pwa-install-btn__action" id="pwaInstallAction">
+            <i class="fas fa-download"></i> Установить
+        </button>
+        <button class="pwa-install-btn__dismiss" id="pwaInstallDismiss">✕</button>
+    </div>
+</div>
+
+ 
+
+    <!-- Уведомление (вход/выход/регистрация) -->
+    <div class="toast" id="toast">
+        <div class="toast__icon" id="toastIcon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="toast__content">
+            <div class="toast__title" id="toastTitle">Успешно!</div>
+            <div class="toast__message" id="toastMessage">Добро пожаловать!</div>
+        </div>
+        <button class="toast__close" id="toastClose">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+
+           <!-- Подтверждение выхода -->
+    <div class="logout-modal" id="logoutModal">
+        <div class="logout-modal__overlay" id="logoutOverlay"></div>
+        <div class="logout-modal__content">
+            <div class="logout-modal__icon">
+                <i class="fas fa-sign-out-alt"></i>
             </div>
-            <div class="pwa-install__info">
-                <strong>Установить приложение</strong>
-                <span>Быстрый доступ к ShopXand</span>
+            <h3>Вы точно хотите выйти?</h3>
+            <p>Ваши корзина и избранное сохранятся</p>
+            <div class="logout-modal__actions">
+                <button class="logout-modal__btn logout-modal__btn--cancel" id="logoutCancel">
+                    Отмена
+                </button>
+                <button class="logout-modal__btn logout-modal__btn--confirm" id="logoutConfirm">
+                    <i class="fas fa-check"></i> Выйти
+                </button>
             </div>
-            <button class="pwa-install__btn" id="pwaInstallBtn">Установить</button>
-            <button class="pwa-install__close" id="pwaInstallClose">✕</button>
         </div>
     </div>
+
+
+        <!-- Кнопка Telegram (фиксированная) -->
+    <a href="https://t.me/shopxand" target="_blank" class="telegram-btn" id="telegramBtn" title="Написать в Telegram">
+        <i class="fab fa-telegram-plane"></i>
+        <span class="telegram-btn__text">Поддержка</span>
+    </a>
+
+    <!-- Виджет связи с менеджером -->
+    <div class="support-widget" id="supportWidget">
+        <div class="support-widget__overlay" id="supportOverlay"></div>
+        <div class="support-widget__content">
+            <div class="support-widget__header">
+                <h3><i class="fab fa-telegram"></i> Связь с менеджером</h3>
+                <button class="support-widget__close" id="supportClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="support-widget__body">
+                <p>Напишите нам в Telegram для быстрой связи</p>
+                
+                <div class="support-widget__options">
+                    <a href="https://t.me/shopxand" target="_blank" class="support-widget__option">
+<i class="fas fa-user-tie"></i>
+<div>
+    <strong>Менеджер</strong>
+    <span>По вопросам заказов</span>
+</div>
+                    </a>
+                    <a href="https://t.me/shopxand" target="_blank" class="support-widget__option">
+<i class="fas fa-headset"></i>
+<div>
+    <strong>Поддержка</strong>
+    <span>Помощь и возврат</span>
+</div>
+                    </a>
+                </div>
+                
+                <div class="support-widget__divider">
+                    <span>или напишите сообщение</span>
+                </div>
+                
+                <form class="support-widget__form" id="supportForm">
+                    <input type="text" placeholder="Ваше имя" id="supportName" required>
+                    <input type="tel" placeholder="Телефон" id="supportPhone" required>
+                    <textarea placeholder="Ваш вопрос..." rows="3" id="supportMessage"></textarea>
+                    <button type="submit" class="support-widget__submit">
+<i class="fab fa-telegram-plane"></i> Отправить в Telegram
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомление о статусе заказа -->
+    <div class="order-notify" id="orderNotify">
+        <div class="order-notify__content">
+            <div class="order-notify__icon">📦</div>
+            <div class="order-notify__info">
+                <strong id="notifyTitle">Заказ принят!</strong>
+                <span id="notifyMsg">Ожидайте доставку через 12-18 дней</span>
+            </div>
+            <button class="order-notify__close" id="notifyClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+        <!-- Окно подтверждения -->
+    <div class="confirm-modal" id="confirmModal">
+        <div class="confirm-modal__overlay" id="confirmOverlay"></div>
+        <div class="confirm-modal__content">
+            <div class="confirm-modal__icon" id="confirmIcon">
+                <i class="fas fa-question-circle"></i>
+            </div>
+            <h3 id="confirmTitle">Вы уверены?</h3>
+            <p id="confirmMessage">Это действие нельзя отменить</p>
+            <div class="confirm-modal__actions">
+                <button class="confirm-modal__btn confirm-modal__btn--cancel" id="confirmCancel">Отмена</button>
+                <button class="confirm-modal__btn confirm-modal__btn--ok" id="confirmOk">Да</button>
+            </div>
+        </div>
+    </div>
+
+    
+
 
     <script src="script.js"></script> 
 </body>
