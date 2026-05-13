@@ -5,6 +5,24 @@
 document.addEventListener('DOMContentLoaded', function() {
 
 
+     function showToast(title, message, type) {
+        var toast = document.getElementById('toast');
+        if (!toast) return;
+        document.getElementById('toastTitle').textContent = title;
+        document.getElementById('toastMessage').textContent = message;
+        var icon = document.getElementById('toastIcon');
+        if (type === 'success') {
+            icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+            icon.className = 'toast__icon';
+        } else if (type === 'error') {
+            icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+            icon.className = 'toast__icon error';
+        }
+        toast.classList.add('show');
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(function() { toast.classList.remove('show'); }, 3000);
+
+    }
     
         // ============================================
     // IMAGE HELPER - Проверка типа картинки
@@ -2737,7 +2755,7 @@ checkDeliveryNotifications();
     
     console.log('Модуль поиска загружен');
 
-        // ============================================
+          // ============================================
     // QUICKVIEW - Быстрый просмотр
     // ============================================
     
@@ -2757,15 +2775,15 @@ checkDeliveryNotifications();
     const productsData = {
         '1': {
             id: '1',
-            name: 'Вельветовая рубашка с длинными руковами',
+            name: 'Вельветовая рубашка с длинными рукавами',
             cat: 'Одежда',
             price: 120,
             oldPrice: 180,
-            discount: '-8%',
+            discount: '-33%',
             img: 'img/Рубашка.jpeg',
             rating: 4.8,
             reviews: 324,
-            desc: 'Вельветовая рубашка с длинными руковами',
+            desc: 'Стильная вельветовая рубашка. Мягкая ткань, удобный крой.',
             sizes: ['X', 'XL', '2XL', '3XL'],
             specs: [
                 ['Материал', 'Вельвет 100%'],
@@ -2786,13 +2804,13 @@ checkDeliveryNotifications();
             img: 'img/Крассовка.jpeg',
             rating: 4.6,
             reviews: 189,
-            desc: 'Крассовка AF1 Air Force 1, лучший модель белый',
+            desc: 'Крассовка AF1 Air Force 1, лучшая модель белая',
             shoeSizes: ['38', '39', '40', '41', '42', '43', '44'],
             specs: [
                 ['Материал', 'Кожа'],
-                ['Размер', '38', '39', '40', '41', '42', '43', '44'],
+                ['Размер', '38-44'],
                 ['Стиль', 'Повседневный'],
-                ['Сизон', 'Все сезоны']
+                ['Сезон', 'Все сезоны']
             ],
             thumbs: ['img/Крассовка.jpeg', 'img/Крассовка.jpeg', 'img/Крассовка.jpeg']
         },
@@ -2802,40 +2820,36 @@ checkDeliveryNotifications();
             cat: 'Одежда',
             price: 140,
             oldPrice: 250,
-            discount: '-14%',
+            discount: '-44%',
             img: 'img/Крассовка-2.jpeg',
             rating: 4.9,
             reviews: 512,
-            desc: 'Крассовка в британском стиле',
+            desc: 'Крассовка в британском стиле, премиум качество',
             shoeSizes: ['38', '39', '40', '41', '42', '43', '44'],
             specs: [
-                ['Материал', 'Прастой'],
-                ['Размер', '38', '39', '40', '41', '42', '43', '44'],
+                ['Материал', 'Премиум'],
+                ['Размер', '38-44'],
                 ['Стиль', 'Повседневный'],
-                ['Сизон', 'Весна-осень']
+                ['Сезон', 'Весна-осень']
             ],
             thumbs: ['img/Крассовка-2.jpeg', 'img/Крассовка-2.jpeg', 'img/Крассовка-2.jpeg']
         },
         '4': {
             id: '4',
-            name: 'Провадной наушник',
+            name: 'Проводной наушник',
             cat: 'Электроника',
-            price: 30,
+            price: 2100,
             oldPrice: null,
             discount: null,
             img: 'img/Наушник.jpeg',
             rating: 4.7,
             reviews: 256,
-            desc: 'Современные умные часы с широким функционалом.',
+            desc: 'Качественный проводной наушник с микрофоном',
             specs: [
-            ['Коннект', 'Проводные'],
-            ['Конектор', '3.5мм'],
-            ['Длина кабеля', '1.2м'],
-            ['Микрофон', 'Есть'],
-            ['Частота', '20Hz - 20000Hz'],
-            ['Сопротивление', '32Ω'],
-            ['Материал', 'ABS + TPE'],
-            ['Цвет', 'Черный']
+                ['Коннект', 'Проводные'],
+                ['Коннектор', '3.5мм'],
+                ['Длина кабеля', '1.2м'],
+                ['Микрофон', 'Есть']
             ],
             thumbs: ['img/Наушник.jpeg', 'img/Наушник.jpeg', 'img/Наушник.jpeg']
         },
@@ -2845,20 +2859,16 @@ checkDeliveryNotifications();
             cat: 'Электроника',
             price: 230,
             oldPrice: 300,
-            discount: '-9%',
+            discount: '-23%',
             img: 'img/watch.jpeg',
             rating: 4.9,
             reviews: 678,
-            desc: 'Часы "CHENXI"',
+            desc: 'Стильные кварцевые часы CHENXI',
             specs: [
-            ['Бренд', 'CHENXI'],
-            ['Тип', 'Кварцевые'],
-            ['Ремешок', 'Нержавеющая сталь'],
-            ['Стекло', 'Hardlex'],
-            ['Водозащита', '3ATM'],
-            ['Функции', 'Дата, Хронограф'],
-            ['Диаметр', '45мм'],
-            ['Стиль', 'Business / Luxury']
+                ['Бренд', 'CHENXI'],
+                ['Тип', 'Кварцевые'],
+                ['Ремешок', 'Нержавеющая сталь'],
+                ['Водозащита', '3ATM']
             ],
             thumbs: ['img/watch.jpeg', 'img/watch.jpeg', 'img/watch.jpeg']
         },
@@ -2872,17 +2882,13 @@ checkDeliveryNotifications();
             img: 'img/Шилопка-2.jpeg',
             rating: 4.7,
             reviews: 432,
-            desc: 'Кожаные тапочки',
+            desc: 'Кожаные тапочки, натуральная кожа',
             shoeSizes: ['38', '39', '40', '41', '42', '43', '44'],
             specs: [
-            ['Материал', 'Натуральная кожа'],
-            ['Подошва', 'Резиновая'],
-            ['Тип', 'Домашние тапочки'],
-            ['Пол', 'Мужские'],
-            ['Размеры', '38,39,40, 41, 42, 43, 44'],
-            ['Цвет', 'Черный'],
-            ['Сезон', 'Все сезоны'],
-            ['Особенности', 'Антискользящие']
+                ['Материал', 'Натуральная кожа'],
+                ['Подошва', 'Резиновая'],
+                ['Тип', 'Домашние тапочки'],
+                ['Цвет', 'Черный']
             ],
             thumbs: ['img/Шилопка-2.jpeg', 'img/Шилопка-2.jpeg', 'img/Шилопка-2.jpeg']
         },
@@ -2892,27 +2898,22 @@ checkDeliveryNotifications();
             cat: 'Электроника',
             price: 80,
             oldPrice: 90,
-            discount: '-1.5%',
+            discount: '-11%',
             img: 'img/Знак Мерса.jpeg',
             rating: 4.8,
             reviews: 156,
-
-            desc: 'Металлический знак Mercedes-Benz для автомобиля с премиальным дизайном.',
+            desc: 'Металлический знак Mercedes-Benz',
             specs: [
-            ['Бренд', 'Mercedes-Benz'],
-            ['Материал', 'Металл'],
-            ['Цвет', 'Серебристый'],
-            ['Тип', 'Эмблема / Логотип'],
-            ['Крепление', 'Клейкая основа'],
-            ['Размер', '8см'],
-            ['Совместимость', 'Mercedes-Benz'],
-            ['Особенности', 'Устойчив к воде и солнцу']
+                ['Бренд', 'Mercedes-Benz'],
+                ['Материал', 'Металл'],
+                ['Цвет', 'Серебристый'],
+                ['Размер', '8см']
             ],
             thumbs: ['img/Знак Мерса.jpeg', 'img/Знак Мерса.jpeg', 'img/Знак Мерса.jpeg']
         },
         '8': {
             id: '8',
-            name: 'Кочественноя рубашка с длинными руковами',
+            name: 'Качественная рубашка с длинными рукавами',
             cat: 'Одежда',
             price: 120,
             oldPrice: null,
@@ -2920,84 +2921,74 @@ checkDeliveryNotifications();
             img: 'img/Рубашка-3.jpeg',
             rating: 4.5,
             reviews: 89,
-            desc: 'Кочественноя рубашка с длинными руковами',
+            desc: 'Качественная рубашка с длинными рукавами',
             sizes: ['X', 'XL', '2XL', '3XL'],
             specs: [
-            ['Материал', 'Хлопок + Полиэстер'],
-            ['Тип', 'Рубашка с длинными рукавами'],
-            ['Пол', 'Мужская'],
-            ['Размеры', ['X', 'XL', '2XL', '3XL']],
-            ['Цвет', 'Белый'],
-            ['Стиль', 'Casual / Classic'],
-            ['Сезон', 'Весна, Осень'],
-            ['Особенности', 'Дышащая ткань']
+                ['Материал', 'Хлопок + Полиэстер'],
+                ['Тип', 'Рубашка с длинными рукавами'],
+                ['Цвет', 'Белый'],
+                ['Стиль', 'Casual / Classic']
             ],
             thumbs: ['img/Рубашка-3.jpeg', 'img/Рубашка-3.jpeg', 'img/Рубашка-3.jpeg']
         }
     };
-
     
-
-        // Смена главного изображения при клике на миниатюру
+    // Смена главного изображения
     window.changeQvThumb = function(imgSrc, thumbBtn) {
         const mainImg = document.getElementById('quickviewMainImg');
-        
         if (imgSrc && (imgSrc.startsWith('http') || imgSrc.startsWith('img/') || 
             imgSrc.endsWith('.png') || imgSrc.endsWith('.jpg') || 
             imgSrc.endsWith('.jpeg') || imgSrc.endsWith('.webp'))) {
-            mainImg.innerHTML = `<img src="${imgSrc}" alt="" style="width:100%;height:100%;object-fit:contain;">`;
+            mainImg.innerHTML = '<img src="' + imgSrc + '" alt="" style="width:100%;height:100%;object-fit:contain;">';
         } else {
-            mainImg.innerHTML = `<span>${imgSrc || '📦'}</span>`;
+            mainImg.innerHTML = '<span>' + (imgSrc || '📦') + '</span>';
         }
-        
-        // Обновляем активный класс
-        document.querySelectorAll('.quickview__thumb').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.quickview__thumb').forEach(function(t) { t.classList.remove('active'); });
         thumbBtn.classList.add('active');
     };
     
     // Открыть быстрый просмотр
     function openQuickview(productId) {
-        // Обновляем title страницы при просмотре товара
-
         const product = productsData[productId];
         if (!product) return;
         
-        // === СБРОС РАЗМЕРОВ ПРИ КАЖДОМ ОТКРЫТИИ ===
+        // Сброс размеров
         var sizeBlock = document.getElementById('quickviewSizeBlock');
         if (sizeBlock) {
             sizeBlock.style.display = 'none';
             var sizesContainer = document.getElementById('quickviewSizes');
-            if (sizesContainer) {
-                sizesContainer.innerHTML = '';
-            }
+            if (sizesContainer) sizesContainer.innerHTML = '';
         }
         
-        // Заполняем данные
+        currentQvProduct = product;
+        qvQuantity = 1;
+        
         document.getElementById('quickviewCat').textContent = product.cat;
         document.getElementById('quickviewName').textContent = product.name;
         document.getElementById('quickviewDesc').textContent = product.desc;
         document.getElementById('quickviewPrice').textContent = product.price.toLocaleString() + ' сомони';
         document.getElementById('qvQty').textContent = qvQuantity;
         
-       // Главное изображение
+        // Главное изображение
         const mainImg = document.getElementById('quickviewMainImg');
-        if (product.img && (product.img.startsWith('http') || product.img.startsWith('img/') || product.img.endsWith('.png') || product.img.endsWith('.jpg') || product.img.endsWith('.jpeg') || product.img.endsWith('.webp'))) {
-            mainImg.innerHTML = `<img src="${product.img}" alt="${product.name}" style="width:100%;height:100%;object-fit:contain;">`;
+        if (product.img && (product.img.startsWith('http') || product.img.startsWith('img/') || 
+            product.img.endsWith('.png') || product.img.endsWith('.jpg') || 
+            product.img.endsWith('.jpeg') || product.img.endsWith('.webp'))) {
+            mainImg.innerHTML = '<img src="' + product.img + '" alt="' + product.name + '" style="width:100%;height:100%;object-fit:contain;">';
         } else {
-            mainImg.innerHTML = `<span>${product.img || '📦'}</span>`;
+            mainImg.innerHTML = '<span>' + (product.img || '📦') + '</span>';
         }
         
         // Миниатюры
         const thumbs = document.getElementById('quickviewThumbs');
-        thumbs.innerHTML = product.thumbs.map((thumb, i) => `
-            <button class="quickview__thumb ${i === 0 ? 'active' : ''}" onclick="window.changeQvThumb('${thumb}', this)">
-                ${thumb && (thumb.startsWith('http') || thumb.startsWith('img/') || thumb.endsWith('.png') || thumb.endsWith('.jpg') || thumb.endsWith('.jpeg') || thumb.endsWith('.webp'))
-                    ? `<img src="${thumb}" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:8px;">`
-                    : `<span>${thumb || '📦'}</span>`
-                }
-            </button>
-        `).join('');
-       
+        thumbs.innerHTML = product.thumbs.map(function(thumb, i) {
+            var isActive = i === 0 ? ' active' : '';
+            var content = (thumb && (thumb.startsWith('http') || thumb.startsWith('img/') || 
+                thumb.endsWith('.png') || thumb.endsWith('.jpg') || thumb.endsWith('.jpeg') || thumb.endsWith('.webp')))
+                ? '<img src="' + thumb + '" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:8px;">'
+                : '<span>' + (thumb || '📦') + '</span>';
+            return '<button class="quickview__thumb' + isActive + '" onclick="window.changeQvThumb(\'' + thumb + '\', this)">' + content + '</button>';
+        }).join('');
         
         // Цена
         if (product.oldPrice) {
@@ -3011,131 +3002,74 @@ checkDeliveryNotifications();
         }
         
         // Характеристики
-        const specs = document.querySelector('.quickview__specs');
-        specs.innerHTML = product.specs.map(s => `
-            <div class="quickview__spec">
-                <span>${s[0]}</span>
-                <span>${s[1]}</span>
-            </div>
-        `).join('');
+        var specsEl = document.querySelector('.quickview__specs');
+        specsEl.innerHTML = product.specs.map(function(s) {
+            return '<div class="quickview__spec"><span>' + s[0] + '</span><span>' + s[1] + '</span></div>';
+        }).join('');
         
         // Рейтинг
-        const stars = document.querySelector('.quickview__stars');
-        stars.innerHTML = generateStars(product.rating);
+        var starsEl = document.querySelector('.quickview__stars');
+        starsEl.innerHTML = generateStars(product.rating);
         document.querySelector('.quickview__rating-num').textContent = product.rating;
         document.querySelector('.quickview__reviews').textContent = product.reviews + ' отзывов';
         
         // Избранное
         updateQvFavorite();
         
+        // Размеры
+        if (sizeBlock) {
+            var sizesContainer = document.getElementById('quickviewSizes');
+            if (product.cat === 'Одежда') {
+                if (product.shoeSizes && product.shoeSizes.length > 0) {
+                    sizeBlock.style.display = 'flex';
+                    sizeBlock.querySelector('span').textContent = 'Размер обуви:';
+                    sizesContainer.innerHTML = '';
+                    product.shoeSizes.forEach(function(size, i) {
+                        var btn = document.createElement('button');
+                        btn.className = 'quickview__size-btn' + (i === 0 ? ' active' : '');
+                        btn.setAttribute('data-size', size);
+                        btn.textContent = size;
+                        btn.onclick = function() {
+                            sizesContainer.querySelectorAll('.quickview__size-btn').forEach(function(b) { b.classList.remove('active'); });
+                            this.classList.add('active');
+                        };
+                        sizesContainer.appendChild(btn);
+                    });
+                } else if (product.sizes && product.sizes.length > 0) {
+                    sizeBlock.style.display = 'flex';
+                    sizeBlock.querySelector('span').textContent = 'Размер:';
+                    sizesContainer.innerHTML = '';
+                    product.sizes.forEach(function(size, i) {
+                        var btn = document.createElement('button');
+                        btn.className = 'quickview__size-btn' + (i === 0 ? ' active' : '');
+                        btn.setAttribute('data-size', size);
+                        btn.textContent = size;
+                        btn.onclick = function() {
+                            sizesContainer.querySelectorAll('.quickview__size-btn').forEach(function(b) { b.classList.remove('active'); });
+                            this.classList.add('active');
+                        };
+                        sizesContainer.appendChild(btn);
+                    });
+                } else {
+                    sizeBlock.style.display = 'none';
+                }
+            } else {
+                sizeBlock.style.display = 'none';
+            }
+        }
+        
+        // Похожие товары
+        renderRelatedProducts(product);
+        
         // Открываем
         quickview.classList.add('active');
         document.body.style.overflow = 'hidden';
-
         document.title = product.name + ' — купить в ShopXand | Цена ' + product.price + ' сомони';
-
-            // === ВЫБОР РАЗМЕРА (только для Одежды с sizes или shoeSizes) ===
-    var sizeBlock = document.getElementById('quickviewSizeBlock');
-    if (sizeBlock) {
-        var sizesContainer = document.getElementById('quickviewSizes');
-        
-        // Проверяем и категорию И наличие размеров
-        if (product.cat === 'Одежда' && product.sizes && product.sizes.length > 0) {
-            // Одежда с sizes
-            sizeBlock.style.display = 'flex';
-            sizeBlock.querySelector('span').textContent = 'Размер:';
-            sizesContainer.innerHTML = '';
-            product.sizes.forEach(function(size, i) {
-                var btn = document.createElement('button');
-                btn.className = 'quickview__size-btn';
-                if (i === 0) btn.classList.add('active');
-                btn.setAttribute('data-size', size);
-                btn.textContent = size;
-                btn.onclick = function() {
-                    sizesContainer.querySelectorAll('.quickview__size-btn').forEach(function(b) { b.classList.remove('active'); });
-                    this.classList.add('active');
-                };
-                sizesContainer.appendChild(btn);
-            });
-        } else if (product.cat === 'Одежда' && product.shoeSizes && product.shoeSizes.length > 0) {
-            // Обувь с shoeSizes
-            sizeBlock.style.display = 'flex';
-            sizeBlock.querySelector('span').textContent = 'Размер обуви:';
-            sizesContainer.innerHTML = '';
-            product.shoeSizes.forEach(function(size, i) {
-                var btn = document.createElement('button');
-                btn.className = 'quickview__size-btn';
-                if (i === 0) btn.classList.add('active');
-                btn.setAttribute('data-size', size);
-                btn.textContent = size;
-                btn.onclick = function() {
-                    sizesContainer.querySelectorAll('.quickview__size-btn').forEach(function(b) { b.classList.remove('active'); });
-                    this.classList.add('active');
-                };
-                sizesContainer.appendChild(btn);
-            });
-        } else {
-            // Всё остальное — скрываем
-            sizeBlock.style.display = 'none';
-        }
-    }
-         
-
-            // === ПОХОЖИЕ ТОВАРЫ ===
-        renderRelatedProducts(product);
-
-
-    }
-
-        // Похожие товары
-    function renderRelatedProducts(currentProduct) {
-        var relatedContainer = document.getElementById('quickviewRelated');
-        if (!relatedContainer) return;
-        
-        // Находим товары той же категории, исключая текущий
-        var related = [];
-        for (var key in productsData) {
-            var p = productsData[key];
-            if (p.cat === currentProduct.cat && p.id !== currentProduct.id) {
-                related.push(p);
-            }
-        }
-        
-        // Если в категории мало товаров, добавляем из других категорий
-        if (related.length < 4) {
-            for (var key2 in productsData) {
-                var p2 = productsData[key2];
-                if (p2.id !== currentProduct.id && !related.find(function(r) { return r.id === p2.id; })) {
-                    related.push(p2);
-                }
-                if (related.length >= 4) break;
-            }
-        }
-        
-        // Ограничиваем 4 товарами
-        related = related.slice(0, 4);
-        
-        // Отрисовываем
-        relatedContainer.innerHTML = related.map(function(item) {
-            return `
-                <div class="related-card" onclick="window.openQuickview('${item.id}')">
-                    <div class="related-card__img">
-${item.img && (item.img.startsWith('http') || item.img.startsWith('img/') || item.img.endsWith('.png') || item.img.endsWith('.jpg') || item.img.endsWith('.jpeg'))
-    ? '<img src="' + item.img + '" alt="' + item.name + '">'
-    : '<span>' + (item.img || '📦') + '</span>'
-}
-                    </div>
-                    <div class="related-card__name">${item.name}</div>
-                    <div class="related-card__price">${item.price.toLocaleString()} с.</div>
-                </div>
-            `;
-        }).join('');
     }
     
-    // Делаем openQuickview глобальной
     window.openQuickview = openQuickview;
     
-    // Закрыть быстрый просмотр
+    // Закрыть
     function closeQuickview() {
         quickview.classList.remove('active');
         if (!cartPanel.classList.contains('active') &&
@@ -3146,19 +3080,21 @@ ${item.img && (item.img.startsWith('http') || item.img.startsWith('img/') || ite
         }
     }
     
-    // Генерация звёзд
+    window.closeQuickview = closeQuickview;
+    
+    // Звёзды
     function generateStars(rating) {
-        const full = Math.floor(rating);
-        const half = rating - full >= 0.5;
-        let html = '';
-        for (let i = 0; i < full; i++) html += '<i class="fas fa-star"></i>';
+        var full = Math.floor(rating);
+        var half = rating - full >= 0.5;
+        var html = '';
+        for (var i = 0; i < full; i++) html += '<i class="fas fa-star"></i>';
         if (half) html += '<i class="fas fa-star-half-alt"></i>';
         return html;
     }
     
-    // Обновить кнопку избранного
+    // Избранное
     function updateQvFavorite() {
-        if (!currentQvProduct) return;
+        if (!currentQvProduct || !qvFavorite) return;
         if (isInFavorites(currentQvProduct.id)) {
             qvFavorite.classList.add('active');
             qvFavorite.querySelector('i').className = 'fas fa-heart';
@@ -3170,55 +3106,40 @@ ${item.img && (item.img.startsWith('http') || item.img.startsWith('img/') || ite
     
     // Клик по карточке товара
     document.addEventListener('click', function(e) {
-        const card = e.target.closest('.product-card');
+        var card = e.target.closest('.product-card');
         if (!card) return;
-        
-        // Не открываем если кликнули по кнопкам
-        if (e.target.closest('.product-card__cart-btn') ||
-            e.target.closest('.product-card__fav')) {
-            return;
-        }
-        
-        const cartBtn = card.querySelector('.product-card__cart-btn');
+        if (e.target.closest('.product-card__cart-btn') || e.target.closest('.product-card__fav')) return;
+        var cartBtn = card.querySelector('.product-card__cart-btn');
         if (cartBtn) {
-            const id = cartBtn.getAttribute('data-id');
-            if (id && productsData[id]) {
-                openQuickview(id);
-            }
+            var id = cartBtn.getAttribute('data-id');
+            if (id && productsData[id]) openQuickview(id);
         }
     });
     
     // Количество
     if (qvQtyMinus) {
         qvQtyMinus.addEventListener('click', function() {
-            if (qvQuantity > 1) {
-                qvQuantity--;
-                qvQty.textContent = qvQuantity;
-            }
+            if (qvQuantity > 1) { qvQuantity--; qvQty.textContent = qvQuantity; }
         });
     }
-    
     if (qvQtyPlus) {
         qvQtyPlus.addEventListener('click', function() {
-            qvQuantity++;
-            qvQty.textContent = qvQuantity;
+            qvQuantity++; qvQty.textContent = qvQuantity;
         });
     }
     
-        if (qvAddToCart) {
+    // Кнопка "В корзину"
+    if (qvAddToCart) {
         qvAddToCart.addEventListener('click', function() {
             if (!currentQvProduct) return;
             
-            // Получаем выбранный размер
-            let selectedSize = '';
-            const activeSizeBtn = document.querySelector('.quickview__size-btn.active');
+            var selectedSize = '';
+            var activeSizeBtn = document.querySelector('.quickview__size-btn.active');
             if (activeSizeBtn) {
                 selectedSize = ' (' + activeSizeBtn.getAttribute('data-size') + ')';
             }
             
-            console.log('Добавляем в корзину с размером:', selectedSize);
-            
-            for (let i = 0; i < qvQuantity; i++) {
+            for (var i = 0; i < qvQuantity; i++) {
                 addToCart({
                     id: currentQvProduct.id,
                     name: currentQvProduct.name + selectedSize,
@@ -3228,21 +3149,17 @@ ${item.img && (item.img.startsWith('http') || item.img.startsWith('img/') || ite
                 });
             }
             
-            // Анимация
             this.textContent = '✓ Добавлено';
             this.style.background = '#00c853';
-            setTimeout(() => {
-                this.innerHTML = '<i class="fas fa-shopping-cart"></i> В корзину';
-                this.style.background = '';
+            var btn = this;
+            setTimeout(function() {
+                btn.innerHTML = '<i class="fas fa-shopping-cart"></i> В корзину';
+                btn.style.background = '';
             }, 1500);
         });
-
-        
     }
-
-  
     
-    // Избранное в быстром просмотре
+    // Кнопка "Избранное"
     if (qvFavorite) {
         qvFavorite.addEventListener('click', function() {
             if (!currentQvProduct) return;
@@ -3255,15 +3172,45 @@ ${item.img && (item.img.startsWith('http') || item.img.startsWith('img/') || ite
     if (quickviewOverlay) quickviewOverlay.addEventListener('click', closeQuickview);
     if (quickviewClose) quickviewClose.addEventListener('click', closeQuickview);
     
-    // Escape
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && quickview.classList.contains('active')) {
-            closeQuickview();
-        }
-
-        
+        if (e.key === 'Escape' && quickview.classList.contains('active')) closeQuickview();
     });
-
+    
+    // Похожие товары
+    function renderRelatedProducts(currentProduct) {
+        var relatedContainer = document.getElementById('quickviewRelated');
+        if (!relatedContainer) return;
+        
+        var related = [];
+        for (var key in productsData) {
+            var p = productsData[key];
+            if (p.cat === currentProduct.cat && p.id !== currentProduct.id) related.push(p);
+        }
+        if (related.length < 4) {
+            for (var key2 in productsData) {
+                var p2 = productsData[key2];
+                if (p2.id !== currentProduct.id && !related.find(function(r) { return r.id === p2.id; })) {
+                    related.push(p2);
+                }
+                if (related.length >= 4) break;
+            }
+        }
+        related = related.slice(0, 4);
+        
+        relatedContainer.innerHTML = related.map(function(item) {
+            var imgContent = (item.img && (item.img.startsWith('http') || item.img.startsWith('img/') || 
+                item.img.endsWith('.png') || item.img.endsWith('.jpg') || item.img.endsWith('.jpeg')))
+                ? '<img src="' + item.img + '" alt="' + item.name + '">'
+                : '<span>' + (item.img || '📦') + '</span>';
+            return '<div class="related-card" onclick="window.openQuickview(\'' + item.id + '\')">' +
+                '<div class="related-card__img">' + imgContent + '</div>' +
+                '<div class="related-card__name">' + item.name + '</div>' +
+                '<div class="related-card__price">' + item.price.toLocaleString() + ' с.</div>' +
+                '</div>';
+        }).join('');
+    }
+    
+    console.log('Модуль быстрого просмотра загружен');
     
         // ============================================
     // AUTH - Вход / Регистрация
@@ -3557,112 +3504,167 @@ if (authClose) authClose.addEventListener('click', function() {
             showToast('Ошибка входа', 'Неверный телефон или пароль. Зарегистрируйтесь.', 'error');
         }
     });
-    
-    // Регистрация
+
+        // ============================================
+    // РЕГИСТРАЦИЯ
+    // ============================================
     document.getElementById('registerBtn')?.addEventListener('click', function() {
-        const name = document.getElementById('regName').value.trim();
-        const phone = document.getElementById('regPhone').value.trim();
-        const email = document.getElementById('regEmail').value.trim();
-        const password = document.getElementById('regPassword').value;
-        const passwordConfirm = document.getElementById('regPasswordConfirm').value;
-        const agree = document.getElementById('regAgree').checked;
+        var name = document.getElementById('regName').value.trim();
+        var phone = document.getElementById('regPhone').value.trim();
+        var email = document.getElementById('regEmail').value.trim();
+        var password = document.getElementById('regPassword').value;
+        var passwordConfirm = document.getElementById('regPasswordConfirm').value;
+        var agree = document.getElementById('regAgree')?.checked;
         
         if (!name || !phone) {
-            alert('Заполните обязательные поля: Имя и Телефон');
+            showToast('Ошибка', 'Заполните имя и телефон', 'error');
             return;
         }
-        
         if (!password || password.length < 6) {
-            alert('Пароль должен быть минимум 6 символов');
+            showToast('Ошибка', 'Пароль минимум 6 символов', 'error');
             return;
         }
-        
         if (password !== passwordConfirm) {
-            alert('Пароли не совпадают');
+            showToast('Ошибка', 'Пароли не совпадают', 'error');
             return;
         }
-        
         if (!agree) {
-            alert('Примите условия использования');
+            showToast('Ошибка', 'Примите условия', 'error');
             return;
         }
         
-        // Проверяем, не занят ли телефон
-        const users = getAllUsers();
-        const exists = users.find(function(u) {
-            return u.phone === phone || (email && u.email === email);
+        var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
+        var users = JSON.parse(localStorage.getItem('shopxand_users') || '[]');
+        
+        // Проверка уникальности телефона
+        var phoneExists = users.find(function(u) {
+            var uPhone = (u.phone || '').replace(/[\+\s\-\(\)]/g, '');
+            return uPhone === cleanPhone;
         });
         
-        if (exists) {
-            showToast('Ошибка', 'Пользователь с таким телефоном или email уже зарегистрирован', 'error');
+        if (phoneExists) {
+            showToast('Ошибка', 'Номер ' + phone + ' уже зарегистрирован', 'error');
+            document.getElementById('regPhone').style.borderColor = '#ff4757';
+            setTimeout(function() { document.getElementById('regPhone').style.borderColor = ''; }, 2000);
             return;
         }
         
-        const user = {
+        // Проверка уникальности email
+        if (email) {
+            var emailExists = users.find(function(u) { return u.email === email; });
+            if (emailExists) {
+                showToast('Ошибка', 'Email ' + email + ' уже используется', 'error');
+                document.getElementById('regEmail').style.borderColor = '#ff4757';
+                setTimeout(function() { document.getElementById('regEmail').style.borderColor = ''; }, 2000);
+                return;
+            }
+        }
+        
+        var user = {
             name: name,
-            phone: phone,
+            phone: cleanPhone,
             email: email,
             password: password,
             registeredAt: new Date().toISOString()
         };
         
-        saveUserToBase(user);
-        saveUser(user);
-        closeAuth();
-       showToast('Регистрация успешна!', 'Добро пожаловать, ' + name + '!', 'success');
-    });
-    
-           // Забыли пароль — проверка телефона
-    document.getElementById('forgotBtn')?.addEventListener('click', function() {
-        const phone = document.getElementById('forgotPhone').value.trim();
+        users.push(user);
+        localStorage.setItem('shopxand_users', JSON.stringify(users));
         
+        currentUser = user;
+        isLoggedIn = true;
+        localStorage.setItem('shopxand_user', JSON.stringify(user));
+        
+        updateUserUI();
+        closeAuth();
+        showToast('Регистрация успешна!', 'Добро пожаловать, ' + name + '!', 'success');
+    });
+
+    // ============================================
+    // ВХОД
+    // ============================================
+    document.getElementById('loginBtn')?.addEventListener('click', function() {
+        var phone = document.getElementById('loginPhone').value.trim();
+        var password = document.getElementById('loginPassword').value;
+        
+        if (!phone) {
+            showToast('Ошибка', 'Введите телефон или email', 'error');
+            return;
+        }
+        if (!password) {
+            showToast('Ошибка', 'Введите пароль', 'error');
+            return;
+        }
+        
+        var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
+        var users = JSON.parse(localStorage.getItem('shopxand_users') || '[]');
+        
+        var user = users.find(function(u) {
+            var uPhone = (u.phone || '').replace(/[\+\s\-\(\)]/g, '');
+            return (uPhone === cleanPhone || u.email === phone) && u.password === password;
+        });
+        
+        if (user) {
+            currentUser = user;
+            isLoggedIn = true;
+            localStorage.setItem('shopxand_user', JSON.stringify(user));
+            updateUserUI();
+            closeAuth();
+            showToast('С возвращением!', user.name + ', вы вошли в аккаунт', 'success');
+        } else {
+            showToast('Ошибка входа', 'Неверный телефон или пароль', 'error');
+        }
+    });
+
+    // ============================================
+    // ЗАБЫЛИ ПАРОЛЬ
+    // ============================================
+    document.getElementById('forgotBtn')?.addEventListener('click', function() {
+        var phone = document.getElementById('forgotPhone').value.trim();
         if (!phone) {
             showToast('Ошибка', 'Введите номер телефона', 'error');
             return;
         }
         
-        // Ищем пользователя с таким телефоном
-        const users = getAllUsers();
-        const user = users.find(function(u) { return u.phone === phone; });
+        var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
+        var users = JSON.parse(localStorage.getItem('shopxand_users') || '[]');
+        var user = users.find(function(u) {
+            return (u.phone || '').replace(/[\+\s\-\(\)]/g, '') === cleanPhone;
+        });
         
         if (!user) {
             showToast('Не найдено', 'Пользователь с номером ' + phone + ' не зарегистрирован', 'error');
             return;
         }
         
-        // Сохраняем телефон для смены пароля
-        localStorage.setItem('shopxand_reset_phone', phone);
-        
-        // Показываем поле для нового пароля
+        localStorage.setItem('shopxand_reset_phone', cleanPhone);
         document.getElementById('codeBlock').style.display = 'block';
         this.textContent = 'Телефон подтверждён';
         this.disabled = true;
-        
         showToast('Телефон найден', 'Введите новый пароль', 'success');
     });
-    
-          // Сохранить новый пароль
+
     document.getElementById('resetPasswordBtn')?.addEventListener('click', function() {
-        const newPassword = document.getElementById('newPassword').value;
-        const phone = localStorage.getItem('shopxand_reset_phone');
+        var newPassword = document.getElementById('newPassword').value;
+        var phone = localStorage.getItem('shopxand_reset_phone');
         
         if (!newPassword || newPassword.length < 6) {
-            showToast('Ошибка', 'Пароль должен быть минимум 6 символов', 'error');
+            showToast('Ошибка', 'Пароль минимум 6 символов', 'error');
             return;
         }
         
-        // Обновляем пароль
-        const users = getAllUsers();
-        const userIndex = users.findIndex(function(u) { return u.phone === phone; });
+        var users = JSON.parse(localStorage.getItem('shopxand_users') || '[]');
+        var userIndex = users.findIndex(function(u) {
+            return (u.phone || '').replace(/[\+\s\-\(\)]/g, '') === phone;
+        });
         
         if (userIndex >= 0) {
             users[userIndex].password = newPassword;
             localStorage.setItem('shopxand_users', JSON.stringify(users));
-            
             localStorage.removeItem('shopxand_reset_phone');
             
             document.getElementById('codeBlock').style.display = 'none';
-            document.getElementById('forgotBtn').textContent = 'Отправить код';
+            document.getElementById('forgotBtn').textContent = 'Проверить';
             document.getElementById('forgotBtn').disabled = false;
             document.getElementById('forgotPhone').value = '';
             document.getElementById('newPassword').value = '';
@@ -3671,14 +3673,16 @@ if (authClose) authClose.addEventListener('click', function() {
             showLoginForm();
         }
     });
-    
+     
+
     // Escape
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && authModal && authModal.classList.contains('active')) {
             closeAuth();
         }
     });
-
+    
+   
         // ============================================
     // ОКНО ВЫХОДА
     // ============================================

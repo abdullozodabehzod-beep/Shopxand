@@ -1173,7 +1173,7 @@ data-cat="Одежда">
     </div>
 
     
-          <!-- Быстрый просмотр товара -->
+             <!-- Быстрый просмотр товара -->
     <div class="quickview" id="quickview">
         <div class="quickview__overlay" id="quickviewOverlay"></div>
         <div class="quickview__modal">
@@ -1185,18 +1185,12 @@ data-cat="Одежда">
                 <!-- Галерея фото -->
                 <div class="quickview__gallery">
                     <div class="quickview__main-img" id="quickviewMainImg">
-<span>📱</span>
+                        <span>📱</span>
                     </div>
                     <div class="quickview__thumbs" id="quickviewThumbs">
-<button class="quickview__thumb active">
-    <span>📱</span>
-</button>
-<button class="quickview__thumb">
-    <span>📱</span>
-</button>
-<button class="quickview__thumb">
-    <span>📱</span>
-</button>
+                        <button class="quickview__thumb active"><span>📱</span></button>
+                        <button class="quickview__thumb"><span>📱</span></button>
+                        <button class="quickview__thumb"><span>📱</span></button>
                     </div>
                 </div>
                 
@@ -1207,106 +1201,103 @@ data-cat="Одежда">
                     
                     <!-- Рейтинг -->
                     <div class="quickview__rating">
-<div class="quickview__stars">
-    <i class="fas fa-star"></i>
-    <i class="fas fa-star"></i>
-    <i class="fas fa-star"></i>
-    <i class="fas fa-star"></i>
-    <i class="fas fa-star-half-alt"></i>
-</div>
-<span class="quickview__rating-num">4.8</span>
-<span class="quickview__reviews">324 отзыва</span>
+                        <div class="quickview__stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <span class="quickview__rating-num">4.8</span>
+                        <span class="quickview__reviews">324 отзыва</span>
                     </div>
                     
                     <!-- Цена -->
                     <div class="quickview__prices">
-<span class="quickview__price-old" id="quickviewPriceOld" style="display:none;">3 200 сомони</span>
-<span class="quickview__price-current" id="quickviewPrice">2 560 сомони</span>
-<span class="quickview__discount" id="quickviewDiscount" style="display:none;">-20%</span>
+                        <span class="quickview__price-old" id="quickviewPriceOld" style="display:none;">3 200 сомони</span>
+                        <span class="quickview__price-current" id="quickviewPrice">2 560 сомони</span>
+                        <span class="quickview__discount" id="quickviewDiscount" style="display:none;">-20%</span>
                     </div>
                     
                     <!-- Краткое описание -->
                     <p class="quickview__desc" id="quickviewDesc">
-Отличный смартфон с AMOLED-дисплеем 6.4", камерой 50 МП и аккумулятором на 5000 мАч. Идеальный выбор для повседневного использования.
+                        Отличный смартфон с AMOLED-дисплеем 6.4", камерой 50 МП и аккумулятором на 5000 мАч.
                     </p>
                     
                     <!-- Характеристики -->
-                    <div class="quickview__specs">
-<div class="quickview__spec">
-    <span>Дисплей</span>
-    <span>6.4" AMOLED</span>
-</div>
-<div class="quickview__spec">
-    <span>Память</span>
-    <span>128GB / 8GB</span>
-</div>
-<div class="quickview__spec">
-    <span>Камера</span>
-    <span>50 МП + 12 МП</span>
-</div>
-<div class="quickview__spec">
-    <span>Аккумулятор</span>
-    <span>5000 мАч</span>
-</div>
-
+                    <div class="quickview__specs" id="quickviewSpecs">
+                        <div class="quickview__spec">
+                            <span>Дисплей</span>
+                            <span>6.4" AMOLED</span>
+                        </div>
+                        <div class="quickview__spec">
+                            <span>Память</span>
+                            <span>128GB / 8GB</span>
+                        </div>
+                        <div class="quickview__spec">
+                            <span>Камера</span>
+                            <span>50 МП + 12 МП</span>
+                        </div>
+                        <div class="quickview__spec">
+                            <span>Аккумулятор</span>
+                            <span>5000 мАч</span>
+                        </div>
                     </div>
-                
-                <!-- Выбор размера -->
-                <div class="quickview__size" id="quickviewSizeBlock" style="display:none;">
-                    <span>Размер:</span>
-                    <div class="quickview__size-options" id="quickviewSizes"></div>
-                </div>
+                    
+                    <!-- Выбор размера -->
+                    <div class="quickview__size" id="quickviewSizeBlock" style="display:none;">
+                        <span>Размер:</span>
+                        <div class="quickview__size-options" id="quickviewSizes"></div>
+                    </div>
                     
                     <!-- Выбор количества -->
                     <div class="quickview__quantity">
-<span>Количество:</span>
-<div class="quickview__qty-controls">
-    <button class="quickview__qty-btn" id="qvQtyMinus">−</button>
-    <span class="quickview__qty-num" id="qvQty">1</span>
-    <button class="quickview__qty-btn" id="qvQtyPlus">+</button>
-</div>
+                        <span>Количество:</span>
+                        <div class="quickview__qty-controls">
+                            <button class="quickview__qty-btn" id="qvQtyMinus">−</button>
+                            <span class="quickview__qty-num" id="qvQty">1</span>
+                            <button class="quickview__qty-btn" id="qvQtyPlus">+</button>
+                        </div>
                     </div>
                     
                     <!-- Кнопки -->
                     <div class="quickview__actions">
-<button class="quickview__cart-btn" id="qvAddToCart">
-    <i class="fas fa-shopping-cart"></i>
-    В корзину
-</button>
-<button class="quickview__fav-btn" id="qvFavorite">
-    <i class="far fa-heart"></i>
-</button>
+                        <button class="quickview__cart-btn" id="qvAddToCart">
+                            <i class="fas fa-shopping-cart"></i>
+                            В корзину
+                        </button>
+                        <button class="quickview__fav-btn" id="qvFavorite">
+                            <i class="far fa-heart"></i>
+                        </button>
                     </div>
                     
                     <!-- Доставка -->
                     <div class="quickview__delivery">
-<div class="quickview__delivery-item">
-    <i class="fas fa-truck"></i>
-    <div>
-        <strong>Курьерская доставка</strong>
-        <span>от 1 до 3 дней, 30 сомони</span>
-    </div>
-</div>
-<div class="quickview__delivery-item">
-    <i class="fas fa-store"></i>
-    <div>
-        <strong>Самовывоз</strong>
-        <span>сегодня, бесплатно</span>
-    </div>
-</div>
+                        <div class="quickview__delivery-item">
+                            <i class="fas fa-truck"></i>
+                            <div>
+                                <strong>Курьерская доставка</strong>
+                                <span>от 1 до 3 дней, 30 сомони</span>
+                            </div>
+                        </div>
+                        <div class="quickview__delivery-item">
+                            <i class="fas fa-store"></i>
+                            <div>
+                                <strong>Самовывоз</strong>
+                                <span>сегодня, бесплатно</span>
+                            </div>
+                        </div>
                     </div>
-                      <!-- Похожие товары -->
-            <div class="quickview__related">
-                <h3 class="quickview__related-title">Похожие товары</h3>
-                <div class="quickview__related-grid" id="quickviewRelated">
-                    <!-- Заполняется через JS -->
                 </div>
             </div>
-                </div>
+            
+            <!-- Похожие товары -->
+            <div class="quickview__related">
+                <h3 class="quickview__related-title">Похожие товары</h3>
+                <div class="quickview__related-grid" id="quickviewRelated"></div>
             </div>
         </div>
     </div>
-
 
         <!-- Вход / Регистрация -->
     <div class="auth-modal" id="authModal">
@@ -1320,8 +1311,8 @@ data-cat="Одежда">
             <div class="auth-form active" id="loginForm">
                 <div class="auth-form__header">
                     <div class="auth-form__logo">
-<span class="auth-form__logo-icon">SX</span>
-<span>ShopXand</span>
+                        <span class="auth-form__logo-icon">SX</span>
+                        <span>ShopXand</span>
                     </div>
                     <h2>Вход в аккаунт</h2>
                     <p>Войдите, чтобы отслеживать заказы и сохранять избранное</p>
@@ -1329,46 +1320,43 @@ data-cat="Одежда">
                 
                 <div class="auth-form__body">
                     <div class="auth-form__group">
-<label>Телефон или Email</label>
-<div class="auth-form__input-wrap">
-    <i class="fas fa-envelope"></i>
-    <input type="text" placeholder="+992 XXX XXX XXX" id="loginPhone">
-</div>
-</div>
+                        <label>Телефон или Email</label>
+                        <div class="auth-form__input-wrap">
+                            <i class="fas fa-envelope"></i>
+                            <input type="text" placeholder="+992 XXX XXX XXX" id="loginPhone">
+                        </div>
+                    </div>
                     
-<div class="auth-form__group">
-<label>Пароль</label>
-<div class="auth-form__input-wrap">
-    <i class="fas fa-lock"></i>
-    <input type="password" placeholder="Введите пароль" id="loginPassword">
-    <button type="button" class="auth-form__toggle-password">
-    </button>
-</div>
+                    <div class="auth-form__group">
+                        <label>Пароль</label>
+                        <div class="auth-form__input-wrap">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" placeholder="Введите пароль" id="loginPassword">
+                            <button type="button" class="auth-form__toggle-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="auth-form__row">
-<label class="auth-form__checkbox">
-    <input type="checkbox" checked>
-    <span>Запомнить меня</span>
-</label>
-<a href="#" class="auth-form__forgot">Забыли пароль?</a>
+                        <label class="auth-form__checkbox">
+                            <input type="checkbox" checked>
+                            <span>Запомнить меня</span>
+                        </label>
+                        <a href="#" class="auth-form__forgot">Забыли пароль?</a>
                     </div>
                     
+                    <button class="auth-form__submit" id="loginBtn">Войти</button>
                     
-                    <button class="auth-form__submit" id="loginBtn">Войти
-                    </button>
-                    
-                    <div class="auth-form__divider">
-<span>или</span>
-                    </div>
+                    <div class="auth-form__divider"><span>или</span></div>
                     
                     <div class="auth-form__social">
-<button class="auth-form__social-btn">
-    <i class="fab fa-google"></i> Google
-</button>
-<button class="auth-form__social-btn">
-    <i class="fab fa-facebook"></i> Facebook
-</button>
+                        <button class="auth-form__social-btn">
+                            <i class="fab fa-google"></i> Google
+                        </button>
+                        <button class="auth-form__social-btn">
+                            <i class="fab fa-facebook"></i> Facebook
+                        </button>
                     </div>
                 </div>
                 
@@ -1377,104 +1365,90 @@ data-cat="Одежда">
                 </div>
             </div>
 
-<!-- Форма восстановления пароля -->
-            <div class="auth-form" id="forgotForm">
-                <div class="auth-form__header">
-                    <div class="auth-form__logo">
-<span class="auth-form__logo-icon">SX</span>
-<span>ShopXand</span>
-                    </div>
-                     <h2>Забыли пароль?</h2>
-        <p>Введите ваш номер телефона</p>
-    </div>
-    <div class="auth-form__body">
-        <div class="auth-form__group">
-            <label>Телефон</label>
-            <input type="tel" placeholder="+992 XXX XXX XXX" id="forgotPhone">
-        </div>
-        <button class="auth-form__submit" id="forgotBtn">Проверить</button>
-        
-        <div id="codeBlock" style="display:none;">
-            <div class="auth-form__group">
-                <label>Новый пароль</label>
-                <input type="password" placeholder="Минимум 6 символов" id="newPassword">
-            </div>
-            <button class="auth-form__submit" id="resetPasswordBtn">Сохранить пароль</button>
-        </div>
-    </div>
-    <div class="auth-form__footer">
-        <p><a href="#" id="showLoginFromForgot">← Вернуться ко входу</a></p>
-    </div>
-</div>
-</div>
-    </div>
-                
-            
             <!-- Форма регистрации -->
             <div class="auth-form" id="registerForm">
                 <div class="auth-form__header">
                     <div class="auth-form__logo">
-<span class="auth-form__logo-icon">SX</span>
-<span>ShopXand</span>
+                        <span class="auth-form__logo-icon">SX</span>
+                        <span>ShopXand</span>
                     </div>
                     <h2>Регистрация</h2>
                     <p>Создайте аккаунт для быстрых покупок</p>
                 </div>
                 
                 <div class="auth-form__body">
-                    <div class="auth-form__row-inputs">
-<div class="auth-form__group">
-    <label>Имя</label>
-    <input type="text" placeholder="Ваше имя" id="regName">
-</div>
-<div class="auth-form__group">
-    <label>Фамилия</label>
-    <input type="text" placeholder="Ваша фамилия" id="regSurname">
-</div>
-                    </div>
-                    
                     <div class="auth-form__group">
-<label>Телефон</label>
-<input type="tel" placeholder="+992 XXX XXX XXX" id="regPhone">
+                        <label>Имя *</label>
+                        <input type="text" placeholder="Ваше имя" id="regName">
                     </div>
-                    
                     <div class="auth-form__group">
-<label>Email</label>
-<input type="email" placeholder="example@mail.com" id="regEmail">
+                        <label>Телефон *</label>
+                        <input type="tel" placeholder="+992 XXX XXX XXX" id="regPhone">
                     </div>
-                    
                     <div class="auth-form__group">
-<label>Пароль</label>
-<div class="auth-form__input-wrap">
-    <i class="fas fa-lock"></i>
-    <input type="password" placeholder="Минимум 6 символов" id="regPassword">
-    <button type="button" class="auth-form__toggle-password">
-        <i class="fas fa-eye"></i>
-    </button>
-</div>
+                        <label>Email</label>
+                        <input type="email" placeholder="example@mail.com" id="regEmail">
                     </div>
-                    
                     <div class="auth-form__group">
-<label>Подтвердите пароль</label>
-<input type="password" placeholder="Повторите пароль" id="regPasswordConfirm">
+                        <label>Пароль *</label>
+                        <div class="auth-form__input-wrap">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" placeholder="Минимум 6 символов" id="regPassword">
+                            <button type="button" class="auth-form__toggle-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="auth-form__group">
+                        <label>Подтвердите пароль *</label>
+                        <input type="password" placeholder="Повторите пароль" id="regPasswordConfirm">
                     </div>
                     
                     <label class="auth-form__checkbox">
-<input type="checkbox" id="regAgree">
-<span>Я согласен с <a href="#">условиями использования</a></span>
+                        <input type="checkbox" id="regAgree">
+                        <span>Я согласен с <a href="#">условиями использования</a></span>
                     </label>
                     
-                    <button class="auth-form__submit" id="registerBtn">
-Зарегистрироваться
-                    </button>
+                    <button class="auth-form__submit" id="registerBtn">Зарегистрироваться</button>
                 </div>
                 
                 <div class="auth-form__footer">
                     <p>Уже есть аккаунт? <a href="#" id="showLogin">Войти</a></p>
                 </div>
             </div>
+
+            <!-- Форма восстановления пароля -->
+            <div class="auth-form" id="forgotForm">
+                <div class="auth-form__header">
+                    <div class="auth-form__logo">
+                        <span class="auth-form__logo-icon">SX</span>
+                        <span>ShopXand</span>
+                    </div>
+                    <h2>Забыли пароль?</h2>
+                    <p>Введите ваш номер телефона</p>
+                </div>
+                <div class="auth-form__body">
+                    <div class="auth-form__group">
+                        <label>Телефон</label>
+                        <input type="tel" placeholder="+992 XXX XXX XXX" id="forgotPhone">
+                    </div>
+                    <button class="auth-form__submit" id="forgotBtn">Проверить</button>
+                    
+                    <div id="codeBlock" style="display:none;">
+                        <div class="auth-form__group">
+                            <label>Новый пароль</label>
+                            <input type="password" placeholder="Минимум 6 символов" id="newPassword">
+                        </div>
+                        <button class="auth-form__submit" id="resetPasswordBtn">Сохранить пароль</button>
+                    </div>
+                </div>
+                <div class="auth-form__footer">
+                    <p><a href="#" id="showLoginFromForgot">← Вернуться ко входу</a></p>
+                </div>
+            </div>
         </div>
     </div>
+      
 
     
         <!-- PWA Register -->
@@ -1514,7 +1488,18 @@ console.log('Service Worker ошибка:', err);
 
  
 
-       
+       <div class="toast" id="toast">
+    <div class="toast__icon" id="toastIcon">
+        <i class="fas fa-check-circle"></i>
+    </div>
+    <div class="toast__content">
+        <div class="toast__title" id="toastTitle">Успешно!</div>
+        <div class="toast__message" id="toastMessage">Добро пожаловать!</div>
+    </div>
+    <button class="toast__close" id="toastClose">
+        <i class="fas fa-times"></i>
+    </button>
+</div>
 
 
            <!-- Подтверждение выхода -->

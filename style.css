@@ -3939,15 +3939,17 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0.9);
-    width: 1000px;
-    max-width: 96vw;
-    max-height: 97vh;
-    background: var(--white);
+    width: 900px;
+    max-width: 95vw;
+    max-height: 96vh;
+    background: #fff;
     border-radius: 20px;
     overflow: hidden;
     opacity: 0;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
 }
 
 .quickview.active .quickview__modal {
@@ -3962,26 +3964,25 @@ body {
     width: 38px;
     height: 38px;
     border-radius: 50%;
-    background: var(--white);
-    border: 1px solid var(--border);
+    background: #fff;
+    border: 1px solid #e0e0e0;
     cursor: pointer;
     font-size: 16px;
-    color: var(--text);
+    color: #333;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 10;
-    transition: var(--transition);
+    transition: 0.2s;
 }
 
 .quickview__close:hover {
     background: #ffe0e3;
-    color: var(--accent);
+    color: #ff4757;
     border-color: transparent;
     transform: rotate(90deg);
 }
 
-/* Содержимое */
 .quickview__content {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -4001,7 +4002,7 @@ body {
     position: sticky;
     top: 0;
     height: fit-content;
-    max-height: 70vh;
+    max-height: 82vh;
 }
 
 .quickview__main-img {
@@ -4010,7 +4011,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 180px;
+    font-size: 150px;
     margin-bottom: 24px;
 }
 
@@ -4029,18 +4030,27 @@ body {
     width: 56px;
     height: 56px;
     border-radius: 10px;
-    border: 2px solid var(--border);
-    background: var(--white);
+    border: 2px solid #e0e0e0;
+    background: #fff;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 28px;
-    transition: var(--transition);
+    overflow: hidden;
+    padding: 0;
+    transition: 0.2s;
+}
+
+.quickview__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
 }
 
 .quickview__thumb.active {
-    border-color: var(--primary);
+    border-color: #0066ff;
     box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
 }
 
@@ -4065,7 +4075,7 @@ body {
 .quickview__name {
     font-size: 24px;
     font-weight: 800;
-    color: var(--dark);
+    color: #1a1a2e;
     margin: 0 0 14px;
     line-height: 1.3;
 }
@@ -4109,14 +4119,14 @@ body {
 }
 
 .quickview__price-current {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 800;
-    color: var(--dark);
+    color: #1a1a2e;
 }
 
 .quickview__discount {
-    background: var(--accent);
-    color: white;
+    background: #ff4757;
+    color: #fff;
     padding: 3px 10px;
     border-radius: 6px;
     font-size: 12px;
@@ -4133,18 +4143,18 @@ body {
 
 /* Характеристики */
 .quickview__specs {
-    background: var(--bg);
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin-bottom: 20px;
+    background: #f8f9fc;
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 24px;
 }
 
 .quickview__spec {
     display: flex;
     justify-content: space-between;
-    padding: 6px 0;
-    font-size: 13px;
-    border-bottom: 1px solid var(--border-light);
+    padding: 8px 0;
+    font-size: 14px;
+    border-bottom: 1px solid #e8ecf1;
 }
 
 .quickview__spec:last-child {
@@ -4157,7 +4167,50 @@ body {
 
 .quickview__spec span:last-child {
     font-weight: 600;
-    color: var(--text);
+    color: #333;
+}
+
+/* Выбор размера */
+.quickview__size {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.quickview__size-options {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.quickview__size-btn {
+    width: auto;
+    min-width: 42px;
+    height: 38px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    background: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    transition: 0.2s;
+}
+
+.quickview__size-btn:hover {
+    border-color: #0066ff;
+    color: #0066ff;
+    background: #e8f2ff;
+}
+
+.quickview__size-btn.active {
+    border-color: #0066ff;
+    background: #0066ff;
+    color: #fff;
 }
 
 /* Количество */
@@ -4174,7 +4227,7 @@ body {
     display: flex;
     align-items: center;
     gap: 2px;
-    background: var(--bg);
+    background: #f8f9fc;
     border-radius: 8px;
     padding: 4px;
 }
@@ -4184,19 +4237,19 @@ body {
     height: 34px;
     border-radius: 6px;
     border: none;
-    background: var(--white);
+    background: #fff;
     cursor: pointer;
     font-size: 18px;
-    color: var(--text);
+    color: #333;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: var(--transition);
+    transition: 0.2s;
 }
 
 .quickview__qty-btn:hover {
-    background: var(--primary-light);
-    color: var(--primary);
+    background: #e8f2ff;
+    color: #0066ff;
 }
 
 .quickview__qty-num {
@@ -4216,8 +4269,8 @@ body {
 .quickview__cart-btn {
     flex: 1;
     padding: 14px;
-    background: var(--primary);
-    color: white;
+    background: #0066ff;
+    color: #fff;
     border: none;
     border-radius: 10px;
     font-size: 15px;
@@ -4227,37 +4280,41 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    transition: var(--transition);
+    transition: 0.2s;
 }
 
 .quickview__cart-btn:hover {
-    background: var(--primary-dark);
+    background: #0052cc;
     transform: translateY(-1px);
+}
+
+.quickview__cart-btn:active {
+    transform: scale(0.97);
 }
 
 .quickview__fav-btn {
     width: 48px;
     height: 48px;
     border-radius: 10px;
-    border: 2px solid var(--border);
-    background: var(--white);
+    border: 2px solid #e0e0e0;
+    background: #fff;
     cursor: pointer;
     font-size: 20px;
     color: #ccc;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: var(--transition);
+    transition: 0.2s;
 }
 
 .quickview__fav-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
+    border-color: #ff4757;
+    color: #ff4757;
 }
 
 .quickview__fav-btn.active {
-    border-color: var(--accent);
-    color: var(--accent);
+    border-color: #ff4757;
+    color: #ff4757;
     background: #fff5f5;
 }
 
@@ -4281,7 +4338,7 @@ body {
 
 .quickview__delivery-item i {
     font-size: 20px;
-    color: var(--primary);
+    color: #0066ff;
     width: 24px;
     text-align: center;
 }
@@ -4294,6 +4351,79 @@ body {
 .quickview__delivery-item span {
     color: #999;
     font-size: 12px;
+}
+
+/* Похожие товары */
+.quickview__related {
+    padding: 20px 30px 30px;
+    border-top: 1px solid #e8ecf1;
+    background: #fafbfc;
+    grid-column: 1 / -1;
+}
+
+.quickview__related-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 14px;
+}
+
+.quickview__related-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.related-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+    text-align: center;
+    border: 1px solid #e8ecf1;
+}
+
+.related-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+    border-color: #0066ff;
+}
+
+.related-card__img {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    background: #f8f9fb;
+    border-radius: 8px;
+}
+
+.related-card__img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.related-card__name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    line-height: 1.3;
+    margin-bottom: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.related-card__price {
+    font-size: 14px;
+    font-weight: 800;
+    color: #1a1a2e;
 }
 
 /* Мобильная версия */
@@ -4316,27 +4446,27 @@ body {
     
     .quickview__content {
         grid-template-columns: 1fr;
-        max-height: 85vh;
+        max-height: 60vh;
     }
     
     .quickview__gallery {
-    padding: 20px;
-    position: relative;
-    top: auto;
-    max-height: none;
-}
+        padding: 20px;
+        position: relative;
+        top: auto;
+        max-height: none;
+    }
     
     .quickview__main-img {
-        width: 180px;
-        height: 180px;
+        width: 200px;
+        height: 200px;
         font-size: 100px;
     }
     
     .quickview__info {
-    padding: 20px;
-    max-height: none;
-    overflow-y: visible;
-}
+        padding: 20px;
+        max-height: none;
+        overflow-y: visible;
+    }
     
     .quickview__name {
         font-size: 18px;
@@ -4345,7 +4475,27 @@ body {
     .quickview__price-current {
         font-size: 22px;
     }
+    
+    .quickview__related {
+        padding: 16px;
+    }
+    
+    .quickview__related-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+    
+    .related-card {
+        padding: 8px;
+    }
+    
+    .related-card__img {
+        width: 50px;
+        height: 50px;
+        font-size: 30px;
+    }
 }
+
 
 /* ========================================
    CANCEL ORDER - Отмена заказа
@@ -4458,7 +4608,10 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 4000;
+    z-index: 5000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     pointer-events: none;
     visibility: hidden;
 }
@@ -4474,8 +4627,9 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -4485,55 +4639,53 @@ body {
 }
 
 .auth-modal__container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.9);
+    position: relative;
+    background: #fff;
+    border-radius: 20px;
     width: 440px;
     max-width: 92vw;
     max-height: 90vh;
-    background: var(--white);
-    border-radius: 20px;
     overflow-y: auto;
+    transform: scale(0.9);
     opacity: 0;
-    transition: all 0.3s ease;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    padding: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    z-index: 1;
 }
 
 .auth-modal.active .auth-modal__container {
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1);
     opacity: 1;
 }
 
 .auth-modal__close {
     position: absolute;
-    top: 16px;
-    right: 16px;
+    top: 12px;
+    right: 12px;
     width: 36px;
     height: 36px;
     border-radius: 50%;
     border: none;
-    background: var(--bg-secondary);
+    background: #f0f0f0;
     cursor: pointer;
     font-size: 16px;
-    z-index: 10;
+    color: #333;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: var(--transition);
+    z-index: 2;
+    transition: 0.2s;
 }
 
 .auth-modal__close:hover {
-    background: #ffe0e3;
-    color: var(--accent);
-    transform: rotate(90deg);
+    background: #ffebee;
+    color: #ff4757;
 }
 
-/* Форма */
+/* Формы */
 .auth-form {
     display: none;
-    padding: 32px 28px;
+    padding: 30px 28px;
 }
 
 .auth-form.active {
@@ -4542,7 +4694,7 @@ body {
 
 .auth-form__header {
     text-align: center;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
 }
 
 .auth-form__logo {
@@ -4550,71 +4702,65 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    margin-bottom: 20px;
-    font-size: 22px;
+    margin-bottom: 16px;
+    font-size: 18px;
     font-weight: 800;
-    color: var(--dark);
+    color: #1a1a2e;
 }
 
 .auth-form__logo-icon {
-    background: var(--primary-gradient);
-    color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
+    background: #0066ff;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 900;
 }
 
 .auth-form__header h2 {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 800;
-    margin: 0 0 8px;
-    color: var(--dark);
+    color: #1a1a2e;
+    margin: 0 0 6px;
 }
 
 .auth-form__header p {
-    font-size: 14px;
+    font-size: 13px;
     color: #999;
     margin: 0;
 }
 
-/* Поля формы */
 .auth-form__body {
     margin-bottom: 20px;
 }
 
 .auth-form__group {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .auth-form__group label {
     display: block;
     font-size: 13px;
     font-weight: 600;
-    color: var(--text);
+    color: #333;
     margin-bottom: 6px;
 }
 
-.auth-form__group input[type="text"],
-.auth-form__group input[type="tel"],
-.auth-form__group input[type="email"],
-.auth-form__group input[type="password"] {
+.auth-form__group input {
     width: 100%;
     padding: 12px 14px;
-    border: 2px solid var(--border);
+    border: 2px solid #e0e0e0;
     border-radius: 10px;
     font-size: 15px;
-    font-family: var(--font);
-    transition: var(--transition);
+    font-family: 'Segoe UI', system-ui, sans-serif;
     outline: none;
+    transition: 0.2s;
+    background: #fff;
 }
 
 .auth-form__group input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.08);
+    border-color: #0066ff;
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.08);
 }
 
 .auth-form__input-wrap {
@@ -4623,45 +4769,40 @@ body {
     align-items: center;
 }
 
-.auth-form__input-wrap i:first-child {
+.auth-form__input-wrap i {
     position: absolute;
     left: 14px;
     color: #999;
     font-size: 16px;
+    z-index: 1;
 }
 
 .auth-form__input-wrap input {
-    padding-left: 42px !important;
-    padding-right: 44px !important;
+    padding-left: 40px;
 }
 
 .auth-form__toggle-password {
     position: absolute;
-    right: 4px;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
     background: none;
     border: none;
     color: #999;
     cursor: pointer;
-    padding: 10px;
     font-size: 16px;
+    padding: 6px;
 }
 
 .auth-form__toggle-password:hover {
-    color: var(--text);
+    color: #0066ff;
 }
 
-.auth-form__row-inputs {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-/* Чекбокс и ссылки */
 .auth-form__row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .auth-form__checkbox {
@@ -4669,25 +4810,22 @@ body {
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    color: var(--text);
     cursor: pointer;
 }
 
 .auth-form__checkbox input {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--primary);
-    cursor: pointer;
+    width: 16px;
+    height: 16px;
 }
 
 .auth-form__checkbox a {
-    color: var(--primary);
+    color: #0066ff;
     text-decoration: none;
 }
 
 .auth-form__forgot {
     font-size: 13px;
-    color: var(--primary);
+    color: #0066ff;
     text-decoration: none;
     font-weight: 600;
 }
@@ -4696,119 +4834,110 @@ body {
     text-decoration: underline;
 }
 
-/* Кнопка отправки */
 .auth-form__submit {
     width: 100%;
     padding: 14px;
-    background: var(--primary);
-    color: white;
+    background: #0066ff;
+    color: #fff;
     border: none;
     border-radius: 10px;
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
-    transition: var(--transition);
-    margin-bottom: 16px;
+    transition: 0.2s;
+    margin-top: 8px;
 }
 
 .auth-form__submit:hover {
-    background: var(--primary-dark);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(0, 102, 255, 0.3);
+    background: #0052cc;
 }
 
-/* Разделитель */
+.auth-form__submit:active {
+    transform: scale(0.97);
+}
+
 .auth-form__divider {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin: 20px 0;
+    text-align: center;
+    margin: 16px 0;
     color: #ccc;
     font-size: 13px;
+    position: relative;
 }
 
 .auth-form__divider::before,
 .auth-form__divider::after {
     content: '';
-    flex: 1;
+    position: absolute;
+    top: 50%;
+    width: 35%;
     height: 1px;
-    background: var(--border);
+    background: #e0e0e0;
 }
 
-/* Социальные кнопки */
+.auth-form__divider::before { left: 0; }
+.auth-form__divider::after { right: 0; }
+
 .auth-form__social {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
     gap: 10px;
 }
 
 .auth-form__social-btn {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 12px;
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    background: var(--white);
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: var(--transition);
+    gap: 6px;
+    transition: 0.2s;
 }
 
 .auth-form__social-btn:hover {
-    background: var(--bg);
-    border-color: #ccc;
+    border-color: #0066ff;
+    background: #f0f7ff;
 }
 
-.auth-form__social-btn i {
-    font-size: 18px;
-}
-
-.auth-form__social-btn .fa-google {
-    color: #ea4335;
-}
-
-.auth-form__social-btn .fa-facebook {
-    color: #1877f2;
-}
-
-/* Футер формы */
 .auth-form__footer {
     text-align: center;
-    padding-top: 16px;
-    border-top: 1px solid var(--border-light);
-}
-
-.auth-form__footer p {
-    font-size: 14px;
+    font-size: 13px;
     color: #999;
-    margin: 0;
 }
 
 .auth-form__footer a {
-    color: var(--primary);
+    color: #0066ff;
     text-decoration: none;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .auth-form__footer a:hover {
     text-decoration: underline;
 }
 
+.auth-form__row-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
 /* Мобильная версия */
 @media (max-width: 480px) {
     .auth-modal__container {
-        top: auto;
+        position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
-        transform: translateY(100%);
+        top: auto;
         width: 100%;
         max-width: 100%;
         border-radius: 20px 20px 0 0;
         max-height: 90vh;
+        transform: translateY(100%);
     }
     
     .auth-modal.active .auth-modal__container {
@@ -5308,7 +5437,7 @@ body {
     position: fixed;
     top: 24px;
     right: -400px;
-    z-index: 9999;
+    z-index: 99999;
     display: flex;
     align-items: center;
     gap: 14px;
@@ -5370,14 +5499,20 @@ body {
 
 @media (max-width: 480px) {
     .toast {
-        left: 12px;
-        right: 12px;
-        min-width: auto;
-        max-width: none;
+        font-size: 8px;
+        display: none;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        transform: none;
+        min-width: 200px;
     }
     
     .toast.show {
-        right: 12px;
+    right: 12px;
+    opacity: 1;
+    visibility: visible;
+    display: block;
     }
 }
 
