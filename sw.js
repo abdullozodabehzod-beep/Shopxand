@@ -59,3 +59,26 @@ cache.put(event.request, clone);
         })
     );
 });
+
+// Push событие
+self.addEventListener('push', function(event) {
+    var data = event.data ? event.data.json() : {};
+    var title = data.title || 'ShopXand';
+    var options = {
+        body: data.body || 'Новое уведомление',
+        icon: '/img/icons/icon-192x192.png',
+        badge: '/img/icons/icon-72x72.png',
+        vibrate: [200, 100, 200],
+        data: { url: data.url || '/' }
+    };
+    
+    event.waitUntil(self.registration.showNotification(title, options));
+});
+
+// Клик по уведомлению
+self.addEventListener('notificationclick', function(event) {
+    event.notification.close();
+    event.waitUntil(
+        clients.openWindow(event.notification.data.url || '/')
+    );
+});

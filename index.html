@@ -548,9 +548,6 @@
             </div>
     </section>
 
-
-
-
         <!-- Популярные товары -->
     <section class="products">
         <div class="container">
@@ -1199,6 +1196,40 @@ data-cat="Одежда">
                     <span class="quickview__cat" id="quickviewCat">Электроника</span>
                     <h2 class="quickview__name" id="quickviewName">Смартфон Samsung Galaxy A54 5G 128GB</h2>
                     
+                                        <!-- Отзывы -->
+                    <div class="quickview__reviews-section">
+                        <div class="quickview__reviews-header">
+                            <h4>Отзывы о товаре</h4>
+                            <button class="quickview__add-review-btn" id="qvAddReviewBtn">
+                                <i class="fas fa-pen"></i> Написать отзыв
+                            </button>
+                        </div>
+                        
+                        <!-- Список отзывов -->
+                        <div class="quickview__reviews-list" id="qvReviewsList">
+                            <div class="quickview__review-empty">
+                                <span>📝</span>
+                                <p>Отзывов пока нет. Будьте первым!</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Форма отзыва (скрыта) -->
+                        <div class="quickview__review-form" id="qvReviewForm" style="display:none;">
+                            <div class="quickview__review-stars" id="qvReviewStars">
+                                <span data-star="1"><i class="far fa-star"></i></span>
+                                <span data-star="2"><i class="far fa-star"></i></span>
+                                <span data-star="3"><i class="far fa-star"></i></span>
+                                <span data-star="4"><i class="far fa-star"></i></span>
+                                <span data-star="5"><i class="far fa-star"></i></span>
+                            </div>
+                            <textarea placeholder="Напишите ваш отзыв..." id="qvReviewText" rows="3"></textarea>
+                            <div class="quickview__review-actions">
+                                <button class="quickview__review-cancel" id="qvReviewCancel">Отмена</button>
+                                <button class="quickview__review-submit" id="qvReviewSubmit">Отправить отзыв</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Рейтинг -->
                     <div class="quickview__rating">
                         <div class="quickview__stars">
@@ -1434,13 +1465,17 @@ data-cat="Одежда">
                     </div>
                     <button class="auth-form__submit" id="forgotBtn">Проверить</button>
                     
-                    <div id="codeBlock" style="display:none;">
-                        <div class="auth-form__group">
-                            <label>Новый пароль</label>
-                            <input type="password" placeholder="Минимум 6 символов" id="newPassword">
-                        </div>
-                        <button class="auth-form__submit" id="resetPasswordBtn">Сохранить пароль</button>
-                    </div>
+                   <div id="codeBlock" style="display:none;">
+                <div class="auth-form__group">
+                    <label>Код подтверждения</label>
+                    <input type="text" placeholder="Введите 6-значный код" id="forgotCode" maxlength="6">
+                </div>
+                <div class="auth-form__group">
+                    <label>Новый пароль</label>
+                    <input type="password" placeholder="Минимум 6 символов" id="newPassword">
+                </div>
+                <button class="auth-form__submit" id="resetPasswordBtn">Сохранить пароль</button>
+            </div>
                 </div>
                 <div class="auth-form__footer">
                     <p><a href="#" id="showLoginFromForgot">← Вернуться ко входу</a></p>
@@ -1526,7 +1561,7 @@ console.log('Service Worker ошибка:', err);
         <!-- Кнопка Telegram (фиксированная) -->
     <a href="https://t.me/shopxand" target="_blank" class="telegram-btn" id="telegramBtn" title="Написать в Telegram">
         <i class="fab fa-telegram-plane"></i>
-        <span class="telegram-btn__text">Поддержка</span>
+        <span class="telegram-btn__text">Поддержка и принятия заказы</span>
     </a>
 
     <!-- Виджет связи с менеджером -->
@@ -1605,6 +1640,79 @@ console.log('Service Worker ошибка:', err);
         </div>
     </div>
     
+
+        <!-- Онлайн-чат с поддержкой -->
+    <div class="chat-widget" id="chatWidget">
+        <!-- Кнопка открытия чата -->
+        <button class="chat-widget__btn" id="chatOpenBtn">
+            <i class="fas fa-comment-dots"></i>
+            <span class="chat-widget__badge" id="chatBadge" style="display:none;">1</span>
+        </button>
+        
+        <!-- Окно чата -->
+        <div class="chat-widget__window" id="chatWindow">
+            <div class="chat-widget__header">
+                <div class="chat-widget__header-info">
+                    <div class="chat-widget__avatar">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div>
+                        <h4>Поддержка ShopXand</h4>
+                        <span>Онлайн</span>
+                    </div>
+                </div>
+                <div class="chat-widget__header-actions">
+                    <button class="chat-widget__minimize" id="chatMinimize">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button class="chat-widget__close-btn" id="chatCloseBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Сообщения -->
+            <div class="chat-widget__messages" id="chatMessages">
+                <div class="chat-message chat-message--support">
+                    <div class="chat-message__avatar">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div class="chat-message__bubble">
+                        <p>👋 Здравствуйте! Я менеджер ShopXand. Чем могу помочь?</p>
+                        <span class="chat-message__time">Только что</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Форма -->
+            <div class="chat-widget__form">
+                <input type="text" placeholder="Введите сообщение..." id="chatInput" autocomplete="off">
+                <button id="chatSendBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+        <!-- Запрос на Push-уведомления -->
+    <div class="push-banner" id="pushBanner">
+        <div class="push-banner__content">
+            <div class="push-banner__icon">🔔</div>
+            <div class="push-banner__info">
+                <strong>Включить уведомления?</strong>
+                <span>Узнавайте о статусе заказа и акциях первыми</span>
+            </div>
+             <button class="push-banner__btn push-banner__btn--yes" id="pushYes">Да</button>
+            <button class="push-banner__btn push-banner__btn--settings" id="pushSettings" style="display:none;">
+                ⚙️ Как включить
+            </button>
+    <button class="push-banner__btn push-banner__btn--no" id="pushNo">Нет</button>
+            <div class="push-banner__actions">
+                <button class="push-banner__btn push-banner__btn--yes" id="pushYes">Да</button>
+                <button class="push-banner__btn push-banner__btn--no" id="pushNo">Нет</button>
+            </div>
+        </div>
+    </div>
 
 
 

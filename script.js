@@ -4,6 +4,53 @@
 
 document.addEventListener('DOMContentLoaded', function() {
 
+      // ============================================
+    // ГЛОБАЛЬНЫЕ ФУНКЦИИ
+    // ============================================
+        window.showConfirm = function(title, message, callback) {
+        var modal = document.getElementById('confirmModal');
+        if (!modal) {
+            if (confirm(title + '\n' + message)) callback();
+            return;
+        }
+        
+        // Сброс иконки и кнопки
+        var icon = modal.querySelector('.confirm-modal__icon i');
+        if (icon) {
+            icon.className = 'fas fa-question-circle';
+            icon.style.color = '#ff9100';
+        }
+        var okBtn = document.getElementById('confirmOk');
+        if (okBtn) okBtn.textContent = 'Да';
+        
+        document.getElementById('confirmTitle').textContent = title;
+        document.getElementById('confirmMessage').textContent = message;
+        
+        var newOkBtn = okBtn.cloneNode(true);
+        okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+        
+        newOkBtn.addEventListener('click', function() {
+            callback();
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+        
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    };
+    
+    window.closeConfirm = function() {
+        var modal = document.getElementById('confirmModal');
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    };
+
+    // Закрытие по кнопкам
+    document.getElementById('confirmCancel')?.addEventListener('click', window.closeConfirm);
+    document.getElementById('confirmOverlay')?.addEventListener('click', window.closeConfirm);
+
 
      function showToast(title, message, type) {
         var toast = document.getElementById('toast');
@@ -2066,7 +2113,6 @@ function showToast(title, message, type) {
     console.log('Модуль оформления заказа загружен');
 
 
-
     // ============================================
     // ORDERS - Мои заказы
     // ============================================
@@ -2080,46 +2126,81 @@ function showToast(title, message, type) {
     
     let orders = [];
 
-        window.deleteOrder = function(orderId) {
-        showConfirm('Удалить заказ?', 'Заказ ' + orderId + ' будет удалён навсегда', function() {
-            orders = orders.filter(o => o.id !== orderId);
-            localStorage.setItem('shopxand_orders', JSON.stringify(orders));
-            window.closeOrderDetail();
-            renderOrders();
-        });
+    // ============================================
+    // УДАЛИТЬ ЗАКАЗ
+    // ============================================
+    window.deleteOrder = function(orderId) {
+        var order = orders.find(function(o) { return o.id === orderId; });
+        
+        showConfirm(
+            'Удалить заказ?',
+            'Заказ ' + orderId + ' будет удалён навсегда',
+            function() {
+                orders = orders.filter(function(o) { return o.id !== orderId; });
+                localStorage.setItem('shopxand_orders', JSON.stringify(orders));
+                
+                if (order) {
+                    var msg = '🗑 КЛИЕНТ УДАЛИЛ ЗАКАЗ\n\n' +
+                        '📦 Заказ: ' + order.id + '\n' +
+                        '👤 Клиент: ' + order.customer.name + '\n' +
+                        '📞 Телефон: ' + order.customer.phone + '\n' +
+                        '💰 Сумма: ' + order.total.toLocaleString() + ' с.\n' +
+                        '📅 Дата: ' + new Date().toLocaleString('ru-RU');
+                    
+                    fetch('https://api.telegram.org/bot' + BOT_ORDER + '/sendMessage', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
+                    });
+                }
+                
+                window.closeOrderDetail();
+                renderOrders();
+                showToast('Удалено', 'Заказ удалён', 'success');
+            }
+        );
     };
 
-    const confirmModal = document.getElementById('confirmModal');
-    const confirmOverlay = document.getElementById('confirmOverlay');
-    const confirmCancel = document.getElementById('confirmCancel');
-    const confirmOk = document.getElementById('confirmOk');
-    let confirmCallback = null;
-
-    function showConfirm(title, message, callback) {
-        document.getElementById('confirmTitle').textContent = title;
-        document.getElementById('confirmMessage').textContent = message;
-        confirmCallback = callback;
-        confirmModal.classList.add('active');
-    }
-    function hideConfirm() { confirmModal.classList.remove('active'); confirmCallback = null; }
-    confirmCancel?.addEventListener('click', hideConfirm);
-    confirmOverlay?.addEventListener('click', hideConfirm);
-    confirmOk?.addEventListener('click', function() {
-        if (confirmCallback) confirmCallback();
-        hideConfirm();
-    });
-
-    
-              window.cancelOrder = function(orderId) {
+    // ============================================
+    // ОТМЕНИТЬ ЗАКАЗ
+    // ============================================
+   
+        window.cancelOrder = function(orderId) {
+        var order = orders.find(function(o) { return o.id === orderId; });
+        if (!order) return;
+        
+        var orderDate = new Date(order.date);
+        var now = new Date();
+        var hoursPassed = (now - orderDate) / (1000 * 60 * 60);
+        
+        // Если прошло 24 часа — показываем окно и выходим
+        if (hoursPassed >= 24) {
+            showConfirm(
+                '⛔ Отмена невозможна',
+                'Прошло более 24 часов с момента заказа. Отмена недоступна.',
+                function() {
+                    // просто закрываем окно, ничего не делаем
+                }
+            );
+            // Меняем текст кнопки "Да" на "Понятно"
+            var okBtn = document.getElementById('confirmOk');
+            if (okBtn) okBtn.textContent = 'Понятно';
+            
+            // Меняем иконку на красную
+            var icon = document.querySelector('.confirm-modal__icon i');
+            if (icon) {
+                icon.className = 'fas fa-clock';
+                icon.style.color = '#ff4757';
+            }
+            
+            return;
+        }
+        
+        // Если меньше 24 часов — отправляем запрос
         showConfirm(
             'Отменить заказ?',
-            'Запрос на отмену будет отправлен. Ожидайте подтверждения.',
+            'Заказ будет отменён. Ожидайте подтверждения менеджера.',
             function() {
-                // Находим заказ
-                var order = orders.find(function(o) { return o.id === orderId; });
-                if (!order) return;
-                
-                // Меняем статус на ожидание отмены
                 order.status = 'pending_cancel';
                 order.trackSteps = [
                     { label: 'Заказ принят', completed: true, current: false },
@@ -2129,20 +2210,19 @@ function showToast(title, message, type) {
                 ];
                 localStorage.setItem('shopxand_orders', JSON.stringify(orders));
                 
-                // Отправляем запрос на отмену тебе в Telegram с кнопками
                 var cancelMsg = 
-                    '⚠️ *ЗАПРОС НА ОТМЕНУ!*\n\n' +
-                    '📦 *Заказ:* ' + order.id + '\n' +
-                    '👤 *Клиент:* ' + order.customer.name + '\n' +
-                    '📞 *Телефон:* ' + order.customer.phone + '\n' +
-                    '📍 *Адрес:* ' + order.customer.city + ', ' + order.customer.address + '\n' +
-                    '💰 *Сумма:* ' + order.total.toLocaleString() + ' с.\n\n' +
+                    '⚠️ ЗАПРОС НА ОТМЕНУ!\n\n' +
+                    '📦 Заказ: ' + order.id + '\n' +
+                    '👤 Клиент: ' + order.customer.name + '\n' +
+                    '📞 Телефон: ' + order.customer.phone + '\n' +
+                    '📍 Адрес: ' + order.customer.city + ', ' + order.customer.address + '\n' +
+                    '💰 Сумма: ' + order.total.toLocaleString() + ' с.\n\n' +
                     'Клиент хочет отменить заказ.';
                 
                 var inlineKeyboard = {
                     inline_keyboard: [[
-{ text: '✅ Да, отменить', callback_data: 'approve_cancel_' + order.id },
-{ text: '❌ Нет, оставить', callback_data: 'reject_cancel_' + order.id }
+                        { text: '✅ Да, отменить', callback_data: 'approve_cancel_' + order.id },
+                        { text: '❌ Нет, оставить', callback_data: 'reject_cancel_' + order.id }
                     ]]
                 };
                 
@@ -2150,56 +2230,52 @@ function showToast(title, message, type) {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-chat_id: CHAT_ID,
-text: cancelMsg,
-reply_markup: JSON.stringify(inlineKeyboard)
+                        chat_id: CHAT_ID,
+                        text: cancelMsg,
+                        reply_markup: JSON.stringify(inlineKeyboard)
                     })
-                }).then(function(r) { return r.json(); })
-                  .then(function(d) {
-                    if (d.ok) {
-// Сохраняем message_id для удаления потом
-var cancelRequests = JSON.parse(localStorage.getItem('shopxand_cancel_requests') || '{}');
-cancelRequests[order.id] = d.result.message_id;
-localStorage.setItem('shopxand_cancel_requests', JSON.stringify(cancelRequests));
-
-showToast('Запрос отправлен', 'Ожидайте подтверждения от менеджера', 'success');
-                    }
                 });
                 
                 renderOrders();
+                showToast('Запрос отправлен', 'Ожидайте подтверждения', 'success');
             }
         );
     };
+    
 
-    // Загрузка заказов
+    // ============================================
+    // ЗАГРУЗКА И СОХРАНЕНИЕ
+    // ============================================
     function loadOrders() {
-        const savedOrders = localStorage.getItem('shopxand_orders');
-        if (savedOrders) {
-            orders = JSON.parse(savedOrders);
-        }
+        var saved = localStorage.getItem('shopxand_orders');
+        if (saved) orders = JSON.parse(saved);
     }
     
-    // Сохранение заказа
     function saveOrder(order) {
-        orders.unshift(order); // Добавляем в начало
+        orders.unshift(order);
         localStorage.setItem('shopxand_orders', JSON.stringify(orders));
         updateOrdersCount();
+
+         // Отправляем push-уведомление
+        setTimeout(function() {
+            window.notifyOrderStatus(order, 'processing');
+        }, 1000);
     }
     
-        function updateOrdersCount(count) {
+    function updateOrdersCount(count) {
         var total = count !== undefined ? count : orders.length;
         if (ordersCount) {
-            var word = getOrderWord(total);
-            ordersCount.textContent = total + ' ' + word;
+            ordersCount.textContent = total + ' ' + getOrderWord(total);
         }
     }
+    
     function getOrderWord(count) {
         if (count % 10 === 1 && count % 100 !== 11) return 'заказ';
         if (count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20)) return 'заказа';
         return 'заказов';
     }
     
-        function getStatusClass(status) {
+    function getStatusClass(status) {
         switch(status) {
             case 'processing': return 'order-card__status--processing';
             case 'delivery': return 'order-card__status--delivery';
@@ -2221,12 +2297,12 @@ showToast('Запрос отправлен', 'Ожидайте подтверж�
         }
     }
     
-    
-        // Отрисовать заказы
+    // ============================================
+    // ОТРИСОВКА ЗАКАЗОВ
+    // ============================================
     function renderOrders() {
         if (!ordersList) return;
         
-         // Фильтруем заказы: показываем только заказы текущего пользователя
         var filteredOrders = orders;
         if (currentUser) {
             filteredOrders = orders.filter(function(order) {
@@ -2240,173 +2316,122 @@ showToast('Запрос отправлен', 'Ожидайте подтверж�
         } else {
             ordersEmpty.style.display = 'none';
             
-            ordersList.innerHTML = filteredOrders.map(order => {
-                const date = new Date(order.date);
-                const dateStr = date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+            ordersList.innerHTML = filteredOrders.map(function(order) {
+                var date = new Date(order.date);
+                var dateStr = date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
                 
-                // Расчёт времени доставки
-                let deliveryInfo = '';
-                if (order.status === 'processing') {
-                    deliveryInfo = 'Доставка через 1-3 дня';
-                } else if (order.status === 'delivery') {
-                    deliveryInfo = 'Доставка сегодня-завтра';
-                } else if (order.status === 'completed') {
-                    deliveryInfo = 'Заказ доставлен';
-                }
+                var deliveryInfo = '';
+                if (order.status === 'processing') deliveryInfo = 'Доставка через 12-18 дней - отминить заказ после 24 часа невозможен';
+                else if (order.status === 'delivery') deliveryInfo = '📦 Доставка сегодня-завтра';
+                else if (order.status === 'completed') deliveryInfo = '✅ Заказ доставлен';
+                else if (order.status === 'pending_cancel') deliveryInfo = '⏳ Ожидает подтверждения отмены';
+                else if (order.status === 'cancelled') deliveryInfo = '❌ Заказ отменён';
                 
-                return `
-                <div class="order-card">
-                    <div class="order-card__header">
-<div>
-    <div class="order-card__number">${order.id}</div>
-    <div class="order-card__date">${dateStr}</div>
-    <div class="order-card__customer">👤 ${order.customer.name}</div> <!-- ← добавить -->
-
-</div>
-<span class="order-card__status ${getStatusClass(order.status)}">${getStatusText(order.status)}</span>
-                    </div>
-                    
-                    <!-- Отслеживание -->
-                    <div class="order-track">
-${(order.trackSteps || []).map((step, i, arr) => `
-    <div class="order-track__step ${step.completed ? 'completed' : ''} ${step.current ? 'current' : ''}">
-        <div class="order-track__dot"></div>
-        ${i < arr.length - 1 ? '<div class="order-track__line"></div>' : ''}
-        <div class="order-track__label">${step.label}</div>
-    </div>
-`).join('')}
-                    </div>
-                    
-                    <!-- Информация о доставке -->
-                    <div class="order-card__delivery-info">
-<i class="fas fa-truck"></i>
-<span>${deliveryInfo}</span>
-                    </div>
-                    
-                    <!-- Товары -->
-                    <div class="order-card__items">
-${order.items.map(item => `
-    <div class="order-card__item">
-    <span class="order-card__item-icon">
-    ${item.img && (item.img.endsWith('.png') || item.img.endsWith('.jpg') || item.img.endsWith('.jpeg') || item.img.endsWith('.webp'))
-        ? `<img src="${item.img}" alt="${item.name}" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;">`
-        : item.img || '📦'
-    }
-</span>
-        <span class="order-card__item-name">${item.name}</span>
-        <span class="order-card__item-qty">×${item.quantity}</span>
-    </div>
-`).join('')}
-                    </div>
-                    
-                     <div class="order-card__footer">
-        <span class="order-card__total">${order.total.toLocaleString()} сомони</span>
-        <div style="display: flex; gap: 6px;">
-            ${order.status !== 'cancelled' && order.status !== 'completed' ? `
-                <button class="order-card__cancel-btn" onclick="window.cancelOrder('${order.id}')">
-                    <i class="fas fa-times"></i> Отменить
-                </button>
-            ` : ''}
-            <button class="order-card__delete-btn" onclick="window.deleteOrder('${order.id}')">
-                <i class="fas fa-trash-alt"></i> Удалить
-            </button>
-            <button class="order-card__details-btn" onclick="window.showOrderDetail('${order.id}')">
-                Детали
-            </button>
-        </div>
-    </div>
-                    
-                `;
+                var orderDate2 = new Date(order.date);
+                var hoursPassed2 = (new Date() - orderDate2) / (1000 * 60 * 60);
+                var cantCancel = hoursPassed2 >= 24 && order.status === 'processing';
+                
+                return '<div class="order-card">' +
+                    '<div class="order-card__header">' +
+                        '<div>' +
+                            '<div class="order-card__number">' + order.id + '</div>' +
+                            '<div class="order-card__date">' + dateStr + '</div>' +
+                            '<div class="order-card__customer">👤 ' + order.customer.name + '</div>' +
+                        '</div>' +
+                        '<span class="order-card__status ' + getStatusClass(order.status) + '">' + getStatusText(order.status) + '</span>' +
+                    '</div>' +
+                    '<div class="order-track">' +
+                        (order.trackSteps || []).map(function(step, i, arr) {
+                            return '<div class="order-track__step ' + (step.completed ? 'completed' : '') + ' ' + (step.current ? 'current' : '') + '">' +
+                                '<div class="order-track__dot"></div>' +
+                                (i < arr.length - 1 ? '<div class="order-track__line"></div>' : '') +
+                                '<div class="order-track__label">' + step.label + '</div>' +
+                            '</div>';
+                        }).join('') +
+                    '</div>' +
+                    '<div class="order-card__delivery-info"><i class="fas fa-truck"></i><span>' + deliveryInfo + '</span></div>' +
+                    '<div class="order-card__items">' +
+                        order.items.map(function(item) {
+                            var imgContent = (item.img && (item.img.endsWith('.png') || item.img.endsWith('.jpg') || item.img.endsWith('.jpeg') || item.img.endsWith('.webp')))
+                                ? '<img src="' + item.img + '" alt="' + item.name + '" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;">'
+                                : (item.img || '📦');
+                            return '<div class="order-card__item">' +
+                                '<span class="order-card__item-icon">' + imgContent + '</span>' +
+                                '<span class="order-card__item-name">' + item.name + '</span>' +
+                                '<span class="order-card__item-qty">×' + item.quantity + '</span>' +
+                            '</div>';
+                        }).join('') +
+                    '</div>' +
+                    '<div class="order-card__footer">' +
+                        '<span class="order-card__total">' + order.total.toLocaleString() + ' сомони</span>' +
+                        '<div style="display: flex; gap: 6px;">' +
+                            (order.status !== 'cancelled' && order.status !== 'completed' && order.status !== 'pending_cancel' ? 
+                                (function() {
+                                    if (hoursPassed2 < 24) {
+                                        return '<button class="order-card__cancel-btn" onclick="window.cancelOrder(\'' + order.id + '\')"><i class="fas fa-times"></i> Отменить</button>';
+                                    }
+                                    return '';
+                                })() 
+                            : '') +
+                            '<button class="order-card__delete-btn" onclick="window.deleteOrder(\'' + order.id + '\')"><i class="fas fa-trash-alt"></i> Удалить</button>' +
+                            '<button class="order-card__details-btn" onclick="window.showOrderDetail(\'' + order.id + '\')">Детали</button>' +
+                        '</div>' +
+                        (cantCancel ? '<div style="font-size:11px;color:#ff4757;margin-top:6px;">⛔ Отмена невозможна (прошло 24 часа)</div>' : '') +
+                    '</div>' +
+                '</div>';
             }).join('');
         }
         
         updateOrdersCount(filteredOrders.length);
     }
-
     
-    // Показать детали заказа
+    // ============================================
+    // ДЕТАЛИ ЗАКАЗА
+    // ============================================
     function showOrderDetail(orderId) {
-        const order = orders.find(o => o.id === orderId);
+        var order = orders.find(function(o) { return o.id === orderId; });
         if (!order) return;
         
-        // Удаляем старый popup если есть
-        const oldPopup = document.querySelector('.order-detail-popup');
-        const oldOverlay = document.querySelector('.order-detail-popup__overlay');
+        var oldPopup = document.querySelector('.order-detail-popup');
+        var oldOverlay = document.querySelector('.order-detail-popup__overlay');
         if (oldPopup) oldPopup.remove();
         if (oldOverlay) oldOverlay.remove();
         
-        const date = new Date(order.date);
-        const dateStr = date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-        const deliveryText = order.delivery === 'pickup' ? 'Самовывоз' : 'Курьерская доставка';
-        const paymentText = order.payment === 'card' ? 'Банковская карта' : 'Наличные при получении';
+        var date = new Date(order.date);
+        var dateStr = date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        var deliveryText = order.delivery === 'pickup' ? 'Самовывоз' : 'Курьерская доставка';
+        var paymentText = order.payment === 'card' ? 'Банковская карта' : 'Наличные при получении';
         
-        const overlay = document.createElement('div');
+        var overlay = document.createElement('div');
         overlay.className = 'order-detail-popup__overlay';
+        overlay.onclick = window.closeOrderDetail;
         document.body.appendChild(overlay);
         
-        const popup = document.createElement('div');
+        var popup = document.createElement('div');
         popup.className = 'order-detail-popup';
-       
+        popup.innerHTML = 
+            '<button class="order-detail-popup__close" onclick="window.closeOrderDetail()"><i class="fas fa-times"></i></button>' +
+            '<h4>Заказ ' + order.id + '</h4>' +
+            '<div class="order-detail-popup__info">' +
+                '<div class="order-detail-popup__row"><span>Дата</span><span>' + dateStr + '</span></div>' +
+                '<div class="order-detail-popup__row"><span>Статус</span><span>' + getStatusText(order.status) + '</span></div>' +
+                '<div class="order-detail-popup__row"><span>Имя</span><span>' + order.customer.name + '</span></div>' +
+                '<div class="order-detail-popup__row"><span>Телефон</span><span>' + order.customer.phone + '</span></div>' +
+                '<div class="order-detail-popup__row"><span>Город</span><span>' + order.customer.city + '</span></div>' +
+                '<div class="order-detail-popup__row"><span>Адрес</span><span>' + order.customer.address + '</span></div>' +
+                '<div class="order-detail-popup__row"><span>Доставка</span><span>' + deliveryText + '</span></div>' +
+                '<div class="order-detail-popup__row"><span>Оплата</span><span>' + paymentText + '</span></div>' +
+                '<div class="order-detail-popup__row"><span>Сумма</span><span>' + order.total.toLocaleString() + ' сомони</span></div>' +
+            '</div>' +
+            (order.status !== 'cancelled' && order.status !== 'completed' ?
+                '<button class="order-cancel-btn" onclick="window.cancelOrder(\'' + order.id + '\')"><i class="fas fa-times-circle"></i> Отменить заказ</button>' : '') +
+            (order.status === 'cancelled' ?
+                '<div class="order-cancelled-badge"><i class="fas fa-ban"></i> Заказ отменён</div>' : '') +
+            '<button class="order-delete-btn" onclick="window.deleteOrder(\'' + order.id + '\'); window.closeOrderDetail();"><i class="fas fa-trash-alt"></i> Удалить заказ</button>';
+        
         document.body.appendChild(popup);
-            popup.innerHTML = `
-        <button class="order-detail-popup__close" onclick="window.closeOrderDetail()">
-            <i class="fas fa-times"></i>
-        </button>
-        <h4>Заказ ${order.id}</h4>
-        <div class="order-detail-popup__info">
-            <div class="order-detail-popup__row">
-                <span>Дата</span>
-                <span>${dateStr}</span>
-            </div>
-            <div class="order-detail-popup__row">
-                <span>Статус</span>
-                <span>${getStatusText(order.status)}</span>
-            </div>
-            <div class="order-detail-popup__row">
-                <span>Имя</span>
-                <span>${order.customer.name}</span>
-            </div>
-            <div class="order-detail-popup__row">
-                <span>Телефон</span>
-                <span>${order.customer.phone}</span>
-            </div>
-            <div class="order-detail-popup__row">
-                <span>Город</span>
-                <span>${order.customer.city}</span>
-            </div>
-            <div class="order-detail-popup__row">
-                <span>Адрес</span>
-                <span>${order.customer.address}</span>
-            </div>
-            <div class="order-detail-popup__row">
-                <span>Доставка</span>
-                <span>${deliveryText}</span>
-            </div>
-            <div class="order-detail-popup__row">
-                <span>Оплата</span>
-                <span>${paymentText}</span>
-            </div>
-            <div class="order-detail-popup__row">
-                <span>Сумма</span>
-                <span>${order.total.toLocaleString()} сомони</span>
-            </div>
-        </div>
-        ${order.status !== 'cancelled' && order.status !== 'completed' ? `
-            <button class="order-cancel-btn" onclick="window.cancelOrder('${order.id}')">
-                <i class="fas fa-times-circle"></i> Отменить заказ
-            </button>
-        ` : ''}
-        ${order.status === 'cancelled' ? `
-            <div class="order-cancelled-badge">
-                <i class="fas fa-ban"></i> Заказ отменён
-            </div>
-        ` : ''}
-    <button class="order-delete-btn" onclick="window.deleteOrder('${order.id}'); window.closeOrderDetail();">
-        <i class="fas fa-trash-alt"></i> Удалить заказ
-    </button>
-
-    `;
-        setTimeout(() => {
+        
+        setTimeout(function() {
             overlay.classList.add('active');
             popup.classList.add('active');
         }, 10);
@@ -2415,19 +2440,15 @@ ${order.items.map(item => `
     window.showOrderDetail = showOrderDetail;
     
     window.closeOrderDetail = function() {
-        const popup = document.querySelector('.order-detail-popup');
-        const overlay = document.querySelector('.order-detail-popup__overlay');
-        if (popup) {
-            popup.classList.remove('active');
-            overlay.classList.remove('active');
-            setTimeout(() => {
-                popup.remove();
-                overlay.remove();
-            }, 300);
-        }
+        var popup = document.querySelector('.order-detail-popup');
+        var overlay = document.querySelector('.order-detail-popup__overlay');
+        if (popup) { popup.classList.remove('active'); overlay.classList.remove('active'); }
+        setTimeout(function() { if (popup) popup.remove(); if (overlay) overlay.remove(); }, 300);
     };
     
-    // Открытие/закрытие панели заказов
+    // ============================================
+    // ОТКРЫТИЕ / ЗАКРЫТИЕ
+    // ============================================
     function openOrders() {
         ordersPanel.classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -2436,47 +2457,35 @@ ${order.items.map(item => `
     
     function closeOrders() {
         ordersPanel.classList.remove('active');
-        if (!cartPanel.classList.contains('active') &&
-            !favPanel.classList.contains('active') &&
-            !mobileMenu.classList.contains('active') &&
-            !checkoutModal.classList.contains('active')) {
+        if (!cartPanel.classList.contains('active') && !favPanel.classList.contains('active') &&
+            !mobileMenu.classList.contains('active') && !checkoutModal.classList.contains('active')) {
             document.body.style.overflow = '';
         }
     }
+    window.closeOrders = closeOrders;
     
-    // Кнопка "Заказы" в хедере
-    const headerOrdersBtn = document.querySelector('.header__action--orders, .header__action:nth-child(2)');
+    var headerOrdersBtn = document.querySelector('.header__action--orders, .header__action:nth-child(2)');
     if (headerOrdersBtn) {
-        headerOrdersBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            openOrders();
-        });
+        headerOrdersBtn.addEventListener('click', function(e) { e.preventDefault(); openOrders(); });
     }
     
-    // Заказы в мобильном меню
-    const mobileOrdersLink = document.querySelector('.mobile-menu__action i.fa-box')?.parentElement;
-    if (mobileOrdersLink) {
-        mobileOrdersLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            closeMenu();
+    var mobileOrdersAction = document.querySelector('.mobile-menu__action i.fa-box')?.parentElement;
+    if (mobileOrdersAction) {
+        mobileOrdersAction.addEventListener('click', function(e) {
+            e.preventDefault(); e.stopPropagation();
+            window.closeMenu();
             setTimeout(openOrders, 400);
         });
     }
     
-    // Закрытие
     if (ordersOverlay) ordersOverlay.addEventListener('click', closeOrders);
     if (ordersClose) ordersClose.addEventListener('click', closeOrders);
     
-    // Escape
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && ordersPanel && ordersPanel.classList.contains('active')) {
-            closeOrders();
-        }
+        if (e.key === 'Escape' && ordersPanel && ordersPanel.classList.contains('active')) closeOrders();
     });
     
-    // Кнопка "Перейти в каталог"
-    const ordersEmptyBtn = document.getElementById('ordersEmptyBtn');
+    var ordersEmptyBtn = document.getElementById('ordersEmptyBtn');
     if (ordersEmptyBtn) {
         ordersEmptyBtn.addEventListener('click', function() {
             closeOrders();
@@ -2484,11 +2493,11 @@ ${order.items.map(item => `
         });
     }
     
-    // Загрузка при старте
     loadOrders();
     updateOrdersCount();
     
-    console.log('Модуль заказов загружен. Заказов:', orders.length);
+    console.log('📦 Модуль заказов загружен. Заказов:', orders.length);
+    
 
 
         // ============================================
@@ -3213,69 +3222,112 @@ checkDeliveryNotifications();
     console.log('Модуль быстрого просмотра загружен');
     
         // ============================================
-    // AUTH - Вход / Регистрация
+    // AUTH - Профессиональная система входа
     // ============================================
-    
     
     const authModal = document.getElementById('authModal');
     const authOverlay = document.getElementById('authOverlay');
     const authClose = document.getElementById('authClose');
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
+    const forgotForm = document.getElementById('forgotForm');
     
     let isLoggedIn = false;
     let currentUser = null;
+    let authToken = null;
     
-    // Загрузка пользователя
+    // ============================================
+    // ЗАГРУЗКА ПОЛЬЗОВАТЕЛЯ
+    // ============================================
     function loadUser() {
-        const savedUser = localStorage.getItem('shopxand_user');
-        if (savedUser) {
+        var savedUser = localStorage.getItem('shopxand_user');
+        var savedToken = localStorage.getItem('shopxand_token');
+        if (savedUser && savedToken) {
             currentUser = JSON.parse(savedUser);
+            authToken = savedToken;
             isLoggedIn = true;
             updateUserUI();
         }
     }
     
-       function saveUser(user) {
+    // ============================================
+    // ГЕНЕРАЦИЯ ТОКЕНА
+    // ============================================
+    function generateToken() {
+        return 'sx_' + Date.now() + '_' + Math.random().toString(36).substr(2, 16);
+    }
+    
+    // ============================================
+    // БАЗА ПОЛЬЗОВАТЕЛЕЙ
+    // ============================================
+    function getAllUsers() {
+        return JSON.parse(localStorage.getItem('shopxand_users') || '[]');
+    }
+    
+    function saveAllUsers(users) {
+        localStorage.setItem('shopxand_users', JSON.stringify(users));
+    }
+    
+    function findUserByPhone(phone) {
+        var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
+        var users = getAllUsers();
+        return users.find(function(u) {
+            return (u.phone || '').replace(/[\+\s\-\(\)]/g, '') === cleanPhone;
+        });
+    }
+    
+    function findUserByEmail(email) {
+        if (!email) return null;
+        var users = getAllUsers();
+        return users.find(function(u) { return u.email === email; });
+    }
+    
+    // ============================================
+    // СОХРАНЕНИЕ СЕССИИ
+    // ============================================
+    function saveSession(user) {
         currentUser = user;
         isLoggedIn = true;
+        authToken = generateToken();
         localStorage.setItem('shopxand_user', JSON.stringify(user));
-        // Сохраняем ID пользователя для привязки заказов
+        localStorage.setItem('shopxand_token', authToken);
+        // Сохраняем ID для привязки данных
         localStorage.setItem('shopxand_current_user_phone', user.phone);
-        updateUserUI();
     }
     
-    // Выход
-    function logout() {
+    function clearSession() {
         currentUser = null;
         isLoggedIn = false;
+        authToken = null;
         localStorage.removeItem('shopxand_user');
+        localStorage.removeItem('shopxand_token');
         localStorage.removeItem('shopxand_current_user_phone');
+    }
+    
+    // ============================================
+    // ВЫХОД
+    // ============================================
+    function logout() {
+        clearSession();
         updateUserUI();
         renderOrders();
+        showToast('Вы вышли', 'До новых встреч!', 'success');
     }
     
-    // Проверка авторизации
-    function requireAuth(callback) {
-        if (isLoggedIn) {
-            callback();
-        } else {
-            openAuth();
-        }
-    }
-    
-    // Обновление интерфейса
+    // ============================================
+    // UI
+    // ============================================
     function updateUserUI() {
-        const loginBtn = document.querySelector('.header__action--login, .header__action:first-of-type');
-        const mobileLoginBtn = document.querySelector('.mobile-menu__login-btn');
+        var loginBtn = document.querySelector('.header__action--login, .header__action:first-of-type');
+        var mobileLoginBtn = document.querySelector('.mobile-menu__login-btn');
         
         if (isLoggedIn && currentUser) {
             if (loginBtn) {
                 loginBtn.querySelector('i').className = 'fas fa-user-check';
-                loginBtn.querySelector('span').textContent = currentUser.name || 'Профиль';
+                loginBtn.querySelector('span').textContent = currentUser.name;
             }
             if (mobileLoginBtn) {
-                mobileLoginBtn.textContent = currentUser.name || 'Мой профиль';
+                mobileLoginBtn.textContent = currentUser.name;
             }
         } else {
             if (loginBtn) {
@@ -3288,142 +3340,103 @@ checkDeliveryNotifications();
         }
     }
     
-        function openAuth() {
-        console.log('openAuth вызван');
-        console.log('authModal:', authModal);
-        
-        if (!authModal) {
-            console.error('authModal не найден!');
-            return;
-        }
+    // ============================================
+    // МОДАЛЬНЫЕ ОКНА
+    // ============================================
+    function openAuth() {
+        if (!authModal) return;
         authModal.classList.add('active');
         document.body.style.overflow = 'hidden';
         showLoginForm();
     }
     
-    function openAuth() {
-    // Проверка localStorage
-    try {
-        localStorage.setItem('test', '1');
-        localStorage.removeItem('test');
-    } catch(e) {
-        showToast('Ошибка', 'Включите Cookie и хранилище в настройках браузера', 'error');
-        return;
-    }
-
-        function closeAuth() {
+    function closeAuth() {
         if (!authModal) return;
         authModal.classList.remove('active');
-        document.body.style.overflow = '';
+        if (!cartPanel.classList.contains('active') &&
+            !favPanel.classList.contains('active') &&
+            !ordersPanel.classList.contains('active') &&
+            !mobileMenu.classList.contains('active') &&
+            !quickview.classList.contains('active')) {
+            document.body.style.overflow = '';
+        }
     }
-    
-    window.closeAuth = closeAuth; // ← ДОБАВЬ ЭТУ СТРОКУ
-    
-    if (!authModal) return;
-    authModal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    showLoginForm();
-}
+    window.closeAuth = closeAuth;
     
     function showLoginForm() {
         loginForm.classList.add('active');
         registerForm.classList.remove('active');
+        if (forgotForm) forgotForm.classList.remove('active');
     }
     
     function showRegisterForm() {
         loginForm.classList.remove('active');
         registerForm.classList.add('active');
+        if (forgotForm) forgotForm.classList.remove('active');
     }
     
-        const headerLoginBtn = document.querySelector('.header__action--login, .header__action:first-of-type');
+    function showForgotForm() {
+        loginForm.classList.remove('active');
+        registerForm.classList.remove('active');
+        if (forgotForm) forgotForm.classList.add('active');
+        var codeBlock = document.getElementById('codeBlock');
+        if (codeBlock) codeBlock.style.display = 'none';
+    }
+    
+    // ============================================
+    // КНОПКИ ОТКРЫТИЯ
+    // ============================================
+    var headerLoginBtn = document.querySelector('.header__action--login, .header__action:first-of-type');
     if (headerLoginBtn) {
         headerLoginBtn.addEventListener('click', function(e) {
             e.preventDefault();
             if (isLoggedIn) {
-                logoutModal.classList.add('active');
+                document.getElementById('logoutModal').classList.add('active');
                 document.body.style.overflow = 'hidden';
             } else {
                 openAuth();
             }
         });
     }
-
-        const mobileLoginBtn = document.querySelector('.mobile-menu__login-btn');
+    
+    var mobileLoginBtn = document.querySelector('.mobile-menu__login-btn');
     if (mobileLoginBtn) {
         mobileLoginBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            e.stopPropagation();
-            
-            if (isLoggedIn) {
-                window.closeMenu();
-                setTimeout(function() {
-                    logoutModal.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                }, 350);
-            } else {
-                closeMenu();
-                setTimeout(function() {
+            window.closeMenu();
+            setTimeout(function() {
+                if (isLoggedIn) {
+                    document.getElementById('logoutModal').classList.add('active');
+                } else {
                     openAuth();
-                }, 400);
-            }
+                }
+            }, 400);
         });
     }
-   
     
-    // Закрытие
-    if (authOverlay) authOverlay.addEventListener('click', function() {
-    closeAuth();
-});
-if (authClose) authClose.addEventListener('click', function() {
-    window.closeAuth();
-});   
+    // Закрытие модалки
+    if (authOverlay) authOverlay.addEventListener('click', function() { closeAuth(); });
+    if (authClose) authClose.addEventListener('click', function() { closeAuth(); });
     
-       // Переключение форм
+    // Переключение форм
     document.getElementById('showRegister')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        showRegisterForm();
+        e.preventDefault(); showRegisterForm();
     });
-    
     document.getElementById('showLogin')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        showLoginForm();
+        e.preventDefault(); showLoginForm();
     });
-    
-    // Забыли пароль
-    document.querySelector('.auth-form__forgot')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        showForgotForm();
-    });
-    
     document.getElementById('showLoginFromForgot')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        showLoginForm();
+        e.preventDefault(); showLoginForm();
     });
-    
-    function showLoginForm() {
-        loginForm.classList.add('active');
-        registerForm.classList.remove('active');
-        document.getElementById('forgotForm').classList.remove('active');
-    }
-    
-    function showRegisterForm() {
-        loginForm.classList.remove('active');
-        registerForm.classList.add('active');
-        document.getElementById('forgotForm').classList.remove('active');
-    }
-    
-    function showForgotForm() {
-        loginForm.classList.remove('active');
-        registerForm.classList.remove('active');
-        document.getElementById('forgotForm').classList.add('active');
-        document.getElementById('codeBlock').style.display = 'none';
-    }
+    document.querySelector('.auth-form__forgot')?.addEventListener('click', function(e) {
+        e.preventDefault(); showForgotForm();
+    });
     
     // Показать/скрыть пароль
     document.querySelectorAll('.auth-form__toggle-password').forEach(function(btn) {
         btn.addEventListener('click', function() {
-            const input = this.parentElement.querySelector('input');
-            const icon = this.querySelector('i');
+            var input = this.parentElement.querySelector('input');
+            var icon = this.querySelector('i');
             if (input.type === 'password') {
                 input.type = 'text';
                 icon.className = 'fas fa-eye-slash';
@@ -3434,79 +3447,8 @@ if (authClose) authClose.addEventListener('click', function() {
         });
     });
     
-    // ============================================
-    // РЕАЛЬНЫЙ ВХОД
-    // ============================================
-    
-    // Загружаем всех пользователей
-    function getAllUsers() {
-        const users = localStorage.getItem('shopxand_users');
-        return users ? JSON.parse(users) : [];
-    }
-    
-    // Сохраняем пользователя в общую базу
-    function saveUserToBase(user) {
-        const users = getAllUsers();
-        const existingIndex = users.findIndex(function(u) {
-            return u.phone === user.phone || u.email === user.email;
-        });
-        
-        if (existingIndex >= 0) {
-            users[existingIndex] = user;
-        } else {
-            users.push(user);
-        }
-        
-        localStorage.setItem('shopxand_users', JSON.stringify(users));
-    }
-    
-    // Найти пользователя
-    function findUser(phoneOrEmail, password) {
-        const users = getAllUsers();
-        return users.find(function(u) {
-            return (u.phone === phoneOrEmail || u.email === phoneOrEmail) && u.password === password;
-        });
-    }
-    
-          document.getElementById('loginBtn')?.addEventListener('click', function() {
-        const phone = document.getElementById('loginPhone').value.trim();
-        const password = document.getElementById('loginPassword').value;
-        
-        console.log('=== ВХОД ===');
-        console.log('Телефон:', phone);
-        console.log('Пароль:', password);
-        
-        if (!phone) {
-            showToast('Ошибка', 'Введите телефон или email', 'error');
-            return;
-        }
-        
-        if (!password) {
-            showToast('Ошибка', 'Введите пароль', 'error');
-            return;
-        }
-        
-        // Ищем пользователя
-        const users = getAllUsers();
-        console.log('Все пользователи:', users);
-        
-        const user = users.find(function(u) {
-            return (u.phone === phone || u.email === phone) && u.password === password;
-        });
-        
-        console.log('Найден пользователь:', user);
-        
-        if (user) {
-            saveUser(user);
-            closeAuth();
-            showToast('С возвращением!', user.name + ', вы вошли в аккаунт', 'success');
-        } else {
-            showToast('Ошибка входа', 'Неверный телефон или пароль. Зарегистрируйтесь.', 'error');
-        }
-    });
-
         // ============================================
-    // РЕГИСТРАЦИЯ
+    // РЕГИСТРАЦИЯ — СТРОГАЯ ВАЛИДАЦИЯ
     // ============================================
     document.getElementById('registerBtn')?.addEventListener('click', function() {
         var name = document.getElementById('regName').value.trim();
@@ -3516,12 +3458,27 @@ if (authClose) authClose.addEventListener('click', function() {
         var passwordConfirm = document.getElementById('regPasswordConfirm').value;
         var agree = document.getElementById('regAgree')?.checked;
         
-        if (!name || !phone) {
-            showToast('Ошибка', 'Заполните имя и телефон', 'error');
+        if (!name || name.length < 2) {
+            showToast('Ошибка', 'Имя должно содержать минимум 2 символа', 'error');
             return;
         }
-        if (!password || password.length < 6) {
-            showToast('Ошибка', 'Пароль минимум 6 символов', 'error');
+        
+       var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
+        if (!cleanPhone.startsWith('992') || cleanPhone.length !== 12 || !/^\d+$/.test(cleanPhone)) {
+            showToast('Ошибка', 'Введите номер в формате 992XXXXXXXXX', 'error');
+            return;
+        }
+        
+        if (email) {
+            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showToast('Ошибка', 'Введите корректный email', 'error');
+                return;
+            }
+        }
+        
+        if (!password || password.length < 6 || !/[a-zA-Z]/.test(password) || !/\d/.test(password)) {
+            showToast('Ошибка', 'Пароль: минимум 6 символов, буквы и цифры', 'error');
             return;
         }
         if (password !== passwordConfirm) {
@@ -3529,37 +3486,40 @@ if (authClose) authClose.addEventListener('click', function() {
             return;
         }
         if (!agree) {
-            showToast('Ошибка', 'Примите условия', 'error');
+            showToast('Ошибка', 'Примите условия использования', 'error');
             return;
         }
         
-        var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
-        var users = JSON.parse(localStorage.getItem('shopxand_users') || '[]');
-        
-        // Проверка уникальности телефона
-        var phoneExists = users.find(function(u) {
-            var uPhone = (u.phone || '').replace(/[\+\s\-\(\)]/g, '');
-            return uPhone === cleanPhone;
-        });
-        
-        if (phoneExists) {
-            showToast('Ошибка', 'Номер ' + phone + ' уже зарегистрирован', 'error');
+         // ===== ПРОВЕРКА УНИКАЛЬНОСТИ НОМЕРА =====
+        var existingPhone = findUserByPhone(cleanPhone);
+        if (existingPhone) {
+            showToast(
+                'Номер уже зарегистрирован',
+                'Номер ' + phone + ' уже используется. Один номер = один аккаунт. Войдите или восстановите пароль.',
+                'error'
+            );
             document.getElementById('regPhone').style.borderColor = '#ff4757';
-            setTimeout(function() { document.getElementById('regPhone').style.borderColor = ''; }, 2000);
+            setTimeout(function() { document.getElementById('regPhone').style.borderColor = ''; }, 3000);
             return;
         }
         
-        // Проверка уникальности email
+          // ===== ПРОВЕРКА УНИКАЛЬНОСТИ EMAIL =====
         if (email) {
-            var emailExists = users.find(function(u) { return u.email === email; });
-            if (emailExists) {
-                showToast('Ошибка', 'Email ' + email + ' уже используется', 'error');
+            var existingEmail = findUserByEmail(email);
+            if (existingEmail) {
+                showToast(
+                    'Email уже используется',
+                    'Email ' + email + ' уже зарегистрирован. Один email = один аккаунт.',
+                    'error'
+                );
                 document.getElementById('regEmail').style.borderColor = '#ff4757';
-                setTimeout(function() { document.getElementById('regEmail').style.borderColor = ''; }, 2000);
+                setTimeout(function() { document.getElementById('regEmail').style.borderColor = ''; }, 3000);
                 return;
             }
         }
         
+        
+          // Создаём аккаунт
         var user = {
             name: name,
             phone: cleanPhone,
@@ -3568,24 +3528,23 @@ if (authClose) authClose.addEventListener('click', function() {
             registeredAt: new Date().toISOString()
         };
         
+        var users = getAllUsers();
         users.push(user);
-        localStorage.setItem('shopxand_users', JSON.stringify(users));
-        
-        currentUser = user;
-        isLoggedIn = true;
-        localStorage.setItem('shopxand_user', JSON.stringify(user));
+        saveAllUsers(users);
+        saveSession(user);
         
         updateUserUI();
         closeAuth();
-        showToast('Регистрация успешна!', 'Добро пожаловать, ' + name + '!', 'success');
+        showToast('Регистрация успешна!', 'Добро пожаловать, ' + name + '! Ваш аккаунт привязан к номеру ' + phone, 'success');
     });
-
-    // ============================================
-    // ВХОД
+    
+   // ============================================
+    // ВХОД — СТРОГАЯ ПРОВЕРКА
     // ============================================
     document.getElementById('loginBtn')?.addEventListener('click', function() {
         var phone = document.getElementById('loginPhone').value.trim();
         var password = document.getElementById('loginPassword').value;
+        var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
         
         if (!phone) {
             showToast('Ошибка', 'Введите телефон или email', 'error');
@@ -3596,181 +3555,184 @@ if (authClose) authClose.addEventListener('click', function() {
             return;
         }
         
-        var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
-        var users = JSON.parse(localStorage.getItem('shopxand_users') || '[]');
+        var user = null;
         
-        var user = users.find(function(u) {
-            var uPhone = (u.phone || '').replace(/[\+\s\-\(\)]/g, '');
-            return (uPhone === cleanPhone || u.email === phone) && u.password === password;
-        });
-        
-        if (user) {
-            currentUser = user;
-            isLoggedIn = true;
-            localStorage.setItem('shopxand_user', JSON.stringify(user));
-            updateUserUI();
-            closeAuth();
-            showToast('С возвращением!', user.name + ', вы вошли в аккаунт', 'success');
+        // Если введён email
+        if (phone.includes('@')) {
+            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(phone)) {
+                showToast('Ошибка', 'Неверный формат email', 'error');
+                return;
+            }
+            user = findUserByEmail(phone);
         } else {
-            showToast('Ошибка входа', 'Неверный телефон или пароль', 'error');
+            // Если введён телефон — строгая проверка
+            if (!cleanPhone.startsWith('992') || cleanPhone.length !== 12 || !/^\d+$/.test(cleanPhone)) {
+                showToast('Ошибка', 'Введите номер в формате 992XXXXXXXXX', 'error');
+                return;
+            }
+            user = findUserByPhone(cleanPhone);
         }
+        
+        if (!user) {
+            showToast('Ошибка', 'Пользователь не найден', 'error');
+            return;
+        }
+        
+        if (user.password !== password) {
+            showToast('Неверный пароль', 'Проверьте пароль или восстановите его', 'error');
+            return;
+        }
+        
+        saveSession(user);
+        updateUserUI();
+        closeAuth();
+        showToast('С возвращением!', user.name + ', вы вошли в аккаунт', 'success');
     });
-
-    // ============================================
-    // ЗАБЫЛИ ПАРОЛЬ
+       // ============================================
+    // ЗАБЫЛИ ПАРОЛЬ — БЕЗОПАСНОЕ ВОССТАНОВЛЕНИЕ
     // ============================================
     document.getElementById('forgotBtn')?.addEventListener('click', function() {
         var phone = document.getElementById('forgotPhone').value.trim();
-        if (!phone) {
-            showToast('Ошибка', 'Введите номер телефона', 'error');
+        var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
+        
+        if (!cleanPhone || cleanPhone.length < 9) {
+            showToast('Ошибка', 'Введите корректный номер телефона', 'error');
             return;
         }
         
-        var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
-        var users = JSON.parse(localStorage.getItem('shopxand_users') || '[]');
-        var user = users.find(function(u) {
-            return (u.phone || '').replace(/[\+\s\-\(\)]/g, '') === cleanPhone;
-        });
+        var user = findUserByPhone(cleanPhone);
         
         if (!user) {
-            showToast('Не найдено', 'Пользователь с номером ' + phone + ' не зарегистрирован', 'error');
+            showToast(
+                'Аккаунт не найден',
+                'Номер ' + phone + ' не зарегистрирован. Проверьте номер или создайте новый аккаунт.',
+                'error'
+            );
             return;
         }
         
-        localStorage.setItem('shopxand_reset_phone', cleanPhone);
+        // Генерируем код подтверждения (6 цифр)
+        var code = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        // Сохраняем код и телефон ВРЕМЕННО (на 5 минут)
+        localStorage.setItem('shopxand_reset_code', code);
+        localStorage.setItem('shopxand_reset_phone', user.phone);
+        localStorage.setItem('shopxand_reset_expire', Date.now() + 300000); // 5 минут
+        
+        // Показываем поле для кода
         document.getElementById('codeBlock').style.display = 'block';
-        this.textContent = 'Телефон подтверждён';
+        this.textContent = 'Код отправлен';
         this.disabled = true;
-        showToast('Телефон найден', 'Введите новый пароль', 'success');
-    });
-
-    document.getElementById('resetPasswordBtn')?.addEventListener('click', function() {
-        var newPassword = document.getElementById('newPassword').value;
-        var phone = localStorage.getItem('shopxand_reset_phone');
         
-        if (!newPassword || newPassword.length < 6) {
-            showToast('Ошибка', 'Пароль минимум 6 символов', 'error');
-            return;
-        }
+        // Отправляем код в Telegram владельцу
+        var msg = '🔐 *ВОССТАНОВЛЕНИЕ ПАРОЛЯ*\n\n' +
+            '👤 Аккаунт: ' + user.name + '\n' +
+            '📞 Телефон: ' + user.phone + '\n' +
+            '🔑 Код подтверждения: *' + code + '*\n\n' +
+            'Код действителен 5 минут. Если это не вы — проигнорируйте.';
         
-        var users = JSON.parse(localStorage.getItem('shopxand_users') || '[]');
-        var userIndex = users.findIndex(function(u) {
-            return (u.phone || '').replace(/[\+\s\-\(\)]/g, '') === phone;
+        fetch('https://api.telegram.org/bot' + BOT_ORDER + '/sendMessage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: CHAT_ID,
+                text: msg,
+                parse_mode: 'Markdown'
+            })
         });
         
-        if (userIndex >= 0) {
-            users[userIndex].password = newPassword;
-            localStorage.setItem('shopxand_users', JSON.stringify(users));
-            localStorage.removeItem('shopxand_reset_phone');
-            
-            document.getElementById('codeBlock').style.display = 'none';
-            document.getElementById('forgotBtn').textContent = 'Проверить';
-            document.getElementById('forgotBtn').disabled = false;
-            document.getElementById('forgotPhone').value = '';
-            document.getElementById('newPassword').value = '';
-            
-            showToast('Пароль изменён!', 'Теперь войдите с новым паролем', 'success');
-            showLoginForm();
-        }
-    });
-     
-
-    // Escape
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && authModal && authModal.classList.contains('active')) {
-            closeAuth();
-        }
+        showToast(
+            'Код отправлен',
+            'Код подтверждения отправлен владельцу номера. Введите код ниже.',
+            'success'
+        );
     });
     
-   
-        // ============================================
+    // ============================================
     // ОКНО ВЫХОДА
     // ============================================
+    var logoutModal = document.getElementById('logoutModal');
+    var logoutOverlay = document.getElementById('logoutOverlay');
+    var logoutCancel = document.getElementById('logoutCancel');
+    var logoutConfirm = document.getElementById('logoutConfirm');
     
-    const logoutModal = document.getElementById('logoutModal');
-    const logoutOverlay = document.getElementById('logoutOverlay');
-    const logoutCancel = document.getElementById('logoutCancel');
-    const logoutConfirm = document.getElementById('logoutConfirm');
-    
-    function openLogoutConfirm() {
-        if (!logoutModal) return;
-        logoutModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-    
-    function closeLogoutConfirm() {
-        if (!logoutModal) return;
+    if (logoutCancel) logoutCancel.addEventListener('click', function() {
         logoutModal.classList.remove('active');
         document.body.style.overflow = '';
-    }
-    
-    // Отмена
-    if (logoutCancel) {
-        logoutCancel.addEventListener('click', closeLogoutConfirm);
-    }
-    
-    // Подтверждение выхода
-    if (logoutConfirm) {
-        logoutConfirm.addEventListener('click', function() {
-            logout();
-            closeLogoutConfirm();
-            showToast('Вы вышли', 'До новых встреч!', 'success');
-        });
-    }
-    
-    // Оверлей
-    if (logoutOverlay) {
-        logoutOverlay.addEventListener('click', closeLogoutConfirm);
-    }
-    
-    // Escape
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && logoutModal && logoutModal.classList.contains('active')) {
-            closeLogoutConfirm();
-        }
+    });
+    if (logoutOverlay) logoutOverlay.addEventListener('click', function() {
+        logoutModal.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+    if (logoutConfirm) logoutConfirm.addEventListener('click', function() {
+        logout();
+        logoutModal.classList.remove('active');
+        document.body.style.overflow = '';
     });
     
     // ============================================
-    // ЗАЩИТА ДЕЙСТВИЙ
+    // ПРОВЕРКА СЕССИИ ПРИ ЗАГРУЗКЕ
     // ============================================
+    function validateSession() {
+        var savedUser = localStorage.getItem('shopxand_user');
+        var savedToken = localStorage.getItem('shopxand_token');
+        
+        if (savedUser && savedToken) {
+            var user = JSON.parse(savedUser);
+            // Проверяем что пользователь всё ещё в базе
+            var exists = findUserByPhone(user.phone);
+            if (exists && exists.password === user.password) {
+                currentUser = exists;
+                isLoggedIn = true;
+                authToken = savedToken;
+            } else {
+                clearSession();
+            }
+        }
+    }
     
-    const originalOpenCart = openCart;
+    // ============================================
+    // ЗАЩИТА ДЕЙСТВИЙ (без входа — окно входа)
+    // ============================================
+    var originalOpenCart = openCart;
     openCart = function() {
         if (!isLoggedIn) { openAuth(); return; }
         originalOpenCart();
     };
     
-    const originalOpenFavorites = openFavorites;
+    var originalOpenFavorites = openFavorites;
     openFavorites = function() {
         if (!isLoggedIn) { openAuth(); return; }
         originalOpenFavorites();
     };
     
-    const originalOpenOrders = openOrders;
+    var originalOpenOrders = openOrders;
     openOrders = function() {
         if (!isLoggedIn) { openAuth(); return; }
         originalOpenOrders();
     };
     
-    const originalAddToCart = addToCart;
+    var originalAddToCart = addToCart;
     addToCart = function(product) {
         if (!isLoggedIn) { openAuth(); return; }
         originalAddToCart(product);
     };
     
-    const originalToggleFavorite = toggleFavorite;
+    var originalToggleFavorite = toggleFavorite;
     toggleFavorite = function(product) {
         if (!isLoggedIn) { openAuth(); return false; }
         return originalToggleFavorite(product);
     };
     
-    // Загрузка
+    // ============================================
+    // ЗАПУСК
+    // ============================================
+    validateSession();
     loadUser();
-
+    updateUserUI();
     
-    
-    console.log('Модуль авторизации загружен');
-
+    console.log('🔐 Система авторизации загружена. Пользователь:', isLoggedIn ? currentUser.name : 'не вошёл');
     
 
     // ============================================
@@ -3876,6 +3838,58 @@ if (authClose) authClose.addEventListener('click', function() {
     });
     
     console.log('Модуль фильтрации загружен');
+
+        document.getElementById('resetPasswordBtn')?.addEventListener('click', function() {
+        var code = document.getElementById('forgotCode')?.value.trim();
+        var newPassword = document.getElementById('newPassword').value;
+        var savedCode = localStorage.getItem('shopxand_reset_code');
+        var phone = localStorage.getItem('shopxand_reset_phone');
+        var expireTime = parseInt(localStorage.getItem('shopxand_reset_expire') || '0');
+        
+        // Проверка кода
+        if (!code) {
+            showToast('Ошибка', 'Введите код подтверждения', 'error');
+            return;
+        }
+        if (code !== savedCode) {
+            showToast('Неверный код', 'Проверьте код подтверждения', 'error');
+            return;
+        }
+        if (Date.now() > expireTime) {
+            showToast('Код истёк', 'Код действителен 5 минут. Запросите новый.', 'error');
+            return;
+        }
+        if (!newPassword || newPassword.length < 6 || !/[a-zA-Z]/.test(newPassword) || !/\d/.test(newPassword)) {
+            showToast('Ошибка', 'Пароль: минимум 6 символов, буквы и цифры', 'error');
+            return;
+        }
+        
+        // Обновляем пароль
+        var users = getAllUsers();
+        var userIndex = users.findIndex(function(u) { return u.phone === phone; });
+        
+        if (userIndex >= 0) {
+            users[userIndex].password = newPassword;
+            saveAllUsers(users);
+            
+            // Очищаем временные данные
+            localStorage.removeItem('shopxand_reset_code');
+            localStorage.removeItem('shopxand_reset_phone');
+            localStorage.removeItem('shopxand_reset_expire');
+            
+            // Сбрасываем форму
+            document.getElementById('codeBlock').style.display = 'none';
+            document.getElementById('forgotBtn').textContent = 'Проверить';
+            document.getElementById('forgotBtn').disabled = false;
+            document.getElementById('forgotPhone').value = '';
+            document.getElementById('newPassword').value = '';
+            var codeInput = document.getElementById('forgotCode');
+            if (codeInput) codeInput.value = '';
+            
+            showToast('Пароль изменён!', 'Теперь войдите с новым паролем', 'success');
+            showLoginForm();
+        }
+    });
     
 
       // ============================================
@@ -3960,3 +3974,499 @@ setTimeout(function() {
     }
     
 
+    // ============================================
+    // CHAT WIDGET - Онлайн чат
+    // ============================================
+    
+    var chatOpenBtn = document.getElementById('chatOpenBtn');
+    var chatWindow = document.getElementById('chatWindow');
+    var chatCloseBtn = document.getElementById('chatCloseBtn');
+    var chatMinimize = document.getElementById('chatMinimize');
+    var chatMessages = document.getElementById('chatMessages');
+    var chatInput = document.getElementById('chatInput');
+    var chatSendBtn = document.getElementById('chatSendBtn');
+    var chatBadge = document.getElementById('chatBadge');
+    
+    var unreadCount = 0;
+    
+    // Открыть чат
+    if (chatOpenBtn) {
+        chatOpenBtn.addEventListener('click', function() {
+            chatWindow.classList.add('active');
+            chatWindow.classList.remove('minimized');
+            unreadCount = 0;
+            chatBadge.style.display = 'none';
+        });
+    }
+
+     // Обновляем приветствие
+            var firstName = document.querySelector('.chat-message--support .chat-message__bubble p');
+            if (firstName) {
+                var userName = (isLoggedIn && currentUser) ? currentUser.name : 'Гость';
+                firstName.textContent = '👋 Здравствуйте, ' + userName + '! Я менеджер ShopXand. Чем могу помочь?';
+            }
+    
+    // Закрыть чат
+    if (chatCloseBtn) {
+        chatCloseBtn.addEventListener('click', function() {
+            chatWindow.classList.remove('active');
+        });
+    }
+    
+    // Свернуть чат
+    if (chatMinimize) {
+        chatMinimize.addEventListener('click', function() {
+            chatWindow.classList.toggle('minimized');
+        });
+    }
+    
+        function sendChatMessage() {
+        var text = chatInput.value.trim();
+        if (!text) return;
+        
+        // Имя и телефон
+        var userName, userPhone;
+        
+        if (isLoggedIn && currentUser) {
+            userName = currentUser.name || 'Клиент';
+            userPhone = currentUser.phone || 'Не указан';
+        } else {
+            userName = 'Гость';
+            userPhone = 'Не в системе';
+        }
+        
+        // Добавляем сообщение пользователя в чат
+        addChatMessage(text, 'user');
+        
+        // Отправляем в Telegram
+        fetch('https://api.telegram.org/bot' + BOT_ORDER + '/sendMessage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: CHAT_ID,
+                text: '💬 *Сообщение из чата*\n\n' +
+                    '👤 *Имя:* ' + userName + '\n' +
+                    '📞 *Телефон:* ' + userPhone + '\n\n' +
+                    '💬 *Сообщение:* ' + text,
+                parse_mode: 'Markdown'
+            })
+        });
+        
+        // Очищаем поле
+        chatInput.value = '';
+        
+        // Авто-ответ
+        setTimeout(function() {
+            addChatMessage('Спасибо за обращение, ' + userName + '! Менеджер скоро ответит вам. ⏳', 'support');
+        }, 1000);
+    }
+    
+    // Добавить сообщение в чат
+    function addChatMessage(text, type) {
+        var now = new Date();
+        var time = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+        
+        var msgDiv = document.createElement('div');
+        msgDiv.className = 'chat-message chat-message--' + type;
+        
+        msgDiv.innerHTML = 
+            '<div class="chat-message__avatar">' +
+                (type === 'support' ? '<i class="fas fa-headset"></i>' : '<i class="fas fa-user"></i>') +
+            '</div>' +
+            '<div class="chat-message__bubble">' +
+                '<p>' + text + '</p>' +
+                '<span class="chat-message__time">' + time + '</span>' +
+            '</div>';
+        
+        chatMessages.appendChild(msgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // Если чат не открыт — счётчик
+        if (!chatWindow.classList.contains('active')) {
+            unreadCount++;
+            chatBadge.textContent = unreadCount;
+            chatBadge.style.display = 'flex';
+        }
+    }
+    
+    // Кнопка отправки
+    if (chatSendBtn) {
+        chatSendBtn.addEventListener('click', sendChatMessage);
+    }
+    
+    // Enter для отправки
+    if (chatInput) {
+        chatInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        });
+    }
+    
+    console.log('💬 Чат загружен');
+
+
+        // ============================================
+    // REVIEWS - Отзывы в быстром просмотре
+    // ============================================
+    
+    var qvAddReviewBtn = document.getElementById('qvAddReviewBtn');
+    var qvReviewForm = document.getElementById('qvReviewForm');
+    var qvReviewCancel = document.getElementById('qvReviewCancel');
+    var qvReviewSubmit = document.getElementById('qvReviewSubmit');
+    var qvReviewStars = document.getElementById('qvReviewStars');
+    var qvReviewText = document.getElementById('qvReviewText');
+    var qvReviewsList = document.getElementById('qvReviewsList');
+    
+    var selectedRating = 0;
+    var reviewsData = JSON.parse(localStorage.getItem('shopxand_reviews') || '{}');
+    
+    // Звёзды
+    if (qvReviewStars) {
+        qvReviewStars.querySelectorAll('span').forEach(function(star) {
+            star.addEventListener('click', function() {
+                selectedRating = parseInt(this.getAttribute('data-star'));
+                updateReviewStars();
+            });
+            star.addEventListener('mouseenter', function() {
+                var val = parseInt(this.getAttribute('data-star'));
+                highlightStars(val);
+            });
+        });
+        qvReviewStars.addEventListener('mouseleave', function() {
+            highlightStars(selectedRating);
+        });
+    }
+    
+    function highlightStars(count) {
+        qvReviewStars.querySelectorAll('span').forEach(function(s, i) {
+            var icon = s.querySelector('i');
+            if (i < count) {
+                icon.className = 'fas fa-star';
+            } else {
+                icon.className = 'far fa-star';
+            }
+        });
+    }
+    
+    function updateReviewStars() {
+        highlightStars(selectedRating);
+    }
+    
+    // Открыть форму
+    if (qvAddReviewBtn) {
+        qvAddReviewBtn.addEventListener('click', function() {
+            if (!isLoggedIn) {
+                showToast('Войдите', 'Чтобы оставить отзыв, войдите в аккаунт', 'error');
+                openAuth();
+                return;
+            }
+            qvReviewForm.style.display = 'block';
+            selectedRating = 0;
+            updateReviewStars();
+            qvReviewText.value = '';
+        });
+    }
+    
+    // Отмена
+    if (qvReviewCancel) {
+        qvReviewCancel.addEventListener('click', function() {
+            qvReviewForm.style.display = 'none';
+        });
+    }
+    
+    // Отправить отзыв
+    if (qvReviewSubmit) {
+        qvReviewSubmit.addEventListener('click', function() {
+            var text = qvReviewText.value.trim();
+            
+            if (selectedRating === 0) {
+                showToast('Ошибка', 'Поставьте оценку', 'error');
+                return;
+            }
+            if (!text) {
+                showToast('Ошибка', 'Напишите отзыв', 'error');
+                return;
+            }
+            
+            var productId = currentQvProduct.id;
+            var review = {
+                name: currentUser.name,
+                rating: selectedRating,
+                text: text,
+                date: new Date().toISOString()
+            };
+            
+            if (!reviewsData[productId]) {
+                reviewsData[productId] = [];
+            }
+            reviewsData[productId].push(review);
+            localStorage.setItem('shopxand_reviews', JSON.stringify(reviewsData));
+            
+            // Обновляем рейтинг товара
+            updateProductRating(productId);
+            
+            qvReviewForm.style.display = 'none';
+            selectedRating = 0;
+            qvReviewText.value = '';
+            
+            renderProductReviews(productId);
+            showToast('Спасибо!', 'Ваш отзыв добавлен', 'success');
+        });
+    }
+    
+    // Отрисовать отзывы
+    function renderProductReviews(productId) {
+        var reviews = reviewsData[productId] || [];
+        
+        if (reviews.length === 0) {
+            qvReviewsList.innerHTML = 
+                '<div class="quickview__review-empty">' +
+                    '<span>📝</span>' +
+                    '<p>Отзывов пока нет. Будьте первым!</p>' +
+                '</div>';
+            return;
+        }
+        
+        qvReviewsList.innerHTML = reviews.map(function(r) {
+            var date = new Date(r.date);
+            var starsHtml = '';
+            for (var i = 1; i <= 5; i++) {
+                starsHtml += i <= r.rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+            }
+            return '<div class="qv-review-item">' +
+                '<div class="qv-review-item__header">' +
+                    '<span class="qv-review-item__name">' + r.name + '</span>' +
+                    '<span class="qv-review-item__date">' + date.toLocaleDateString('ru-RU') + '</span>' +
+                '</div>' +
+                '<div class="qv-review-item__stars">' + starsHtml + '</div>' +
+                '<p class="qv-review-item__text">' + r.text + '</p>' +
+            '</div>';
+        }).join('');
+    }
+    
+    // Обновить рейтинг товара
+    function updateProductRating(productId) {
+        var reviews = reviewsData[productId] || [];
+        if (reviews.length === 0) return;
+        
+        var total = reviews.reduce(function(s, r) { return s + r.rating; }, 0);
+        var avg = (total / reviews.length).toFixed(1);
+        
+        // Обновляем в productsData
+        if (productsData[productId]) {
+            productsData[productId].rating = parseFloat(avg);
+            productsData[productId].reviews = reviews.length;
+        }
+        
+        // Обновляем на странице если открыт быстрый просмотр
+        if (currentQvProduct && currentQvProduct.id === productId) {
+            document.querySelector('.quickview__rating-num').textContent = avg;
+            document.querySelector('.quickview__reviews').textContent = reviews.length + ' отзывов';
+            document.querySelector('.quickview__stars').innerHTML = generateStars(parseFloat(avg));
+        }
+    }
+    
+    // Загружаем отзывы при открытии быстрого просмотра
+    var originalOpenQuickview = openQuickview;
+    openQuickview = function(productId) {
+        originalOpenQuickview(productId);
+        renderProductReviews(productId);
+        qvReviewForm.style.display = 'none';
+    };
+
+        // ============================================
+    // PUSH NOTIFICATIONS
+    // ============================================
+    
+    var pushBanner = document.getElementById('pushBanner');
+    var pushYes = document.getElementById('pushYes');
+    var pushNo = document.getElementById('pushNo');
+    var pushSubscription = null;
+    
+    // Ключи для VAPID (сгенерируй свои: https://web-push-codelab.glitch.me/)
+    var vapidPublicKey = 'BEl62i2YrVqKf5qFh7LxQ8mXkPz9nR3sT6wV0yA1bC4dE5fG6hI7jK8lM9nO0pQrStUvWxYz';
+    
+    function urlBase64ToUint8Array(base64String) {
+        var padding = '='.repeat((4 - base64String.length % 4) % 4);
+        var base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+        var rawData = window.atob(base64);
+        var outputArray = new Uint8Array(rawData.length);
+        for (var i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    }
+    
+    // Показать баннер
+     function showPushBanner() {
+        if (!pushBanner) return;
+        if (localStorage.getItem('push_banner_dismissed')) return;
+        if (Notification.permission === 'granted') return;
+        
+        // Если уже запрещено — показываем кнопку "Как включить"
+        if (Notification.permission === 'denied') {
+            document.getElementById('pushYes').style.display = 'none';
+            document.getElementById('pushSettings').style.display = 'block';
+        }
+        
+        setTimeout(function() {
+            pushBanner.classList.add('show');
+        }, 5000); // через 5 секунд
+    }
+
+      // Кнопка "Как включить"
+    document.getElementById('pushSettings')?.addEventListener('click', function() {
+        showToast(
+            'Как включить уведомления',
+            '1. Нажмите 🔒 слева от адреса\n2. Найдите "Уведомления"\n3. Выберите "Разрешить"\n4. Обновите страницу',
+            'error'
+        );
+        pushBanner.classList.remove('show');
+        localStorage.setItem('push_banner_dismissed', '1');
+    });
+    
+    // Запросить разрешение
+       function requestPushPermission() {
+        if (!('Notification' in window)) {
+            showToast('Не поддерживается', 'Ваш браузер не поддерживает уведомления', 'error');
+            pushBanner.classList.remove('show');
+            return;
+        }
+        
+        // Если уже разрешено
+        if (Notification.permission === 'granted') {
+            showToast('Уже включены!', 'Уведомления уже работают 🔔', 'success');
+            pushBanner.classList.remove('show');
+            localStorage.setItem('push_banner_dismissed', '1');
+            return;
+        }
+        
+        // Если запрещено — показываем инструкцию
+        if (Notification.permission === 'denied') {
+            showToast(
+                'Уведомления заблокированы',
+                'Нажмите на значок 🔒 слева от адресной строки → Разрешить уведомления',
+                'error'
+            );
+            pushBanner.classList.remove('show');
+            localStorage.setItem('push_banner_dismissed', '1');
+            return;
+        }
+        
+        // Запрашиваем разрешение
+        Notification.requestPermission().then(function(permission) {
+            pushBanner.classList.remove('show');
+            localStorage.setItem('push_banner_dismissed', '1');
+            
+            if (permission === 'granted') {
+                showToast('Уведомления включены!', 'Вы будете получать уведомления о заказах и акциях 🔔', 'success');
+            } else if (permission === 'denied') {
+                showToast(
+                    'Заблокировано',
+                    'Нажмите на значок 🔒 слева от адресной строки → Разрешить уведомления',
+                    'error'
+                );
+            } else {
+                showToast(
+                    'Не решено',
+                    'Нажмите на значок 🔒 слева от адресной строки → Разрешить уведомления',
+                    'error'
+                );
+            }
+        });
+    }
+    
+    function subscribeToPush() {
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+        
+        navigator.serviceWorker.ready.then(function(registration) {
+            registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
+            }).then(function(subscription) {
+                pushSubscription = subscription;
+                console.log('Push подписка:', subscription);
+                localStorage.setItem('push_subscription', JSON.stringify(subscription));
+            }).catch(function(err) {
+                console.log('Push ошибка:', err);
+            });
+        });
+    }
+    
+    // Отправить уведомление
+    function sendPushNotification(title, body, icon, url) {
+        if (!('Notification' in window)) return;
+        
+        if (Notification.permission === 'granted') {
+            var options = {
+                body: body,
+                icon: icon || 'img/icons/icon-192x192.png',
+                badge: 'img/icons/icon-72x72.png',
+                vibrate: [200, 100, 200],
+                data: { url: url || '/' },
+                requireInteraction: false
+            };
+            
+            var notification = new Notification(title, options);
+            
+            notification.onclick = function() {
+                window.open(url || '/', '_blank');
+                notification.close();
+            };
+            
+            // Авто-закрытие через 5 секунд
+            setTimeout(function() {
+                notification.close();
+            }, 5000);
+        }
+    }
+    
+    // Кнопки
+    if (pushYes) {
+        pushYes.addEventListener('click', requestPushPermission);
+    }
+    if (pushNo) {
+        pushNo.addEventListener('click', function() {
+            pushBanner.classList.remove('show');
+            localStorage.setItem('push_banner_dismissed', '1');
+        });
+    }
+    
+    // Уведомление при заказе
+    function notifyOrderStatus(order, status) {
+        var title, body;
+        
+        switch(status) {
+            case 'processing':
+                title = '📦 Заказ ' + order.id;
+                body = 'Ваш заказ принят! Доставка 12-18 дней.';
+                break;
+            case 'delivery':
+                title = '🚚 Заказ ' + order.id;
+                body = 'Ваш заказ в пути! Ожидайте доставку.';
+                break;
+            case 'completed':
+                title = '✅ Заказ ' + order.id;
+                body = 'Заказ доставлен! Спасибо за покупку!';
+                break;
+            default:
+                return;
+        }
+        
+        sendPushNotification(title, body);
+    }
+    
+    // Уведомление об акции
+    function notifyPromo(title, body) {
+        sendPushNotification(title, body);
+    }
+    
+    // Показываем баннер при загрузке
+    showPushBanner();
+    
+    // Экспорт функций
+    window.notifyOrderStatus = notifyOrderStatus;
+    window.notifyPromo = notifyPromo;
+    
+    console.log('🔔 Push-уведомления загружены');

@@ -6036,3 +6036,628 @@ body {
 .confirm-modal__btn { flex: 1; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; }
 .confirm-modal__btn--cancel { background: #f0f0f0; color: #333; }
 .confirm-modal__btn--ok { background: #ff4757; color: #fff; }
+
+/* ========================================
+   CHAT WIDGET - Онлайн чат (слева)
+   ======================================== */
+
+.chat-widget {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    z-index: 9998;
+}
+
+.chat-widget__btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #0088cc;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    box-shadow: 0 4px 20px rgba(0, 136, 204, 0.4);
+    transition: 0.3s;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: chatPulse 2s infinite;
+}
+
+@keyframes chatPulse {
+    0%, 100% { box-shadow: 0 4px 20px rgba(0, 136, 204, 0.4); }
+    50% { box-shadow: 0 4px 30px rgba(0, 136, 204, 0.7); }
+}
+
+.chat-widget__btn:hover {
+    transform: scale(1.1);
+}
+
+.chat-widget__badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #ff4757;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Окно чата */
+.chat-widget__window {
+    position: absolute;
+    bottom: 80px;
+    left: 0;
+    width: 380px;
+    height: 500px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: scale(0);
+    opacity: 0;
+    transform-origin: bottom left;
+    transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+}
+
+.chat-widget__window.active {
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: all;
+}
+
+.chat-widget__window.minimized {
+    height: 56px;
+}
+
+/* Хедер */
+.chat-widget__header {
+    background: #0088cc;
+    color: #fff;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.chat-widget__header-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat-widget__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.chat-widget__header-info h4 {
+    font-size: 15px;
+    margin: 0;
+    font-weight: 700;
+}
+
+.chat-widget__header-info span {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.chat-widget__header-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.chat-widget__minimize,
+.chat-widget__close-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.chat-widget__minimize:hover,
+.chat-widget__close-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Сообщения */
+.chat-widget__messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    background: #f5f7fa;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.chat-widget__messages::-webkit-scrollbar {
+    width: 4px;
+}
+
+.chat-widget__messages::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 2px;
+}
+
+.chat-message {
+    display: flex;
+    gap: 8px;
+    max-width: 85%;
+}
+
+.chat-message--support {
+    align-self: flex-start;
+}
+
+.chat-message--user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.chat-message__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #0088cc;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.chat-message--user .chat-message__avatar {
+    background: #e0e0e0;
+    color: #666;
+}
+
+.chat-message__bubble {
+    background: #fff;
+    padding: 10px 14px;
+    border-radius: 16px 16px 16px 4px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.chat-message--user .chat-message__bubble {
+    background: #0088cc;
+    color: #fff;
+    border-radius: 16px 16px 4px 16px;
+}
+
+.chat-message__bubble p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.chat-message__time {
+    font-size: 10px;
+    color: #999;
+    display: block;
+    margin-top: 4px;
+}
+
+.chat-message--user .chat-message__time {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Форма */
+.chat-widget__form {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid #eee;
+    flex-shrink: 0;
+    background: #fff;
+}
+
+.chat-widget__form input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 2px solid #e0e0e0;
+    border-radius: 20px;
+    font-size: 14px;
+    outline: none;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    transition: 0.2s;
+}
+
+.chat-widget__form input:focus {
+    border-color: #0088cc;
+}
+
+.chat-widget__form button {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: none;
+    background: #0088cc;
+    color: #fff;
+    cursor: pointer;
+    font-size: 18px;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-widget__form button:hover {
+    background: #0077b5;
+}
+
+.chat-widget__form button:active {
+    transform: scale(0.95);
+}
+
+/* ========================================
+   TELEGRAM BUTTON (справа)
+   ======================================== */
+
+.telegram-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 999;
+    background: #0088cc;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 50px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 4px 20px rgba(0, 136, 204, 0.4);
+    transition: all 0.3s ease;
+    animation: telegramFloat 3s ease-in-out infinite;
+}
+
+@keyframes telegramFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+.telegram-btn:hover {
+    background: #0077b5;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 30px rgba(0, 136, 204, 0.6);
+}
+
+.telegram-btn i {
+    font-size: 22px;
+}
+
+.telegram-btn__text {
+    font-size: 14px;
+}
+
+/* Мобильная версия */
+@media (max-width: 480px) {
+    .chat-widget {
+        left: 12px;
+        bottom: 16px;
+    }
+    
+    .chat-widget__btn {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .chat-widget__window {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 80vh;
+        border-radius: 16px 16px 0 0;
+    }
+    
+    .telegram-btn {
+        right: 12px;
+        bottom: 16px;
+        padding: 10px 16px;
+    }
+    
+    .telegram-btn__text {
+        display: none;
+    }
+}
+
+/* ========================================
+   QUICKVIEW REVIEWS - Отзывы
+   ======================================== */
+
+.quickview__reviews-section {
+    margin-bottom: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #e8ecf1;
+}
+
+.quickview__reviews-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.quickview__reviews-header h4 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.quickview__add-review-btn {
+    padding: 6px 14px;
+    background: transparent;
+    border: 2px solid #0066ff;
+    color: #0066ff;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.quickview__add-review-btn:hover {
+    background: #0066ff;
+    color: #fff;
+}
+
+/* Список отзывов */
+.quickview__reviews-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.quickview__review-empty {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+}
+
+.quickview__review-empty span {
+    font-size: 40px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.quickview__review-empty p {
+    font-size: 13px;
+    margin: 0;
+}
+
+/* Карточка отзыва */
+.qv-review-item {
+    padding: 12px;
+    background: #f8f9fb;
+    border-radius: 10px;
+    margin-bottom: 8px;
+}
+
+.qv-review-item__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.qv-review-item__name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #333;
+}
+
+.qv-review-item__date {
+    font-size: 11px;
+    color: #999;
+}
+
+.qv-review-item__stars {
+    color: #ffb800;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.qv-review-item__text {
+    font-size: 13px;
+    color: #555;
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Форма отзыва */
+.quickview__review-form {
+    margin-top: 12px;
+    padding: 14px;
+    background: #f8f9fb;
+    border-radius: 10px;
+}
+
+.quickview__review-stars {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.quickview__review-stars span {
+    color: #ffb800;
+    transition: 0.2s;
+}
+
+.quickview__review-stars span:hover {
+    transform: scale(1.2);
+}
+
+.quickview__review-stars span .fas {
+    color: #ffb800;
+}
+
+.quickview__review-stars span .far {
+    color: #ccc;
+}
+
+.quickview__review-form textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    resize: vertical;
+    outline: none;
+    margin-bottom: 10px;
+}
+
+.quickview__review-form textarea:focus {
+    border-color: #0066ff;
+}
+
+.quickview__review-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.quickview__review-cancel,
+.quickview__review-submit {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: 0.2s;
+}
+
+.quickview__review-cancel {
+    background: #e0e0e0;
+    color: #666;
+}
+
+.quickview__review-submit {
+    background: #0066ff;
+    color: #fff;
+}
+
+.quickview__review-submit:hover {
+    background: #0052cc;
+}
+
+/* ========================================
+   PUSH NOTIFICATION BANNER
+   ======================================== */
+
+.push-banner {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    display: none;
+}
+
+.push-banner.show {
+    display: block;
+    animation: slideDownPush 0.4s ease;
+}
+
+@keyframes slideDownPush {
+    from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.push-banner__content {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #fff;
+    padding: 16px 20px;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    width: 420px;
+    max-width: 92vw;
+}
+
+.push-banner__icon {
+    font-size: 36px;
+    flex-shrink: 0;
+}
+
+.push-banner__info {
+    flex: 1;
+}
+
+.push-banner__info strong {
+    display: block;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+.push-banner__info span {
+    font-size: 12px;
+    color: #999;
+}
+
+.push-banner__actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.push-banner__btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: 0.2s;
+}
+
+.push-banner__btn--yes {
+    background: #0066ff;
+    color: #fff;
+}
+
+.push-banner__btn--no {
+    background: #f0f0f0;
+    color: #666;
+}
+
