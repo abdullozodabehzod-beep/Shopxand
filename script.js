@@ -2,8 +2,88 @@
  * ShopXand - Mobile Menu & Search
  */
 
-document.addEventListener('DOMContentLoaded', function() {
+// ============================================
+// API CONFIG
+// ============================================
+var API_URL = 'http://localhost:3000/api';
+var API_TOKEN = localStorage.getItem('shopxand_token') || '';
 
+function apiHeaders() {
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': API_TOKEN ? 'Bearer ' + API_TOKEN : ''
+    };
+}
+
+async function apiRequest(url, options) {
+    options = options || {};
+    try {
+        var response = await fetch(API_URL + url, {
+            method: options.method || 'GET',
+            headers: Object.assign(apiHeaders(), options.headers || {}),
+            body: options.body || undefined
+        });
+        var data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Ошибка сервера');
+        return data;
+    } catch (error) {
+        console.error('API Error:', error);
+        throw error;
+    }
+}
+
+async function checkAuth() {
+    var token = localStorage.getItem('shopxand_token');
+    if (!token) return;
+    
+    try {
+        var data = await apiRequest('/auth/me');
+        currentUser = data.user;
+        isLoggedIn = true;
+        API_TOKEN = token;
+        updateUserUI();
+    } catch (err) {
+        API_TOKEN = '';
+        localStorage.removeItem('shopxand_token');
+        currentUser = null;
+        isLoggedIn = false;
+    }
+}
+// Глобальные переменные
+var isLoggedIn = false;
+var currentUser = null;
+var cart = [];
+var orders = [];
+var favorites = [];
+var productsData = {};
+
+// API
+var API_URL = 'http://localhost:3000/api';
+var API_TOKEN = localStorage.getItem('shopxand_token') || '';
+
+ 
+
+document.addEventListener('DOMContentLoaded', async function()  {
+
+        await loadProducts();
+    
+     // Проверяем авторизацию
+    await checkAuth();
+    
+        // Сначала грузим локально (быстро)
+    loadLocalProducts();
+
+    // Потом пытаемся с сервера (если доступен)
+    try {
+        await loadProducts();
+    } catch (err) {
+        console.log('Сервер недоступен, остаёмся на локальных данных');
+    }
+    
+    // Загружаем заказы если вошёл
+    if (isLoggedIn) {
+        await loadOrders();
+    }
       // ============================================
     // ГЛОБАЛЬНЫЕ ФУНКЦИИ
     // ============================================
@@ -1096,8 +1176,8 @@ function showToast(title, message, type) {
     const favEmpty = document.getElementById('favEmpty');
     const favCountElement = document.querySelector('.fav-panel__count');
     
-    // Массив избранного
-    let favorites = [];
+    
+
     
     // Загрузка из localStorage
     function loadFavorites() {
@@ -1343,8 +1423,7 @@ function showToast(title, message, type) {
     const cartCountElement = document.querySelector('.cart-panel__count');
     const headerCartCount = document.querySelector('.header__cart-count');
     
-    // Корзина (массив товаров)
-    let cart = [];
+   
     
     // Загружаем корзину из localStorage
     function loadCart() {
@@ -2124,41 +2203,31 @@ function showToast(title, message, type) {
     const ordersEmpty = document.getElementById('ordersEmpty');
     const ordersCount = document.getElementById('ordersCount');
     
-    let orders = [];
+  
 
     // ============================================
     // УДАЛИТЬ ЗАКАЗ
     // ============================================
-    window.deleteOrder = function(orderId) {
+       window.deleteOrder = function(orderId) {
         var order = orders.find(function(o) { return o.id === orderId; });
         
-        showConfirm(
-            'Удалить заказ?',
-            'Заказ ' + orderId + ' будет удалён навсегда',
-            function() {
-                orders = orders.filter(function(o) { return o.id !== orderId; });
-                localStorage.setItem('shopxand_orders', JSON.stringify(orders));
-                
-                if (order) {
-                    var msg = '🗑 КЛИЕНТ УДАЛИЛ ЗАКАЗ\n\n' +
-                        '📦 Заказ: ' + order.id + '\n' +
-                        '👤 Клиент: ' + order.customer.name + '\n' +
-                        '📞 Телефон: ' + order.customer.phone + '\n' +
-                        '💰 Сумма: ' + order.total.toLocaleString() + ' с.\n' +
-                        '📅 Дата: ' + new Date().toLocaleString('ru-RU');
-                    
-                    fetch('https://api.telegram.org/bot' + BOT_ORDER + '/sendMessage', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
-                    });
-                }
-                
-                window.closeOrderDetail();
-                renderOrders();
-                showToast('Удалено', 'Заказ удалён', 'success');
+        showConfirm('Удалить заказ?', 'Заказ ' + orderId + ' будет удалён', function() {
+            orders = orders.filter(function(o) { return o.id !== orderId; });
+            localStorage.setItem('shopxand_orders', JSON.stringify(orders));
+            
+            if (order) {
+                var msg = '🗑 КЛИЕНТ УДАЛИЛ ЗАКАЗ\n📦 ' + order.id + '\n👤 ' + order.customer.name;
+                fetch('https://api.telegram.org/bot' + BOT_ORDER + '/sendMessage', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
+                });
             }
-        );
+            
+            window.closeOrderDetail();
+            renderOrders();
+            showToast('Удалено', 'Заказ удалён', 'success');
+        });
     };
 
     // ============================================
@@ -2246,20 +2315,42 @@ function showToast(title, message, type) {
     // ============================================
     // ЗАГРУЗКА И СОХРАНЕНИЕ
     // ============================================
-    function loadOrders() {
-        var saved = localStorage.getItem('shopxand_orders');
-        if (saved) orders = JSON.parse(saved);
+        async function loadOrders() {
+        if (!isLoggedIn || !API_TOKEN) {
+            var saved = localStorage.getItem('shopxand_orders');
+            if (saved) orders = JSON.parse(saved);
+            return;
+        }
+        
+        try {
+            var data = await apiRequest('/orders');
+            orders = data.orders;
+            console.log('📦 Заказы загружены с сервера:', orders.length);
+        } catch (err) {
+            console.log('Загружаем локально');
+            var saved = localStorage.getItem('shopxand_orders');
+            if (saved) orders = JSON.parse(saved);
+        }
     }
     
-    function saveOrder(order) {
+        async function saveOrder(order) {
         orders.unshift(order);
-        localStorage.setItem('shopxand_orders', JSON.stringify(orders));
         updateOrdersCount();
-
-         // Отправляем push-уведомление
-        setTimeout(function() {
-            window.notifyOrderStatus(order, 'processing');
-        }, 1000);
+        
+        if (isLoggedIn && API_TOKEN) {
+            try {
+                await apiRequest('/orders', {
+                    method: 'POST',
+                    body: JSON.stringify(order)
+                });
+                console.log('✅ Заказ сохранён на сервере');
+            } catch (err) {
+                console.log('Сохраняем локально');
+                localStorage.setItem('shopxand_orders', JSON.stringify(orders));
+            }
+        } else {
+            localStorage.setItem('shopxand_orders', JSON.stringify(orders));
+        }
     }
     
     function updateOrdersCount(count) {
@@ -2780,167 +2871,53 @@ checkDeliveryNotifications();
     let currentQvProduct = null;
     let qvQuantity = 1;
     
-    // Данные товаров для быстрого просмотра
-    const productsData = {
-        '1': {
-            id: '1',
-            name: 'Вельветовая рубашка с длинными рукавами',
-            cat: 'Одежда',
-            price: 120,
-            oldPrice: 180,
-            discount: '-33%',
-            img: 'img/Рубашка.jpeg',
-            rating: 4.8,
-            reviews: 324,
-            desc: 'Стильная вельветовая рубашка. Мягкая ткань, удобный крой.',
-            sizes: ['X', 'XL', '2XL', '3XL'],
-            specs: [
-                ['Материал', 'Вельвет 100%'],
-                ['Размеры', 'X, XL, 2XL, 3XL'],
-                ['Качество', 'Премиум'],
-                ['Сезон', 'Весна-Осень'],
-                ['Цвет', 'Чёрный']
-            ],
-            thumbs: ['img/Рубашка.jpeg', 'img/Рубашка.jpeg', 'img/Рубашка.jpeg']
-        },
-        '2': {
-            id: '2',
-            name: 'Крассовка AF1 Air Force 1',
-            cat: 'Одежда',
-            price: 110,
-            oldPrice: null,
-            discount: null,
-            img: 'img/Крассовка.jpeg',
-            rating: 4.6,
-            reviews: 189,
-            desc: 'Крассовка AF1 Air Force 1, лучшая модель белая',
-            shoeSizes: ['38', '39', '40', '41', '42', '43', '44'],
-            specs: [
-                ['Материал', 'Кожа'],
-                ['Размер', '38-44'],
-                ['Стиль', 'Повседневный'],
-                ['Сезон', 'Все сезоны']
-            ],
-            thumbs: ['img/Крассовка.jpeg', 'img/Крассовка.jpeg', 'img/Крассовка.jpeg']
-        },
-        '3': {
-            id: '3',
-            name: 'Крассовка в британском стиле',
-            cat: 'Одежда',
-            price: 140,
-            oldPrice: 250,
-            discount: '-44%',
-            img: 'img/Крассовка-2.jpeg',
-            rating: 4.9,
-            reviews: 512,
-            desc: 'Крассовка в британском стиле, премиум качество',
-            shoeSizes: ['38', '39', '40', '41', '42', '43', '44'],
-            specs: [
-                ['Материал', 'Премиум'],
-                ['Размер', '38-44'],
-                ['Стиль', 'Повседневный'],
-                ['Сезон', 'Весна-осень']
-            ],
-            thumbs: ['img/Крассовка-2.jpeg', 'img/Крассовка-2.jpeg', 'img/Крассовка-2.jpeg']
-        },
-        '4': {
-            id: '4',
-            name: 'Проводной наушник',
-            cat: 'Электроника',
-            price: 2100,
-            oldPrice: null,
-            discount: null,
-            img: 'img/Наушник.jpeg',
-            rating: 4.7,
-            reviews: 256,
-            desc: 'Качественный проводной наушник с микрофоном',
-            specs: [
-                ['Коннект', 'Проводные'],
-                ['Коннектор', '3.5мм'],
-                ['Длина кабеля', '1.2м'],
-                ['Микрофон', 'Есть']
-            ],
-            thumbs: ['img/Наушник.jpeg', 'img/Наушник.jpeg', 'img/Наушник.jpeg']
-        },
-        '5': {
-            id: '5',
-            name: 'Часы "CHENXI"',
-            cat: 'Электроника',
-            price: 230,
-            oldPrice: 300,
-            discount: '-23%',
-            img: 'img/watch.jpeg',
-            rating: 4.9,
-            reviews: 678,
-            desc: 'Стильные кварцевые часы CHENXI',
-            specs: [
-                ['Бренд', 'CHENXI'],
-                ['Тип', 'Кварцевые'],
-                ['Ремешок', 'Нержавеющая сталь'],
-                ['Водозащита', '3ATM']
-            ],
-            thumbs: ['img/watch.jpeg', 'img/watch.jpeg', 'img/watch.jpeg']
-        },
-        '6': {
-            id: '6',
-            name: 'Кожаные тапочки',
-            cat: 'Одежда',
-            price: 100,
-            oldPrice: null,
-            discount: null,
-            img: 'img/Шилопка-2.jpeg',
-            rating: 4.7,
-            reviews: 432,
-            desc: 'Кожаные тапочки, натуральная кожа',
-            shoeSizes: ['38', '39', '40', '41', '42', '43', '44'],
-            specs: [
-                ['Материал', 'Натуральная кожа'],
-                ['Подошва', 'Резиновая'],
-                ['Тип', 'Домашние тапочки'],
-                ['Цвет', 'Черный']
-            ],
-            thumbs: ['img/Шилопка-2.jpeg', 'img/Шилопка-2.jpeg', 'img/Шилопка-2.jpeg']
-        },
-        '7': {
-            id: '7',
-            name: 'Знак Mercedes Benz',
-            cat: 'Электроника',
-            price: 80,
-            oldPrice: 90,
-            discount: '-11%',
-            img: 'img/Знак Мерса.jpeg',
-            rating: 4.8,
-            reviews: 156,
-            desc: 'Металлический знак Mercedes-Benz',
-            specs: [
-                ['Бренд', 'Mercedes-Benz'],
-                ['Материал', 'Металл'],
-                ['Цвет', 'Серебристый'],
-                ['Размер', '8см']
-            ],
-            thumbs: ['img/Знак Мерса.jpeg', 'img/Знак Мерса.jpeg', 'img/Знак Мерса.jpeg']
-        },
-        '8': {
-            id: '8',
-            name: 'Качественная рубашка с длинными рукавами',
-            cat: 'Одежда',
-            price: 120,
-            oldPrice: null,
-            discount: null,
-            img: 'img/Рубашка-3.jpeg',
-            rating: 4.5,
-            reviews: 89,
-            desc: 'Качественная рубашка с длинными рукавами',
-            sizes: ['X', 'XL', '2XL', '3XL'],
-            specs: [
-                ['Материал', 'Хлопок + Полиэстер'],
-                ['Тип', 'Рубашка с длинными рукавами'],
-                ['Цвет', 'Белый'],
-                ['Стиль', 'Casual / Classic']
-            ],
-            thumbs: ['img/Рубашка-3.jpeg', 'img/Рубашка-3.jpeg', 'img/Рубашка-3.jpeg']
+    
+        // ============================================
+    // PRODUCTS - Загрузка с сервера или локально
+    // ============================================
+    
+
+        async function loadProducts() {
+        // Сначала грузим локально ВСЕГДА
+        loadLocalProducts();
+        
+        // Потом пытаемся с сервера
+        try {
+            var data = await apiRequest('/products');
+            if (data && data.products && data.products.length > 0) {
+                productsData = {};
+                data.products.forEach(function(p) {
+                    productsData[p.id] = p;
+                });
+                console.log('📦 Товары с сервера:', Object.keys(productsData).length);
+            }
+        } catch (err) {
+            console.log('Сервер недоступен, используем локальные товары');
+            // loadLocalProducts уже вызван выше
         }
-    };
+    }
+    
+    function loadLocalProducts() {
+        productsData = {
+            '1': { id: '1', name: 'Вельветовая рубашка', cat: 'Одежда', price: 120, oldPrice: 180, discount: '-33%', img: 'img/Рубашка.jpeg', rating: 4.8, reviews: 0, desc: 'Стильная вельветовая рубашка.', sizes: ['X', 'XL', '2XL', '3XL'], specs: [['Материал', 'Вельвет 100%'], ['Размеры', 'X-3XL']], thumbs: ['img/Рубашка.jpeg', 'img/Рубашка.jpeg', 'img/Рубашка.jpeg'] },
+            '2': { id: '2', name: 'Крассовка AF1', cat: 'Одежда', price: 110, img: 'img/Крассовка.jpeg', rating: 4.6, reviews: 0, desc: 'Лучшая модель', shoeSizes: ['38','39','40','41','42','43','44'], specs: [['Материал', 'Кожа']], thumbs: ['img/Крассовка.jpeg', 'img/Крассовка.jpeg', 'img/Крассовка.jpeg'] },
+            '3': { id: '3', name: 'Крассовка британская', cat: 'Одежда', price: 140, oldPrice: 250, img: 'img/Крассовка-2.jpeg', rating: 4.9, reviews: 0, desc: 'Британский стиль', shoeSizes: ['38','39','40','41','42','43','44'], specs: [['Материал', 'Премиум']], thumbs: ['img/Крассовка-2.jpeg', 'img/Крассовка-2.jpeg', 'img/Крассовка-2.jpeg'] },
+            '4': { id: '4', name: 'Проводной наушник', cat: 'Электроника', price: 30, img: 'img/Наушник.jpeg', rating: 4.7, reviews: 0, desc: 'Качественный звук', specs: [['Тип', 'Проводные']], thumbs: ['img/Наушник.jpeg', 'img/Наушник.jpeg', 'img/Наушник.jpeg'] },
+            '5': { id: '5', name: 'Часы CHENXI', cat: 'Электроника', price: 230, oldPrice: 300, img: 'img/watch.jpeg', rating: 4.9, reviews: 0, desc: 'Стильные часы', specs: [['Бренд', 'CHENXI']], thumbs: ['img/watch.jpeg', 'img/watch.jpeg', 'img/watch.jpeg'] },
+            '6': { id: '6', name: 'Кожаные тапочки', cat: 'Одежда', price: 100, img: 'img/Шилопка-2.jpeg', rating: 4.7, reviews: 0, desc: 'Натуральная кожа', shoeSizes: ['38','39','40','41','42','43','44'], specs: [['Материал', 'Кожа']], thumbs: ['img/Шилопка-2.jpeg', 'img/Шилопка-2.jpeg', 'img/Шилопка-2.jpeg'] },
+            '7': { id: '7', name: 'Знак Mercedes', cat: 'Электроника', price: 80, oldPrice: 90, img: 'img/Знак Мерса.jpeg', rating: 4.8, reviews: 0, desc: 'Металлический знак', specs: [['Бренд', 'Mercedes']], thumbs: ['img/Знак Мерса.jpeg', 'img/Знак Мерса.jpeg', 'img/Знак Мерса.jpeg'] },
+            '8': { id: '8', name: 'Рубашка белая', cat: 'Одежда', price: 120, img: 'img/Рубашка-3.jpeg', rating: 4.5, reviews: 0, desc: 'Качественная рубашка', sizes: ['X','XL','2XL','3XL'], specs: [['Материал', 'Хлопок']], thumbs: ['img/Рубашка-3.jpeg', 'img/Рубашка-3.jpeg', 'img/Рубашка-3.jpeg'] }
+        };
+        productsLoaded = true;
+    }
+    
+    function getProductById(id) {
+        return productsData[id] || null;
+    }
+    
+    function getAllProductsData() {
+        return Object.values(productsData);
+    }
     
     // Смена главного изображения
     window.changeQvThumb = function(imgSrc, thumbBtn) {
@@ -2958,9 +2935,11 @@ checkDeliveryNotifications();
     
     // Открыть быстрый просмотр
     function openQuickview(productId) {
-        const product = productsData[productId];
-        if (!product) return;
-        
+         var product = getProductById(productId);
+    if (!product || !product.thumbs || !product.specs) {
+        showToast('Ошибка', 'Товар не найден', 'error');
+        return;
+    }
         // Сброс размеров
         var sizeBlock = document.getElementById('quickviewSizeBlock');
         if (sizeBlock) {
@@ -3232,8 +3211,7 @@ checkDeliveryNotifications();
     const registerForm = document.getElementById('registerForm');
     const forgotForm = document.getElementById('forgotForm');
     
-    let isLoggedIn = false;
-    let currentUser = null;
+   
     let authToken = null;
     
     // ============================================
@@ -3450,7 +3428,7 @@ checkDeliveryNotifications();
         // ============================================
     // РЕГИСТРАЦИЯ — СТРОГАЯ ВАЛИДАЦИЯ
     // ============================================
-    document.getElementById('registerBtn')?.addEventListener('click', function() {
+            document.getElementById('registerBtn')?.addEventListener('click', async function() {
         var name = document.getElementById('regName').value.trim();
         var phone = document.getElementById('regPhone').value.trim();
         var email = document.getElementById('regEmail').value.trim();
@@ -3463,7 +3441,7 @@ checkDeliveryNotifications();
             return;
         }
         
-       var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
+        var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
         if (!cleanPhone.startsWith('992') || cleanPhone.length !== 12 || !/^\d+$/.test(cleanPhone)) {
             showToast('Ошибка', 'Введите номер в формате 992XXXXXXXXX', 'error');
             return;
@@ -3489,6 +3467,26 @@ checkDeliveryNotifications();
             showToast('Ошибка', 'Примите условия использования', 'error');
             return;
         }
+        
+        // ===== ОТПРАВКА НА СЕРВЕР =====
+        try {
+            var data = await apiRequest('/auth/register', {
+                method: 'POST',
+                body: JSON.stringify({ name: name, phone: cleanPhone, email: email, password: password })
+            });
+            
+            API_TOKEN = data.token;
+            localStorage.setItem('shopxand_token', data.token);
+            currentUser = data.user;
+            isLoggedIn = true;
+            
+            updateUserUI();
+            closeAuth();
+            showToast('Регистрация успешна!', 'Добро пожаловать, ' + name + '!', 'success');
+        } catch (err) {
+            showToast('Ошибка', err.message, 'error');
+        }
+    
         
          // ===== ПРОВЕРКА УНИКАЛЬНОСТИ НОМЕРА =====
         var existingPhone = findUserByPhone(cleanPhone);
@@ -3541,54 +3539,34 @@ checkDeliveryNotifications();
    // ============================================
     // ВХОД — СТРОГАЯ ПРОВЕРКА
     // ============================================
-    document.getElementById('loginBtn')?.addEventListener('click', function() {
+        document.getElementById('loginBtn')?.addEventListener('click', async function() {
         var phone = document.getElementById('loginPhone').value.trim();
         var password = document.getElementById('loginPassword').value;
-        var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
         
-        if (!phone) {
-            showToast('Ошибка', 'Введите телефон или email', 'error');
-            return;
-        }
-        if (!password) {
-            showToast('Ошибка', 'Введите пароль', 'error');
+        if (!phone || !password) {
+            showToast('Ошибка', 'Введите телефон и пароль', 'error');
             return;
         }
         
-        var user = null;
-        
-        // Если введён email
-        if (phone.includes('@')) {
-            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(phone)) {
-                showToast('Ошибка', 'Неверный формат email', 'error');
-                return;
-            }
-            user = findUserByEmail(phone);
-        } else {
-            // Если введён телефон — строгая проверка
-            if (!cleanPhone.startsWith('992') || cleanPhone.length !== 12 || !/^\d+$/.test(cleanPhone)) {
-                showToast('Ошибка', 'Введите номер в формате 992XXXXXXXXX', 'error');
-                return;
-            }
-            user = findUserByPhone(cleanPhone);
+        try {
+            var data = await apiRequest('/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({ phone: phone, password: password })
+            });
+            
+            API_TOKEN = data.token;
+            localStorage.setItem('shopxand_token', data.token);
+            currentUser = data.user;
+            isLoggedIn = true;
+            
+            updateUserUI();
+            closeAuth();
+            showToast('С возвращением!', data.user.name + ', вы вошли', 'success');
+        } catch (err) {
+            showToast('Ошибка', err.message, 'error');
         }
-        
-        if (!user) {
-            showToast('Ошибка', 'Пользователь не найден', 'error');
-            return;
-        }
-        
-        if (user.password !== password) {
-            showToast('Неверный пароль', 'Проверьте пароль или восстановите его', 'error');
-            return;
-        }
-        
-        saveSession(user);
-        updateUserUI();
-        closeAuth();
-        showToast('С возвращением!', user.name + ', вы вошли в аккаунт', 'success');
     });
+    
        // ============================================
     // ЗАБЫЛИ ПАРОЛЬ — БЕЗОПАСНОЕ ВОССТАНОВЛЕНИЕ
     // ============================================
@@ -4106,8 +4084,8 @@ setTimeout(function() {
     console.log('💬 Чат загружен');
 
 
-        // ============================================
-    // REVIEWS - Отзывы в быстром просмотре
+           // ============================================
+    // REVIEWS API
     // ============================================
     
     var qvAddReviewBtn = document.getElementById('qvAddReviewBtn');
@@ -4119,7 +4097,20 @@ setTimeout(function() {
     var qvReviewsList = document.getElementById('qvReviewsList');
     
     var selectedRating = 0;
-    var reviewsData = JSON.parse(localStorage.getItem('shopxand_reviews') || '{}');
+    var reviewsData = {};
+    
+    async function loadReviews() {
+        try {
+            var data = await apiRequest('/reviews');
+            reviewsData = data.reviews || {};
+        } catch (err) {
+            reviewsData = JSON.parse(localStorage.getItem('shopxand_reviews') || '{}');
+        }
+    }
+    
+    function saveReviewsLocal() {
+        localStorage.setItem('shopxand_reviews', JSON.stringify(reviewsData));
+    }
     
     // Звёзды
     if (qvReviewStars) {
@@ -4129,8 +4120,7 @@ setTimeout(function() {
                 updateReviewStars();
             });
             star.addEventListener('mouseenter', function() {
-                var val = parseInt(this.getAttribute('data-star'));
-                highlightStars(val);
+                highlightStars(parseInt(this.getAttribute('data-star')));
             });
         });
         qvReviewStars.addEventListener('mouseleave', function() {
@@ -4140,18 +4130,11 @@ setTimeout(function() {
     
     function highlightStars(count) {
         qvReviewStars.querySelectorAll('span').forEach(function(s, i) {
-            var icon = s.querySelector('i');
-            if (i < count) {
-                icon.className = 'fas fa-star';
-            } else {
-                icon.className = 'far fa-star';
-            }
+            s.querySelector('i').className = i < count ? 'fas fa-star' : 'far fa-star';
         });
     }
     
-    function updateReviewStars() {
-        highlightStars(selectedRating);
-    }
+    function updateReviewStars() { highlightStars(selectedRating); }
     
     // Открыть форму
     if (qvAddReviewBtn) {
@@ -4177,17 +4160,11 @@ setTimeout(function() {
     
     // Отправить отзыв
     if (qvReviewSubmit) {
-        qvReviewSubmit.addEventListener('click', function() {
+        qvReviewSubmit.addEventListener('click', async function() {
             var text = qvReviewText.value.trim();
             
-            if (selectedRating === 0) {
-                showToast('Ошибка', 'Поставьте оценку', 'error');
-                return;
-            }
-            if (!text) {
-                showToast('Ошибка', 'Напишите отзыв', 'error');
-                return;
-            }
+            if (selectedRating === 0) { showToast('Ошибка', 'Поставьте оценку', 'error'); return; }
+            if (!text) { showToast('Ошибка', 'Напишите отзыв', 'error'); return; }
             
             var productId = currentQvProduct.id;
             var review = {
@@ -4197,83 +4174,69 @@ setTimeout(function() {
                 date: new Date().toISOString()
             };
             
-            if (!reviewsData[productId]) {
-                reviewsData[productId] = [];
-            }
+            if (!reviewsData[productId]) reviewsData[productId] = [];
             reviewsData[productId].push(review);
-            localStorage.setItem('shopxand_reviews', JSON.stringify(reviewsData));
+            saveReviewsLocal();
             
-            // Обновляем рейтинг товара
-            updateProductRating(productId);
+            try {
+                await apiRequest('/reviews', {
+                    method: 'POST',
+                    body: JSON.stringify({ productId, review })
+                });
+            } catch (err) {}
             
             qvReviewForm.style.display = 'none';
             selectedRating = 0;
             qvReviewText.value = '';
             
+            updateProductRating(productId);
             renderProductReviews(productId);
             showToast('Спасибо!', 'Ваш отзыв добавлен', 'success');
         });
     }
     
-    // Отрисовать отзывы
     function renderProductReviews(productId) {
         var reviews = reviewsData[productId] || [];
         
         if (reviews.length === 0) {
-            qvReviewsList.innerHTML = 
-                '<div class="quickview__review-empty">' +
-                    '<span>📝</span>' +
-                    '<p>Отзывов пока нет. Будьте первым!</p>' +
-                '</div>';
+            qvReviewsList.innerHTML = '<div class="quickview__review-empty"><span>📝</span><p>Отзывов пока нет. Будьте первым!</p></div>';
             return;
         }
         
         qvReviewsList.innerHTML = reviews.map(function(r) {
             var date = new Date(r.date);
-            var starsHtml = '';
-            for (var i = 1; i <= 5; i++) {
-                starsHtml += i <= r.rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
-            }
+            var stars = '';
+            for (var i = 1; i <= 5; i++) stars += i <= r.rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
             return '<div class="qv-review-item">' +
-                '<div class="qv-review-item__header">' +
-                    '<span class="qv-review-item__name">' + r.name + '</span>' +
-                    '<span class="qv-review-item__date">' + date.toLocaleDateString('ru-RU') + '</span>' +
-                '</div>' +
-                '<div class="qv-review-item__stars">' + starsHtml + '</div>' +
-                '<p class="qv-review-item__text">' + r.text + '</p>' +
-            '</div>';
+                '<div class="qv-review-item__header"><span class="qv-review-item__name">' + r.name + '</span><span class="qv-review-item__date">' + date.toLocaleDateString('ru-RU') + '</span></div>' +
+                '<div class="qv-review-item__stars">' + stars + '</div>' +
+                '<p class="qv-review-item__text">' + r.text + '</p></div>';
         }).join('');
     }
     
-    // Обновить рейтинг товара
     function updateProductRating(productId) {
         var reviews = reviewsData[productId] || [];
         if (reviews.length === 0) return;
-        
         var total = reviews.reduce(function(s, r) { return s + r.rating; }, 0);
         var avg = (total / reviews.length).toFixed(1);
-        
-        // Обновляем в productsData
         if (productsData[productId]) {
             productsData[productId].rating = parseFloat(avg);
             productsData[productId].reviews = reviews.length;
         }
-        
-        // Обновляем на странице если открыт быстрый просмотр
         if (currentQvProduct && currentQvProduct.id === productId) {
             document.querySelector('.quickview__rating-num').textContent = avg;
             document.querySelector('.quickview__reviews').textContent = reviews.length + ' отзывов';
-            document.querySelector('.quickview__stars').innerHTML = generateStars(parseFloat(avg));
         }
     }
     
-    // Загружаем отзывы при открытии быстрого просмотра
     var originalOpenQuickview = openQuickview;
     openQuickview = function(productId) {
         originalOpenQuickview(productId);
         renderProductReviews(productId);
         qvReviewForm.style.display = 'none';
     };
+    
+    loadReviews();
 
         // ============================================
     // PUSH NOTIFICATIONS
@@ -4470,3 +4433,181 @@ setTimeout(function() {
     window.notifyPromo = notifyPromo;
     
     console.log('🔔 Push-уведомления загружены');
+
+
+        // ============================================
+    // ВХОД — С ПРОВЕРКОЙ УСТРОЙСТВА
+    // ============================================
+    document.getElementById('loginBtn')?.addEventListener('click', async function() {
+        var phone = document.getElementById('loginPhone').value.trim();
+        var password = document.getElementById('loginPassword').value;
+        var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
+        
+        if (!phone) {
+            showToast('Ошибка', 'Введите телефон или email', 'error');
+            return;
+        }
+        if (!password) {
+            showToast('Ошибка', 'Введите пароль', 'error');
+            return;
+        }
+        
+        var user = null;
+        
+        if (phone.includes('@')) {
+            user = findUserByEmail(phone);
+        } else {
+            if (!cleanPhone.startsWith('992') || cleanPhone.length !== 12) {
+                showToast('Ошибка', 'Введите номер в формате 992XXXXXXXXX', 'error');
+                return;
+            }
+            user = findUserByPhone(cleanPhone);
+        }
+        
+        if (!user) {
+            showToast('Ошибка', 'Пользователь не найден', 'error');
+            return;
+        }
+        
+        if (user.password !== password) {
+            showToast('Неверный пароль', 'Проверьте пароль или восстановите его', 'error');
+            return;
+        }
+        
+        // ===== ПРОВЕРКА УСТРОЙСТВА =====
+        var deviceId = getDeviceId();
+        var knownDevices = JSON.parse(localStorage.getItem('shopxand_trusted_devices') || '{}');
+        
+        // Если устройство уже доверенное — входим сразу
+        if (knownDevices[user.phone] === deviceId) {
+            completeLogin(user);
+            return;
+        }
+        
+        // Новое устройство — отправляем код подтверждения
+        var loginCode = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        // Сохраняем временные данные
+        localStorage.setItem('shopxand_login_code', loginCode);
+        localStorage.setItem('shopxand_login_phone', user.phone);
+        localStorage.setItem('shopxand_login_device', deviceId);
+        localStorage.setItem('shopxand_login_expire', Date.now() + 300000);
+        
+        // Отправляем код тебе в Telegram
+        fetch('https://api.telegram.org/bot' + BOT_ORDER + '/sendMessage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: CHAT_ID,
+                text: '🔐 *НОВЫЙ ВХОД В АККАУНТ*\n\n' +
+                    '👤 ' + user.name + '\n' +
+                    '📞 ' + user.phone + '\n' +
+                    '📱 Новое устройство!\n' +
+                    '🔑 Код подтверждения: *' + loginCode + '*\n\n' +
+                    'Сообщите код клиенту для входа.',
+                parse_mode: 'Markdown'
+            })
+        });
+        
+        // Показываем поле для кода
+        showLoginCodeForm(user, deviceId);
+    });
+    
+    function getDeviceId() {
+        var id = localStorage.getItem('shopxand_device_id');
+        if (!id) {
+            id = 'dev_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+            localStorage.setItem('shopxand_device_id', id);
+        }
+        return id;
+    }
+    
+    function completeLogin(user) {
+        saveSession(user);
+        updateUserUI();
+        closeAuth();
+        showToast('С возвращением!', user.name + ', вы вошли в аккаунт', 'success');
+    }
+    
+    function showLoginCodeForm(user, deviceId) {
+        // Скрываем форму входа
+        loginForm.classList.remove('active');
+        
+        // Показываем форму кода
+        var codeForm = document.getElementById('loginCodeForm');
+        if (!codeForm) {
+            codeForm = document.createElement('div');
+            codeForm.id = 'loginCodeForm';
+            codeForm.className = 'auth-form active';
+            codeForm.innerHTML = 
+                '<div class="auth-form__header">' +
+                    '<h2>Подтверждение входа</h2>' +
+                    '<p>Новое устройство обнаружено. Код отправлен менеджеру.</p>' +
+                '</div>' +
+                '<div class="auth-form__body">' +
+                    '<div class="auth-form__group">' +
+                        '<label>Код подтверждения</label>' +
+                        '<input type="text" placeholder="6-значный код" id="loginCodeInput" maxlength="6">' +
+                    '</div>' +
+                    '<button class="auth-form__submit" id="verifyLoginCodeBtn">Подтвердить</button>' +
+                '</div>' +
+                '<div class="auth-form__footer">' +
+                    '<p><a href="#" id="backToLogin">← Назад</a></p>' +
+                '</div>';
+            
+            authModal.querySelector('.auth-modal__container').appendChild(codeForm);
+            
+            // Обработчики
+            document.getElementById('verifyLoginCodeBtn').addEventListener('click', function() {
+                verifyLoginCode(user, deviceId);
+            });
+            
+            document.getElementById('backToLogin').addEventListener('click', function(e) {
+                e.preventDefault();
+                codeForm.classList.remove('active');
+                loginForm.classList.add('active');
+            });
+        } else {
+            codeForm.classList.add('active');
+        }
+    }
+    
+    function verifyLoginCode(user, deviceId) {
+        var inputCode = document.getElementById('loginCodeInput')?.value.trim();
+        var savedCode = localStorage.getItem('shopxand_login_code');
+        var savedPhone = localStorage.getItem('shopxand_login_phone');
+        var expireTime = parseInt(localStorage.getItem('shopxand_login_expire') || '0');
+        
+        if (!inputCode) {
+            showToast('Ошибка', 'Введите код подтверждения', 'error');
+            return;
+        }
+        
+        if (inputCode !== savedCode) {
+            showToast('Неверный код', 'Проверьте код и попробуйте снова', 'error');
+            return;
+        }
+        
+        if (Date.now() > expireTime) {
+            showToast('Код истёк', 'Запросите новый код', 'error');
+            return;
+        }
+        
+        // Сохраняем устройство как доверенное
+        var trustedDevices = JSON.parse(localStorage.getItem('shopxand_trusted_devices') || '{}');
+        trustedDevices[user.phone] = deviceId;
+        localStorage.setItem('shopxand_trusted_devices', JSON.stringify(trustedDevices));
+        
+        // Очищаем временные данные
+        localStorage.removeItem('shopxand_login_code');
+        localStorage.removeItem('shopxand_login_phone');
+        localStorage.removeItem('shopxand_login_device');
+        localStorage.removeItem('shopxand_login_expire');
+        
+        // Входим
+        completeLogin(user);
+        
+        // Удаляем форму кода
+        var codeForm = document.getElementById('loginCodeForm');
+        if (codeForm) codeForm.remove();
+    }
