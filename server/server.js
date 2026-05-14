@@ -8,8 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Подключение к MongoDB
-const MONGO_URI = 'mongodb+srv://admin:shopxand2024@cluster0.xxxxx.mongodb.net/shopxand?retryWrites=true&w=majority';
-
+const MONGO_URI = process.env.MONGODB_URI || 'mongodb+srv://admin:shopxand2024@cluster0.xxxxx.mongodb.net/shopxand';
 mongoose.connect(MONGO_URI)
     .then(() => console.log('✅ MongoDB подключена'))
     .catch(err => console.error('❌ Ошибка MongoDB:', err));
