@@ -2,36 +2,32 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
-
-const authRoutes = require('./routes/auth');
-const productRoutes = require('./routes/products');
-const orderRoutes = require('./routes/orders');
-const reviewRoutes = require('./routes/reviews');
-const chatRoutes = require('./routes/chat');
+const mongoose = require('mongoose');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// Подключение к MongoDB
+const MONGO_URI = 'mongodb+srv://admin:shopxand2024@cluster0.xxxxx.mongodb.net/shopxand?retryWrites=true&w=majority';
 
-// Статические файлы (фронтенд)
+mongoose.connect(MONGO_URI)
+    .then(() => console.log('✅ MongoDB подключена'))
+    .catch(err => console.error('❌ Ошибка MongoDB:', err));
+
+app.use(cors());
+app.use(express.json());
 app.use(express.static(path.join(__dirname, '..')));
 
 // API routes
-app.use('/api/auth', authRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/reviews', reviewRoutes);
-app.use('/api/chat', chatRoutes);
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/products', require('./routes/products'));
+app.use('/api/orders', require('./routes/orders'));
+app.use('/api/reviews', require('./routes/reviews'));
 
-// Главная страница
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
 app.listen(PORT, () => {
-    console.log('🛒 ShopXand сервер запущен на порту ' + PORT);
+    console.log('🛒 ShopXand сервер на порту ' + PORT);
 });
