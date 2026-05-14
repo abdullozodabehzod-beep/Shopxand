@@ -5,7 +5,7 @@
 // ============================================
 // API CONFIG
 // ============================================
-var API_URL = 'http://localhost:3000/api';
+var API_URL = 'https://shopxand-3.onrender.com/api';
 var API_TOKEN = localStorage.getItem('shopxand_token') || '';
 
 function apiHeaders() {
@@ -32,23 +32,24 @@ async function apiRequest(url, options) {
     }
 }
 
-async function checkAuth() {
-    var token = localStorage.getItem('shopxand_token');
-    if (!token) return;
-    
-    try {
-        var data = await apiRequest('/auth/me');
-        currentUser = data.user;
-        isLoggedIn = true;
-        API_TOKEN = token;
-        updateUserUI();
-    } catch (err) {
-        API_TOKEN = '';
-        localStorage.removeItem('shopxand_token');
-        currentUser = null;
-        isLoggedIn = false;
+    async function checkAuth() {
+        var token = localStorage.getItem('shopxand_token');
+        if (!token) return;
+        
+        try {
+            var data = await apiRequest('/auth/me');
+            currentUser = data.user;
+            isLoggedIn = true;
+            API_TOKEN = token;
+            updateUserUI();
+        } catch (err) {
+            API_TOKEN = '';
+            localStorage.removeItem('shopxand_token');
+            // НЕ удаляем доверенные устройства
+            currentUser = null;
+            isLoggedIn = false;
+        }
     }
-}
 // Глобальные переменные
 var isLoggedIn = false;
 var currentUser = null;
@@ -58,7 +59,7 @@ var favorites = [];
 var productsData = {};
 
 // API
-var API_URL = 'http://localhost:3000/api';
+var API_URL = 'https://shopxand-3.onrender.com/api';
 var API_TOKEN = localStorage.getItem('shopxand_token') || '';
 
  
@@ -3286,9 +3287,11 @@ checkDeliveryNotifications();
     // ВЫХОД
     // ============================================
     function logout() {
-        clearSession();
-        updateUserUI();
-        renderOrders();
+          localStorage.removeItem('shopxand_token');
+        // НЕ удаляем device_id — чтобы устройство запомнилось
+        // localStorage.removeItem('shopxand_device_id'); ← убери эту строку если есть
+        currentUser = null;
+        isLoggedIn = false;
         showToast('Вы вышли', 'До новых встреч!', 'success');
     }
     
@@ -4513,7 +4516,7 @@ setTimeout(function() {
         showLoginCodeForm(user, deviceId);
     });
     
-    function getDeviceId() {
+       function getDeviceId() {
         var id = localStorage.getItem('shopxand_device_id');
         if (!id) {
             id = 'dev_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
@@ -4521,8 +4524,14 @@ setTimeout(function() {
         }
         return id;
     }
-    
-    function completeLogin(user) {
+       function completeLogin(user) {
+        // Сохраняем устройство как доверенное
+        var deviceId = getDeviceId();
+        var trustedDevices = JSON.parse(localStorage.getItem('shopxand_trusted_devices') || '{}');
+        trustedDevices[user.phone] = deviceId;
+        localStorage.setItem('shopxand_trusted_devices', JSON.stringify(trustedDevices));
+        
+        // Входим
         saveSession(user);
         updateUserUI();
         closeAuth();
