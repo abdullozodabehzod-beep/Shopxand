@@ -33,3 +33,15 @@ router.get('/', (req, res) => {
 });
 
 module.exports = router;
+
+
+
+// Получить ВСЕ заказы (для админа)
+router.get('/admin/all', async (req, res) => {
+    try {
+        const orders = await Order.find().sort({ date: -1 });
+        res.json({ orders });
+    } catch (err) {
+        res.json({ orders: [] });
+    }
+});
