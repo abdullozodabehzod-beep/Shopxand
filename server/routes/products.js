@@ -22,4 +22,12 @@ router.get('/:id', (req, res) => {
     res.json({ product });
 });
 
+router.post('/', (req, res) => {
+    const products = getProducts();
+    const product = { id: Date.now().toString(), ...req.body };
+    products.push(product);
+    saveProducts(products);
+    res.json({ success: true, product: product });
+});
+
 module.exports = router;
