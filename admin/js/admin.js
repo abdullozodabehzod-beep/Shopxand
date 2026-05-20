@@ -341,10 +341,23 @@ async function loadAnalytics() {
 
 async function deleteProduct(id) {
     if (!confirm('Удалить товар?')) return;
+    
+    console.log('Удаляю товар:', id);
+    
     try {
-        await fetch(API_URL + '/products/' + id, { method: 'DELETE' });
-        loadProductsAdmin();
+        var response = await fetch(API_URL + '/products/' + id, { 
+            method: 'DELETE' 
+        });
+        var data = await response.json();
+        console.log('Ответ:', data);
+        
+        if (response.ok) {
+            loadProductsAdmin(); // Обновить список
+        } else {
+            alert('Ошибка: ' + (data.error || ''));
+        }
     } catch (err) {
-        alert('Ошибка удаления');
+        console.error('Ошибка удаления:', err);
+        alert('Сервер недоступен');
     }
 }

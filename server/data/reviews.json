@@ -1,10 +1,18 @@
 [
   {
-    "productId": "1",
+    "productId": "1779286097889",
     "name": "Pedro",
-    "rating": 3,
-    "text": "this good",
+    "rating": 4,
+    "text": "this good i buy this",
     "status": "approved",
-    "date": "2026-05-16T15:18:18.769Z"
+    "date": "2026-05-20T14:25:28.086Z"
+  },
+  {
+    "productId": "1779286097889",
+    "name": "Pedro",
+    "rating": 1,
+    "text": "this good i buy this",
+    "status": "rejected",
+    "date": "2026-05-20T14:25:28.127Z"
   }
 ]

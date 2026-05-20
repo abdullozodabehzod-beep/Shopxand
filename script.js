@@ -3663,11 +3663,6 @@ addToCart = function(product) { origAddToCart(product); syncUserData(); };
 const origToggleFavorite = toggleFavorite;
 toggleFavorite = function(product) { const r = origToggleFavorite(product); syncUserData(); return r; };
 
-// Загрузка при входе
-const origCompleteLogin = completeLogin;
-completeLogin = function(user, token) { saveSession(user, token); loadUserData(); };
-
-
     // ============================================
     // СИНХРОНИЗАЦИЯ ДАННЫХ С СЕРВЕРОМ
     // ============================================
@@ -4520,3 +4515,53 @@ setTimeout(function() {
         });
     }
 
+    // ============================================
+    // ОТПРАВКА ОТЗЫВА — финальная версия
+    // ============================================
+    document.addEventListener('click', function(e) {
+        var target = e.target;
+        if (target.id === 'qvReviewSubmit' || target.closest('#qvReviewSubmit')) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('Кнопка Отправить отзыв нажата');
+            
+            if (!currentQvProduct) {
+                console.log('Нет товара');
+                return;
+            }
+            
+            var text = document.getElementById('qvReviewText')?.value?.trim();
+            var selected = document.querySelector('#qvReviewStars .fas.fa-star')?.parentElement?.getAttribute('data-star');
+            var rating = selected ? parseInt(selected) : 0;
+            
+            console.log('Текст:', text, 'Рейтинг:', rating);
+            
+            if (!text) { alert('Напишите отзыв'); return; }
+            if (rating === 0) { alert('Поставьте оценку'); return; }
+            
+            // Отправляем
+            fetch(API_URL + '/reviews', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    productId: currentQvProduct.id,
+                    review: {
+                        name: currentUser ? currentUser.name : 'Гость',
+                        rating: rating,
+                        text: text,
+                        date: new Date().toISOString()
+                    }
+                })
+            }).then(function(r) { return r.json(); })
+              .then(function(data) {
+                console.log('Ответ:', data);
+                document.getElementById('qvReviewForm').style.display = 'none';
+                document.getElementById('qvReviewText').value = '';
+                alert('Отзыв отправлен на модерацию!');
+            }).catch(function(err) {
+                console.error('Ошибка:', err);
+                alert('Ошибка отправки');
+            });
+        }
+    });
