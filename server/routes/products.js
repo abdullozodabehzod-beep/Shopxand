@@ -42,4 +42,12 @@ router.post('/', (req, res) => {
     }
 });
 
+// Удалить товар
+router.delete('/:id', (req, res) => {
+    var products = getProducts();
+    products = products.filter(p => p.id !== req.params.id);
+    saveProducts(products);
+    res.json({ success: true });
+});
+
 module.exports = router;

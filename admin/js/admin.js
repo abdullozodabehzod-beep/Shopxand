@@ -93,6 +93,9 @@ async function loadProductsAdmin() {
 
 // Сохранение товара
 async function saveProduct() {
+       var sizesStr = document.getElementById('prodSizes')?.value || '';
+    var shoeSizesStr = document.getElementById('prodShoeSizes')?.value || '';
+    
     var product = {
         name: document.getElementById('prodName').value,
         cat: document.getElementById('prodCat').value,
@@ -100,6 +103,8 @@ async function saveProduct() {
         oldPrice: document.getElementById('prodOldPrice').value ? parseInt(document.getElementById('prodOldPrice').value) : null,
         img: document.getElementById('prodImg').value || '',
         desc: document.getElementById('prodDesc').value || '',
+        sizes: sizesStr ? sizesStr.split(',').map(function(s) { return s.trim(); }) : [],
+        shoeSizes: shoeSizesStr ? shoeSizesStr.split(',').map(function(s) { return s.trim(); }) : [],
         rating: 0,
         reviews: 0,
         specs: [],
@@ -331,5 +336,15 @@ async function loadAnalytics() {
         
     } catch (err) {
         console.log('Ошибка загрузки аналитики:', err);
+    }
+}
+
+async function deleteProduct(id) {
+    if (!confirm('Удалить товар?')) return;
+    try {
+        await fetch(API_URL + '/products/' + id, { method: 'DELETE' });
+        loadProductsAdmin();
+    } catch (err) {
+        alert('Ошибка удаления');
     }
 }

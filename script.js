@@ -76,14 +76,22 @@ function showToast(title, message, type) {
 }
 
 document.addEventListener('DOMContentLoaded', async function()  {
-
-        await checkAuth();
-    loadLocalProducts();
+    await checkAuth();
+    await loadProducts();
+    if (isLoggedIn) await loadOrders();
     
+    // Сначала сервер
+    var serverLoaded = false;
     try {
         await loadProducts();
+        serverLoaded = true;
     } catch (err) {
-        console.log('Локальные товары');
+        console.log('Сервер недоступен');
+    }
+    
+    // Если сервер не ответил — локально
+    if (!serverLoaded) {
+        loadLocalProducts();
     }
     
     if (isLoggedIn) await loadOrders();
@@ -3015,11 +3023,7 @@ checkDeliveryNotifications();
         // ============================================
     // PRODUCTS - Загрузка с сервера или локально
     // ============================================
-        async function loadProducts() {
-        // Сначала грузим локально ВСЕГДА
-        loadLocalProducts();
-        
-        // Потом пытаемся с сервера
+             async function loadProducts() {
         try {
             var data = await apiRequest('/products');
             if (data && data.products && data.products.length > 0) {
@@ -3028,10 +3032,12 @@ checkDeliveryNotifications();
                     productsData[p.id] = p;
                 });
                 console.log('📦 Товары с сервера:', Object.keys(productsData).length);
-                return
+                renderProductCards(); // ← ДОБАВЬ ЭТУ СТРОКУ
             }
         } catch (err) {
-            console.log('Сервер недоступен, используем локальные товары');
+            console.log('Загружаем локально');
+            loadLocalProducts();
+            renderProductCards(); // ← И ЗДЕСЬ
         }
     }
     
@@ -3659,7 +3665,7 @@ toggleFavorite = function(product) { const r = origToggleFavorite(product); sync
 
 // Загрузка при входе
 const origCompleteLogin = completeLogin;
-completeLogin = function(user, token) { origCompleteLogin(user, token); loadUserData(); };
+completeLogin = function(user, token) { saveSession(user, token); loadUserData(); };
 
 
     // ============================================
@@ -4435,6 +4441,82 @@ setTimeout(function() {
     window.notifyPromo = notifyPromo;
     
     console.log('🔔 Push-уведомления загружены');
+
+
+        function renderProductCards() {
+        var grid = document.getElementById('productsGrid');
+        if (!grid) return;
         
+        var allProducts = getAllProductsData();
+        
+        grid.innerHTML = allProducts.map(function(p) {
+            return `
+            <div class="product-card" data-cat="${p.cat || ''}">
+                <div class="product-card__img">
+                    <img src="${p.img || ''}" alt="${p.name}" onerror="this.style.display='none';this.parentElement.innerHTML='📦'">
+                    <button class="product-card__fav" data-id="${p.id}" data-name="${p.name}" data-price="${p.price}" data-img="${p.img || ''}" data-cat="${p.cat || ''}">
+                        <i class="far fa-heart"></i>
+                    </button>
+                    ${p.oldPrice ? '<span class="product-card__badge">-' + Math.round((1 - p.price/p.oldPrice)*100) + '%</span>' : ''}
+                </div>
+                <div class="product-card__body">
+                    <span class="product-card__cat">${p.cat || ''}</span>
+                    <h3 class="product-card__name">${p.name}</h3>
+                    <div class="product-card__rating">
+                        <i class="fas fa-star"></i>
+                        <span>${p.rating || '0'}</span>
+                        <span class="product-card__reviews">(${p.reviews || 0} отзывов)</span>
+                    </div>
+                    <div class="product-card__price">
+                        ${p.oldPrice ? '<span class="product-card__price-old">' + p.oldPrice + ' сомони</span>' : ''}
+                        <span class="product-card__price-current">${p.price} сомони</span>
+                    </div>
+                    <button class="product-card__cart-btn" data-id="${p.id}" data-name="${p.name}" data-price="${p.price}" data-img="${p.img || ''}" data-cat="${p.cat || ''}">
+                        <i class="fas fa-shopping-cart"></i> В корзину
+                    </button>
+                </div>
+            </div>`;
+        }).join('');
+        
+        // Перепривязываем события
+        bindProductEvents();
+    }
     
-       
+    function bindProductEvents() {
+        document.querySelectorAll('.product-card__fav').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var product = {
+                    id: this.getAttribute('data-id'),
+                    name: this.getAttribute('data-name'),
+                    price: this.getAttribute('data-price'),
+                    img: this.getAttribute('data-img'),
+                    cat: this.getAttribute('data-cat')
+                };
+                toggleFavorite(product);
+            });
+        });
+        
+        document.querySelectorAll('.product-card__cart-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                var product = {
+                    id: this.getAttribute('data-id'),
+                    name: this.getAttribute('data-name'),
+                    price: this.getAttribute('data-price'),
+                    img: this.getAttribute('data-img'),
+                    cat: this.getAttribute('data-cat')
+                };
+                addToCart(product);
+                this.textContent = '✓ Добавлено';
+                this.style.background = '#00c853';
+                var self = this;
+                setTimeout(function() {
+                    self.innerHTML = '<i class="fas fa-shopping-cart"></i> В корзину';
+                    self.style.background = '';
+                }, 1500);
+            });
+        });
+    }
+
