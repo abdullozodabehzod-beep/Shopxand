@@ -3,7 +3,7 @@ var urlsToCache = [
     '/',
     '/index.html',
     '/css/style.css',
-    '/js/main.js',
+    '/js/script.js',
     '/manifest.json'
 ];
 

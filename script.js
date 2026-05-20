@@ -5,13 +5,14 @@
 // ============================================
 // API CONFIG
 // ============================================
-var API_URL = 'https://shopxand-3.onrender.com/api';
+var API_URL = 'http://localhost:3000/api';
 var API_TOKEN = localStorage.getItem('shopxand_token') || '';
 
 function apiHeaders() {
+    var token = localStorage.getItem('shopxand_token');
     return {
         'Content-Type': 'application/json',
-        'Authorization': API_TOKEN ? 'Bearer ' + API_TOKEN : ''
+        'Authorization': token ? 'Bearer ' + token : ''
     };
 }
 
@@ -24,6 +25,7 @@ async function apiRequest(url, options) {
             body: options.body || undefined
         });
         var data = await response.json();
+        console.log('API ответ:', response.status, data); // ← ДОБАВЬ ЭТУ СТРОКУ
         if (!response.ok) throw new Error(data.error || 'Ошибка сервера');
         return data;
     } catch (error) {
@@ -32,7 +34,7 @@ async function apiRequest(url, options) {
     }
 }
 
-    async function checkAuth() {
+      async function checkAuth() {
         var token = localStorage.getItem('shopxand_token');
         if (!token) return;
         
@@ -43,11 +45,9 @@ async function apiRequest(url, options) {
             API_TOKEN = token;
             updateUserUI();
         } catch (err) {
-            API_TOKEN = '';
+            // Токен недействителен — очищаем
             localStorage.removeItem('shopxand_token');
-            // НЕ удаляем доверенные устройства
-            currentUser = null;
-            isLoggedIn = false;
+            API_TOKEN = '';
         }
     }
 // Глобальные переменные
@@ -59,32 +59,34 @@ var favorites = [];
 var productsData = {};
 
 // API
-var API_URL = 'https://shopxand-3.onrender.com/api';
+var API_URL = 'http://localhost:3000/api';
 var API_TOKEN = localStorage.getItem('shopxand_token') || '';
 
- 
+function showToast(title, message, type) {
+    var toast = document.getElementById('toast');
+    if (!toast) { alert(title + ': ' + message); return; }
+    document.getElementById('toastTitle').textContent = title;
+    document.getElementById('toastMessage').textContent = message;
+    var icon = document.getElementById('toastIcon');
+    icon.innerHTML = type === 'error' ? '<i class="fas fa-times-circle"></i>' : '<i class="fas fa-check-circle"></i>';
+    icon.className = type === 'error' ? 'toast__icon error' : 'toast__icon';
+    toast.classList.add('show');
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(function() { toast.classList.remove('show'); }, 3000);
+}
 
 document.addEventListener('DOMContentLoaded', async function()  {
 
-        await loadProducts();
-    
-     // Проверяем авторизацию
-    await checkAuth();
-    
-        // Сначала грузим локально (быстро)
+        await checkAuth();
     loadLocalProducts();
-
-    // Потом пытаемся с сервера (если доступен)
+    
     try {
         await loadProducts();
     } catch (err) {
-        console.log('Сервер недоступен, остаёмся на локальных данных');
+        console.log('Локальные товары');
     }
     
-    // Загружаем заказы если вошёл
-    if (isLoggedIn) {
-        await loadOrders();
-    }
+    if (isLoggedIn) await loadOrders();
       // ============================================
     // ГЛОБАЛЬНЫЕ ФУНКЦИИ
     // ============================================
@@ -131,26 +133,6 @@ document.addEventListener('DOMContentLoaded', async function()  {
     // Закрытие по кнопкам
     document.getElementById('confirmCancel')?.addEventListener('click', window.closeConfirm);
     document.getElementById('confirmOverlay')?.addEventListener('click', window.closeConfirm);
-
-
-     function showToast(title, message, type) {
-        var toast = document.getElementById('toast');
-        if (!toast) return;
-        document.getElementById('toastTitle').textContent = title;
-        document.getElementById('toastMessage').textContent = message;
-        var icon = document.getElementById('toastIcon');
-        if (type === 'success') {
-            icon.innerHTML = '<i class="fas fa-check-circle"></i>';
-            icon.className = 'toast__icon';
-        } else if (type === 'error') {
-            icon.innerHTML = '<i class="fas fa-times-circle"></i>';
-            icon.className = 'toast__icon error';
-        }
-        toast.classList.add('show');
-        clearTimeout(toast._timeout);
-        toast._timeout = setTimeout(function() { toast.classList.remove('show'); }, 3000);
-
-    }
     
         // ============================================
     // IMAGE HELPER - Проверка типа картинки
@@ -179,6 +161,12 @@ document.addEventListener('DOMContentLoaded', async function()  {
     const searchToggle = document.getElementById('searchToggle');
     const searchBlock = document.getElementById('searchBlock');
     const searchInput = document.getElementById('searchInput');
+
+    const langSelector = document.getElementById('langSelector');
+    const mobileLangSelector = document.getElementById('mobileLangSelector');
+    const langModal = document.getElementById('langModal');
+    const langOverlay = document.getElementById('langOverlay');
+    const langModalClose = document.getElementById('langModalClose');
     
     // ============================================
     // МЕНЮ: Открытие / Закрытие
@@ -195,7 +183,7 @@ document.addEventListener('DOMContentLoaded', async function()  {
           function closeMenu() {
         mobileMenu.classList.remove('active');
         burgerBtn.classList.remove('active');
-          window.closeMenu = closeMenu;
+    
         
         // Не убираем overflow hidden если открыта другая панель
         if (!langModal.classList.contains('active') && 
@@ -213,6 +201,8 @@ document.addEventListener('DOMContentLoaded', async function()  {
             }
         }, 350);
     }
+
+     window.closeMenu = closeMenu;
     
     burgerBtn.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -632,7 +622,6 @@ document.addEventListener('DOMContentLoaded', async function()  {
     }
 
 
-
 });
 
 
@@ -640,46 +629,13 @@ document.addEventListener('DOMContentLoaded', async function()  {
     const CHAT_ID = '5282056467';
     const CHANNEL_ID = '-1002854630161';
 
-    // ФУНКЦИЯ TOAST
-function showToast(title, message, type) {
-    const toast = document.getElementById('toast');
-    if (!toast) return;
-    
-    const toastTitle = document.getElementById('toastTitle');
-    const toastMessage = document.getElementById('toastMessage');
-    const toastIcon = document.getElementById('toastIcon');
-    
-    toastTitle.textContent = title;
-    toastMessage.textContent = message;
-    
-    if (type === 'success') {
-        toastIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
-        toastIcon.className = 'toast__icon';
-    } else if (type === 'error') {
-        toastIcon.innerHTML = '<i class="fas fa-times-circle"></i>';
-        toastIcon.className = 'toast__icon error';
-    }
-    
-    toast.classList.add('show');
-    clearTimeout(toast._timeout);
-    toast._timeout = setTimeout(function() {
-        toast.classList.remove('show');
-    }, 3000);
-
-
-}
-
 
 
     // ============================================
     // ВЫБОР ЯЗЫКА - ИСПРАВЛЕННАЯ ВЕРСИЯ
     // ============================================
     
-    const langSelector = document.getElementById('langSelector');
-    const mobileLangSelector = document.getElementById('mobileLangSelector');
-    const langModal = document.getElementById('langModal');
-    const langOverlay = document.getElementById('langOverlay');
-    const langModalClose = document.getElementById('langModalClose');
+    
     
     // Текущий язык (по умолчанию русский)
     let currentLang = 'ru';
@@ -1012,6 +968,107 @@ function showToast(title, message, type) {
     
     console.log('Модуль языков загружен. Текущий язык:', currentLang);
 
+        // ============================================
+    // MULTI-LANGUAGE — Автоперевод
+    // ============================================
+    
+    var translationsCache = {};
+    
+    // Загружаем переводы с сервера
+    async function loadTranslations(lang) {
+        if (translationsCache[lang]) return translationsCache[lang];
+        
+        try {
+            var data = await apiRequest('/translations/' + lang);
+            translationsCache[lang] = data;
+            return data;
+        } catch (err) {
+            console.log('Переводы загружены локально');
+            return getLocalTranslations(lang);
+        }
+    }
+    
+    function getLocalTranslations(lang) {
+        var translations = {
+            ru: {
+                catalog: 'Каталог', search: 'Я ищу...', login: 'Войти',
+                orders: 'Заказы', favorites: 'Избранное', cart: 'Корзина',
+                clothing: 'Одежда', electronics: 'Электроника', home: 'Дом и сад',
+                kids: 'Детские товары', beauty: 'Красота и здоровье', sport: 'Спорт и отдых',
+                food: 'Продукты', sales: 'Акции', menuTitle: 'Каталог',
+                myOrders: 'Мои заказы', myFavorites: 'Избранное', myCart: 'Корзина',
+                loginReg: 'Войти или зарегистрироваться', allProducts: 'Все товары',
+                popularProducts: 'Популярные товары', viewAll: 'Смотреть все',
+                addToCart: 'В корзину', addedToCart: '✓ Добавлено',
+                price: 'Цена', oldPrice: 'Старая цена', rating: 'Рейтинг',
+                reviews: 'отзывов', description: 'Описание', specs: 'Характеристики',
+                size: 'Размер', shoeSize: 'Размер обуви', quantity: 'Количество',
+                delivery: 'Доставка', pickup: 'Самовывоз', courier: 'Курьерская доставка',
+                free: 'Бесплатно', days: 'дней', somoni: 'сомони',
+                orderAccepted: 'Ваш заказ принят!', deliveryTime: 'Срок доставки: 12-18 дней',
+                thankYou: 'Спасибо за заказ!', fromChina: 'Заказ доставляется из Китая в Душанбе'
+            },
+            tg: {
+                catalog: 'Каталог', search: 'Ҷустуҷӯ...', login: 'Ворид',
+                orders: 'Фармоишҳо', favorites: 'Интихобшуда', cart: 'Сабад',
+                clothing: 'Либос', electronics: 'Электроника', home: 'Хона ва боғ',
+                kids: 'Молҳои кӯдакона', beauty: 'Зебоӣ ва саломатӣ', sport: 'Варзиш',
+                food: 'Маҳсулот', sales: 'Тафхҳо', menuTitle: 'Каталог',
+                myOrders: 'Фармоишҳои ман', myFavorites: 'Интихобшуда', myCart: 'Сабади ман',
+                loginReg: 'Ворид шудан ё ба қайд гирифтан', allProducts: 'Ҳамаи молҳо',
+                popularProducts: 'Молҳои машҳур', viewAll: 'Ҳамаашро дидан',
+                addToCart: 'Ба сабад', addedToCart: '✓ Илова шуд',
+                price: 'Нарх', oldPrice: 'Нархи пешина', rating: 'Рейтинг',
+                reviews: 'тафсир', description: 'Тавсиф', specs: 'Хусусиятҳо',
+                size: 'Андоза', shoeSize: 'Андозаи пойафзол', quantity: 'Миқдор',
+                delivery: 'Расонидан', pickup: 'Худгир', courier: 'Курьер',
+                free: 'Ройгон', days: 'рӯз', somoni: 'сомонӣ',
+                orderAccepted: 'Фармоиши шумо қабул шуд!', deliveryTime: 'Муҳлати расонидан: 12-18 рӯз',
+                thankYou: 'Ташаккур барои фармоиш!', fromChina: 'Фармоиш аз Хитой ба Душанбе меояд'
+            },
+            en: {
+                catalog: 'Catalog', search: 'Search...', login: 'Sign In',
+                orders: 'Orders', favorites: 'Favorites', cart: 'Cart',
+                clothing: 'Clothing', electronics: 'Electronics', home: 'Home & Garden',
+                kids: 'Kids', beauty: 'Beauty', sport: 'Sports',
+                food: 'Groceries', sales: 'Sales', menuTitle: 'Catalog',
+                myOrders: 'My Orders', myFavorites: 'Favorites', myCart: 'Cart',
+                loginReg: 'Sign in or register', allProducts: 'All Products',
+                popularProducts: 'Popular Products', viewAll: 'View All',
+                addToCart: 'Add to Cart', addedToCart: '✓ Added',
+                price: 'Price', oldPrice: 'Old Price', rating: 'Rating',
+                reviews: 'reviews', description: 'Description', specs: 'Specifications',
+                size: 'Size', shoeSize: 'Shoe Size', quantity: 'Quantity',
+                delivery: 'Delivery', pickup: 'Pickup', courier: 'Courier',
+                free: 'Free', days: 'days', somoni: 'somoni',
+                orderAccepted: 'Order Accepted!', deliveryTime: 'Delivery: 12-18 days',
+                thankYou: 'Thank you for your order!', fromChina: 'Shipping from China to Dushanbe'
+            }
+        };
+        return translations[lang] || translations['ru'];
+    }
+    
+    // Переключение языка
+    async function switchLanguage(lang) {
+        currentLang = lang;
+        var t = await loadTranslations(lang);
+        
+        // Обновляем все элементы с data-translate
+        document.querySelectorAll('[data-translate]').forEach(function(el) {
+            var key = el.getAttribute('data-translate');
+            if (t[key]) el.textContent = t[key];
+        });
+        
+        // Обновляем placeholder
+        document.querySelectorAll('[data-translate-placeholder]').forEach(function(el) {
+            var key = el.getAttribute('data-translate-placeholder');
+            if (t[key]) el.placeholder = t[key];
+        });
+        
+        // Сохраняем
+        localStorage.setItem('shopxand_lang', lang);
+        updateLanguageDisplay(lang);
+    }
 
 
         // ============================================
@@ -2711,150 +2768,232 @@ setInterval(function() {
 updateOrderStatusAutomatically();
 checkDeliveryNotifications();
     
-
-        // ============================================
-    // SEARCH - Поиск товаров
+    // ============================================
+    // SMART SEARCH — Умный поиск
     // ============================================
     
-    const searchInput = document.getElementById('searchInput');
-    const searchBlock = document.getElementById('searchBlock');
-   const productGrid = document.getElementById('productsGrid') || document.querySelector('.products__grid');
-    // Собираем все товары со страницы
+    var searchInput = document.getElementById('searchInput');
+    var searchBlock = document.getElementById('searchBlock');
+    var searchSuggestions = document.getElementById('searchSuggestions');
+    var productGrid = document.getElementById('productsGrid') || document.querySelector('.products__grid');
+    var selectedSuggestionIndex = -1;
+    var searchTimeout;
+    
+    // Собираем все товары
     function getAllProducts() {
-        const products = [];
-        const cards = document.querySelectorAll('.product-card');
-        
+        var products = [];
+        var cards = document.querySelectorAll('.product-card');
         cards.forEach(function(card) {
-            const name = card.querySelector('.product-card__name')?.textContent || '';
-            const cat = card.querySelector('.product-card__cat')?.textContent || '';
-            const cartBtn = card.querySelector('.product-card__cart-btn');
-            
+            var name = card.querySelector('.product-card__name')?.textContent || '';
+            var cat = card.querySelector('.product-card__cat')?.textContent || '';
+            var price = card.querySelector('.product-card__price-current')?.textContent || '';
+            var cartBtn = card.querySelector('.product-card__cart-btn');
             products.push({
                 card: card,
-                name: name.toLowerCase(),
-                cat: cat.toLowerCase(),
+                name: name,
+                cat: cat,
+                price: price,
                 id: cartBtn?.getAttribute('data-id') || '',
-                price: cartBtn?.getAttribute('data-price') || '0',
                 img: cartBtn?.getAttribute('data-img') || '📦'
             });
         });
-        
         return products;
     }
     
-    // Поиск
-    function searchProducts(query) {
-        const products = getAllProducts();
-        query = query.toLowerCase().trim();
+    // Исправление опечаток (базовые правила)
+    function fixTypos(query) {
+        var fixes = {
+            'телеыон': 'телефон',
+            'ноутбуук': 'ноутбук',
+            'рубащка': 'рубашка',
+            'красовка': 'кроссовка',
+            'электроник': 'электроника',
+            'наушьник': 'наушник',
+            'одежда': 'одежда',
+            'шоп': 'shop',
+            'смартвон': 'смартфон',
+            'платье': 'платье',
+            'тапочьки': 'тапочки'
+        };
+        var words = query.toLowerCase().split(' ');
+        var fixed = words.map(function(w) { return fixes[w] || w; }).join(' ');
+        return fixed;
+    }
+    
+    // Подсветка совпадения
+    function highlightMatch(text, query) {
+        if (!query) return text;
+        var regex = new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+        return text.replace(regex, '<span>$1</span>');
+    }
+    
+    // Показать подсказки
+    function showSuggestions(query) {
+        if (!searchSuggestions) return;
         
-        let foundCount = 0;
+        if (!query || query.length < 1) {
+            searchSuggestions.classList.remove('active');
+            selectedSuggestionIndex = -1;
+            return;
+        }
         
-        products.forEach(function(product) {
-            const card = product.card;
+        var products = getAllProducts();
+        var fixedQuery = fixTypos(query);
+        var lowerQuery = query.toLowerCase();
+        var lowerFixed = fixedQuery.toLowerCase();
+        
+        // Ищем совпадения
+        var results = [];
+        products.forEach(function(p) {
+            var score = 0;
+            var nameLower = p.name.toLowerCase();
+            var catLower = p.cat.toLowerCase();
             
-            if (query === '') {
-                // Показать все
-                card.style.display = '';
-                card.style.animation = '';
-                foundCount++;
-            } else if (product.name.includes(query) || product.cat.includes(query)) {
-                // Показать совпадения
-                card.style.display = '';
-                card.style.animation = 'fadeInCard 0.3s ease';
-                foundCount++;
-            } else {
-                // Скрыть несовпадения
-                card.style.display = 'none';
+            // Точное совпадение в названии
+            if (nameLower.indexOf(lowerQuery) >= 0) score = 100;
+            // Совпадение с исправлением
+            else if (lowerFixed !== lowerQuery && nameLower.indexOf(lowerFixed) >= 0) score = 80;
+            // Частичное совпадение (слова)
+            else if (lowerQuery.split(' ').some(function(w) { return w.length > 2 && nameLower.indexOf(w) >= 0; })) score = 60;
+            // Совпадение в категории
+            else if (catLower.indexOf(lowerQuery) >= 0) score = 40;
+            // Начинается с запроса
+            else if (nameLower.startsWith(lowerQuery)) score = 90;
+            
+            if (score > 0) {
+                results.push({ product: p, score: score });
             }
         });
         
-        // Показать/скрыть сообщение "Ничего не найдено"
-        showSearchResult(foundCount, query);
+        // Сортируем по релевантности
+        results.sort(function(a, b) { return b.score - a.score; });
+        results = results.slice(0, 8); // максимум 8 подсказок
         
-        return foundCount;
+        if (results.length === 0) {
+            searchSuggestions.classList.remove('active');
+            return;
+        }
+        
+        // Группируем
+        var topResults = results.slice(0, 5);
+        var catResults = [];
+        var cats = {};
+        results.forEach(function(r) {
+            if (!cats[r.product.cat] && Object.keys(cats).length < 3) {
+                cats[r.product.cat] = true;
+                catResults.push(r.product.cat);
+            }
+        });
+        
+        // Строим HTML
+        var html = '';
+        
+        if (topResults.length > 0) {
+            html += '<div class="search-suggestions__group">';
+            html += '<div class="search-suggestions__group-title">Товары</div>';
+            topResults.forEach(function(r, i) {
+                var name = highlightMatch(r.product.name, query);
+                html += '<div class="search-suggestions__item' + (i === 0 ? ' search-suggestions__item--active' : '') + '" data-id="' + r.product.id + '" onclick="window.selectSearchSuggestion(\'' + r.product.id + '\')">';
+                html += '<div class="search-suggestions__item-img">' + (r.product.img.startsWith('/') || r.product.img.startsWith('img/') ? '<img src="' + r.product.img + '" alt="">' : '<span>' + r.product.img + '</span>') + '</div>';
+                html += '<div class="search-suggestions__item-info">';
+                html += '<div class="search-suggestions__item-name">' + name + '</div>';
+                html += '<div class="search-suggestions__item-cat">' + r.product.cat + '</div>';
+                html += '</div>';
+                html += '<div class="search-suggestions__item-price">' + r.product.price + '</div>';
+                html += '</div>';
+            });
+            html += '</div>';
+        }
+        
+        if (catResults.length > 0) {
+            html += '<div class="search-suggestions__group">';
+            html += '<div class="search-suggestions__group-title">Категории</div>';
+            catResults.forEach(function(cat) {
+                html += '<div class="search-suggestions__item" onclick="window.filterByCategory(\'' + cat + '\')">';
+                html += '<div class="search-suggestions__item-img">🔍</div>';
+                html += '<div class="search-suggestions__item-name">' + cat + '</div>';
+                html += '</div>';
+            });
+            html += '</div>';
+        }
+        
+        html += '<div class="search-suggestions__footer"><button onclick="window.searchAll(\'' + query + '\')">Показать все результаты</button></div>';
+        
+        searchSuggestions.innerHTML = html;
+        searchSuggestions.classList.add('active');
+        selectedSuggestionIndex = 0;
     }
     
-    // Результаты поиска
-    function showSearchResult(count, query) {
-        // Удаляем старый результат
-        const oldResult = document.querySelector('.search-results-info');
-        if (oldResult) oldResult.remove();
-        
-        if (query && count === 0) {
-            const noResult = document.createElement('div');
-            noResult.className = 'search-results-info';
-            noResult.innerHTML = `
-                <div class="search-empty">
-                    <span>🔍</span>
-                    <h3>Ничего не найдено</h3>
-                    <p>По запросу "<strong>${query}</strong>" товаров нет</p>
-                    <button onclick="window.clearSearch()">Показать все товары</button>
-                </div>
-            `;
-            if (productGrid) {
-                productGrid.parentElement.appendChild(noResult);
-            }
-        } else if (query && count > 0) {
-            const resultInfo = document.createElement('div');
-            resultInfo.className = 'search-results-info search-results-found';
-            resultInfo.innerHTML = `
-                <span>Найдено: <strong>${count}</strong> товаров по запросу "<strong>${query}</strong>"</span>
-                <button onclick="window.clearSearch()">✕ Сбросить</button>
-            `;
-            if (productGrid) {
-                productGrid.parentElement.insertBefore(resultInfo, productGrid);
-            }
-        }
-    }
-    
-    // Очистить поиск
-    window.clearSearch = function() {
-        if (searchInput) {
-            searchInput.value = '';
-        }
-        searchProducts('');
-        
-        // Скрыть мобильный поиск
-        if (searchBlock) {
-            searchBlock.classList.remove('active');
+    // Выбрать подсказку
+    window.selectSearchSuggestion = function(productId) {
+        searchSuggestions.classList.remove('active');
+        if (searchInput) searchInput.value = '';
+        // Открываем быстрый просмотр
+        if (typeof openQuickview === 'function') {
+            openQuickview(productId);
         }
     };
     
-    // Обработчик ввода
+    // Показать все результаты
+    window.searchAll = function(query) {
+        searchSuggestions.classList.remove('active');
+        if (searchInput) searchInput.value = query;
+        searchProducts(query);
+        if (productGrid) {
+            productGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+    
+    // Навигация клавишами
     if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const query = this.value;
-            searchProducts(query);
+        searchInput.addEventListener('keydown', function(e) {
+            if (!searchSuggestions.classList.contains('active')) return;
+            
+            var items = searchSuggestions.querySelectorAll('.search-suggestions__item');
+            
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, items.length - 1);
+                updateSuggestionHighlight(items);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, 0);
+                updateSuggestionHighlight(items);
+            } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
+                e.preventDefault();
+                items[selectedSuggestionIndex].click();
+            } else if (e.key === 'Escape') {
+                searchSuggestions.classList.remove('active');
+            }
         });
         
-        // Поиск при нажатии Enter
-        searchInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const query = this.value.trim();
-                searchProducts(query);
-                
-                // Прокрутить к товарам
-                if (productGrid) {
-                    productGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
+        // Ввод с задержкой
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            var query = this.value.trim();
+            searchTimeout = setTimeout(function() {
+                showSuggestions(query);
+            }, 200);
+        });
+        
+        // Клик вне — закрыть
+        document.addEventListener('click', function(e) {
+            if (!searchBlock.contains(e.target)) {
+                searchSuggestions.classList.remove('active');
             }
         });
     }
     
-    // Поиск по кнопке
-    const searchBtn = document.querySelector('.header__search-btn');
-    if (searchBtn) {
-        searchBtn.addEventListener('click', function() {
-            const query = searchInput?.value.trim() || '';
-            searchProducts(query);
-            
-            if (productGrid) {
-                productGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    function updateSuggestionHighlight(items) {
+        items.forEach(function(item, i) {
+            if (i === selectedSuggestionIndex) {
+                item.classList.add('search-suggestions__item--active');
+            } else {
+                item.classList.remove('search-suggestions__item--active');
             }
         });
     }
-    
-    console.log('Модуль поиска загружен');
+        
 
           // ============================================
     // QUICKVIEW - Быстрый просмотр
@@ -2876,8 +3015,6 @@ checkDeliveryNotifications();
         // ============================================
     // PRODUCTS - Загрузка с сервера или локально
     // ============================================
-    
-
         async function loadProducts() {
         // Сначала грузим локально ВСЕГДА
         loadLocalProducts();
@@ -2891,10 +3028,10 @@ checkDeliveryNotifications();
                     productsData[p.id] = p;
                 });
                 console.log('📦 Товары с сервера:', Object.keys(productsData).length);
+                return
             }
         } catch (err) {
             console.log('Сервер недоступен, используем локальные товары');
-            // loadLocalProducts уже вызван выше
         }
     }
     
@@ -3202,97 +3339,50 @@ checkDeliveryNotifications();
     console.log('Модуль быстрого просмотра загружен');
     
         // ============================================
-    // AUTH - Профессиональная система входа
+    // AUTH — Полная авторизация
     // ============================================
     
-    const authModal = document.getElementById('authModal');
-    const authOverlay = document.getElementById('authOverlay');
-    const authClose = document.getElementById('authClose');
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const forgotForm = document.getElementById('forgotForm');
-    
-   
-    let authToken = null;
+    var authModal = document.getElementById('authModal');
+    var authOverlay = document.getElementById('authOverlay');
+    var authClose = document.getElementById('authClose');
+    var loginForm = document.getElementById('loginForm');
+    var registerForm = document.getElementById('registerForm');
+    var forgotForm = document.getElementById('forgotForm');
     
     // ============================================
-    // ЗАГРУЗКА ПОЛЬЗОВАТЕЛЯ
+    // ПРОВЕРКА СЕССИИ ПРИ ЗАГРУЗКЕ
     // ============================================
-    function loadUser() {
-        var savedUser = localStorage.getItem('shopxand_user');
-        var savedToken = localStorage.getItem('shopxand_token');
-        if (savedUser && savedToken) {
-            currentUser = JSON.parse(savedUser);
-            authToken = savedToken;
-            isLoggedIn = true;
-            updateUserUI();
-        }
+    async function checkAuth() {
+    // Временно используем localStorage
+    var user = JSON.parse(localStorage.getItem('shopxand_user') || 'null');
+    if (user) {
+        currentUser = user;
+        isLoggedIn = true;
+        updateUserUI();
+        console.log('✅ Сессия из localStorage:', currentUser.name);
     }
-    
-    // ============================================
-    // ГЕНЕРАЦИЯ ТОКЕНА
-    // ============================================
-    function generateToken() {
-        return 'sx_' + Date.now() + '_' + Math.random().toString(36).substr(2, 16);
-    }
-    
-    // ============================================
-    // БАЗА ПОЛЬЗОВАТЕЛЕЙ
-    // ============================================
-    function getAllUsers() {
-        return JSON.parse(localStorage.getItem('shopxand_users') || '[]');
-    }
-    
-    function saveAllUsers(users) {
-        localStorage.setItem('shopxand_users', JSON.stringify(users));
-    }
-    
-    function findUserByPhone(phone) {
-        var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
-        var users = getAllUsers();
-        return users.find(function(u) {
-            return (u.phone || '').replace(/[\+\s\-\(\)]/g, '') === cleanPhone;
-        });
-    }
-    
-    function findUserByEmail(email) {
-        if (!email) return null;
-        var users = getAllUsers();
-        return users.find(function(u) { return u.email === email; });
-    }
+}
     
     // ============================================
     // СОХРАНЕНИЕ СЕССИИ
     // ============================================
-    function saveSession(user) {
+    function saveSession(user, token) {
         currentUser = user;
         isLoggedIn = true;
-        authToken = generateToken();
+        API_TOKEN = token;
+        localStorage.setItem('shopxand_token', token);
         localStorage.setItem('shopxand_user', JSON.stringify(user));
-        localStorage.setItem('shopxand_token', authToken);
-        // Сохраняем ID для привязки данных
-        localStorage.setItem('shopxand_current_user_phone', user.phone);
+        updateUserUI();
     }
     
-    function clearSession() {
-        currentUser = null;
-        isLoggedIn = false;
-        authToken = null;
-        localStorage.removeItem('shopxand_user');
-        localStorage.removeItem('shopxand_token');
-        localStorage.removeItem('shopxand_current_user_phone');
-    }
-    
-    // ============================================
-    // ВЫХОД
-    // ============================================
     function logout() {
-          localStorage.removeItem('shopxand_token');
-        // НЕ удаляем device_id — чтобы устройство запомнилось
-        // localStorage.removeItem('shopxand_device_id'); ← убери эту строку если есть
         currentUser = null;
         isLoggedIn = false;
-        showToast('Вы вышли', 'До новых встреч!', 'success');
+        API_TOKEN = '';
+        localStorage.removeItem('shopxand_token');
+        localStorage.removeItem('shopxand_user');
+        updateUserUI();
+        renderOrders();
     }
     
     // ============================================
@@ -3307,17 +3397,13 @@ checkDeliveryNotifications();
                 loginBtn.querySelector('i').className = 'fas fa-user-check';
                 loginBtn.querySelector('span').textContent = currentUser.name;
             }
-            if (mobileLoginBtn) {
-                mobileLoginBtn.textContent = currentUser.name;
-            }
+            if (mobileLoginBtn) mobileLoginBtn.textContent = currentUser.name;
         } else {
             if (loginBtn) {
                 loginBtn.querySelector('i').className = 'fas fa-user';
                 loginBtn.querySelector('span').textContent = 'Войти';
             }
-            if (mobileLoginBtn) {
-                mobileLoginBtn.textContent = 'Войти или зарегистрироваться';
-            }
+            if (mobileLoginBtn) mobileLoginBtn.textContent = 'Войти или зарегистрироваться';
         }
     }
     
@@ -3334,13 +3420,7 @@ checkDeliveryNotifications();
     function closeAuth() {
         if (!authModal) return;
         authModal.classList.remove('active');
-        if (!cartPanel.classList.contains('active') &&
-            !favPanel.classList.contains('active') &&
-            !ordersPanel.classList.contains('active') &&
-            !mobileMenu.classList.contains('active') &&
-            !quickview.classList.contains('active')) {
-            document.body.style.overflow = '';
-        }
+        document.body.style.overflow = '';
     }
     window.closeAuth = closeAuth;
     
@@ -3395,43 +3475,29 @@ checkDeliveryNotifications();
         });
     }
     
-    // Закрытие модалки
-    if (authOverlay) authOverlay.addEventListener('click', function() { closeAuth(); });
-    if (authClose) authClose.addEventListener('click', function() { closeAuth(); });
+    if (authOverlay) authOverlay.addEventListener('click', closeAuth);
+    if (authClose) authClose.addEventListener('click', closeAuth);
     
     // Переключение форм
-    document.getElementById('showRegister')?.addEventListener('click', function(e) {
-        e.preventDefault(); showRegisterForm();
-    });
-    document.getElementById('showLogin')?.addEventListener('click', function(e) {
-        e.preventDefault(); showLoginForm();
-    });
-    document.getElementById('showLoginFromForgot')?.addEventListener('click', function(e) {
-        e.preventDefault(); showLoginForm();
-    });
-    document.querySelector('.auth-form__forgot')?.addEventListener('click', function(e) {
-        e.preventDefault(); showForgotForm();
-    });
+    document.getElementById('showRegister')?.addEventListener('click', function(e) { e.preventDefault(); showRegisterForm(); });
+    document.getElementById('showLogin')?.addEventListener('click', function(e) { e.preventDefault(); showLoginForm(); });
+    document.getElementById('showLoginFromForgot')?.addEventListener('click', function(e) { e.preventDefault(); showLoginForm(); });
+    document.querySelector('.auth-form__forgot')?.addEventListener('click', function(e) { e.preventDefault(); showForgotForm(); });
     
-    // Показать/скрыть пароль
+    // Пароль
     document.querySelectorAll('.auth-form__toggle-password').forEach(function(btn) {
         btn.addEventListener('click', function() {
             var input = this.parentElement.querySelector('input');
             var icon = this.querySelector('i');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.className = 'fas fa-eye-slash';
-            } else {
-                input.type = 'password';
-                icon.className = 'fas fa-eye';
-            }
+            if (input.type === 'password') { input.type = 'text'; icon.className = 'fas fa-eye-slash'; }
+            else { input.type = 'password'; icon.className = 'fas fa-eye'; }
         });
     });
     
-        // ============================================
-    // РЕГИСТРАЦИЯ — СТРОГАЯ ВАЛИДАЦИЯ
     // ============================================
-            document.getElementById('registerBtn')?.addEventListener('click', async function() {
+    // РЕГИСТРАЦИЯ
+    // ============================================
+    document.getElementById('registerBtn')?.addEventListener('click', async function() {
         var name = document.getElementById('regName').value.trim();
         var phone = document.getElementById('regPhone').value.trim();
         var email = document.getElementById('regEmail').value.trim();
@@ -3439,116 +3505,40 @@ checkDeliveryNotifications();
         var passwordConfirm = document.getElementById('regPasswordConfirm').value;
         var agree = document.getElementById('regAgree')?.checked;
         
-        if (!name || name.length < 2) {
-            showToast('Ошибка', 'Имя должно содержать минимум 2 символа', 'error');
-            return;
-        }
-        
+        if (!name || name.length < 2) { showToast('Ошибка', 'Имя минимум 2 символа', 'error'); return; }
         var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
-        if (!cleanPhone.startsWith('992') || cleanPhone.length !== 12 || !/^\d+$/.test(cleanPhone)) {
-            showToast('Ошибка', 'Введите номер в формате 992XXXXXXXXX', 'error');
-            return;
-        }
+        if (!cleanPhone.startsWith('992') || cleanPhone.length !== 12) { showToast('Ошибка', 'Номер: 992XXXXXXXXX', 'error'); return; }
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Ошибка', 'Неверный email', 'error'); return; }
+        if (!password || password.length < 6) { showToast('Ошибка', 'Пароль минимум 6 символов', 'error'); return; }
+        if (password !== passwordConfirm) { showToast('Ошибка', 'Пароли не совпадают', 'error'); return; }
+        if (!agree) { showToast('Ошибка', 'Примите условия', 'error'); return; }
         
-        if (email) {
-            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                showToast('Ошибка', 'Введите корректный email', 'error');
-                return;
-            }
-        }
-        
-        if (!password || password.length < 6 || !/[a-zA-Z]/.test(password) || !/\d/.test(password)) {
-            showToast('Ошибка', 'Пароль: минимум 6 символов, буквы и цифры', 'error');
-            return;
-        }
-        if (password !== passwordConfirm) {
-            showToast('Ошибка', 'Пароли не совпадают', 'error');
-            return;
-        }
-        if (!agree) {
-            showToast('Ошибка', 'Примите условия использования', 'error');
-            return;
-        }
-        
-        // ===== ОТПРАВКА НА СЕРВЕР =====
         try {
             var data = await apiRequest('/auth/register', {
                 method: 'POST',
                 body: JSON.stringify({ name: name, phone: cleanPhone, email: email, password: password })
             });
-            
-            API_TOKEN = data.token;
-            localStorage.setItem('shopxand_token', data.token);
-            currentUser = data.user;
-            isLoggedIn = true;
-            
-            updateUserUI();
+            saveSession(data.user, data.token);
             closeAuth();
             showToast('Регистрация успешна!', 'Добро пожаловать, ' + name + '!', 'success');
         } catch (err) {
             showToast('Ошибка', err.message, 'error');
         }
-    
-        
-         // ===== ПРОВЕРКА УНИКАЛЬНОСТИ НОМЕРА =====
-        var existingPhone = findUserByPhone(cleanPhone);
-        if (existingPhone) {
-            showToast(
-                'Номер уже зарегистрирован',
-                'Номер ' + phone + ' уже используется. Один номер = один аккаунт. Войдите или восстановите пароль.',
-                'error'
-            );
-            document.getElementById('regPhone').style.borderColor = '#ff4757';
-            setTimeout(function() { document.getElementById('regPhone').style.borderColor = ''; }, 3000);
-            return;
-        }
-        
-          // ===== ПРОВЕРКА УНИКАЛЬНОСТИ EMAIL =====
-        if (email) {
-            var existingEmail = findUserByEmail(email);
-            if (existingEmail) {
-                showToast(
-                    'Email уже используется',
-                    'Email ' + email + ' уже зарегистрирован. Один email = один аккаунт.',
-                    'error'
-                );
-                document.getElementById('regEmail').style.borderColor = '#ff4757';
-                setTimeout(function() { document.getElementById('regEmail').style.borderColor = ''; }, 3000);
-                return;
-            }
-        }
-        
-        
-          // Создаём аккаунт
-        var user = {
-            name: name,
-            phone: cleanPhone,
-            email: email,
-            password: password,
-            registeredAt: new Date().toISOString()
-        };
-        
-        var users = getAllUsers();
-        users.push(user);
-        saveAllUsers(users);
-        saveSession(user);
-        
-        updateUserUI();
-        closeAuth();
-        showToast('Регистрация успешна!', 'Добро пожаловать, ' + name + '! Ваш аккаунт привязан к номеру ' + phone, 'success');
     });
     
-   // ============================================
-    // ВХОД — СТРОГАЯ ПРОВЕРКА
     // ============================================
+    // ВХОД — БЕЗ ПОДТВЕРЖДЕНИЯ
+    // ============================================
+   
         document.getElementById('loginBtn')?.addEventListener('click', async function() {
         var phone = document.getElementById('loginPhone').value.trim();
         var password = document.getElementById('loginPassword').value;
+
+          phone = phone.replace(/[\+\s\-\(\)]/g, '');
         
-        if (!phone || !password) {
-            showToast('Ошибка', 'Введите телефон и пароль', 'error');
-            return;
+        if (!phone || !password) { 
+            showToast('Ошибка', 'Введите телефон и пароль', 'error'); 
+            return; 
         }
         
         try {
@@ -3556,165 +3546,175 @@ checkDeliveryNotifications();
                 method: 'POST',
                 body: JSON.stringify({ phone: phone, password: password })
             });
-            
-            API_TOKEN = data.token;
-            localStorage.setItem('shopxand_token', data.token);
-            currentUser = data.user;
-            isLoggedIn = true;
-            
-            updateUserUI();
+            saveSession(data.user, data.token);
             closeAuth();
             showToast('С возвращением!', data.user.name + ', вы вошли', 'success');
         } catch (err) {
             showToast('Ошибка', err.message, 'error');
         }
     });
-    
-       // ============================================
-    // ЗАБЫЛИ ПАРОЛЬ — БЕЗОПАСНОЕ ВОССТАНОВЛЕНИЕ
     // ============================================
-    document.getElementById('forgotBtn')?.addEventListener('click', function() {
+    // ЗАБЫЛИ ПАРОЛЬ
+    // ============================================
+       document.getElementById('forgotBtn')?.addEventListener('click', function() {
         var phone = document.getElementById('forgotPhone').value.trim();
+        if (!phone) { showToast('Ошибка', 'Введите телефон', 'error'); return; }
+        
         var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
         
-        if (!cleanPhone || cleanPhone.length < 9) {
-            showToast('Ошибка', 'Введите корректный номер телефона', 'error');
-            return;
-        }
+        // Ищем через API
+        showToast('В разработке', 'Восстановление пароля временно недоступно', 'error');
         
-        var user = findUserByPhone(cleanPhone);
-        
-        if (!user) {
-            showToast(
-                'Аккаунт не найден',
-                'Номер ' + phone + ' не зарегистрирован. Проверьте номер или создайте новый аккаунт.',
-                'error'
-            );
-            return;
-        }
-        
-        // Генерируем код подтверждения (6 цифр)
-        var code = Math.floor(100000 + Math.random() * 900000).toString();
-        
-        // Сохраняем код и телефон ВРЕМЕННО (на 5 минут)
-        localStorage.setItem('shopxand_reset_code', code);
-        localStorage.setItem('shopxand_reset_phone', user.phone);
-        localStorage.setItem('shopxand_reset_expire', Date.now() + 300000); // 5 минут
-        
-        // Показываем поле для кода
+        // Просто показываем поле
         document.getElementById('codeBlock').style.display = 'block';
-        this.textContent = 'Код отправлен';
+        this.textContent = 'Телефон подтверждён';
         this.disabled = true;
+    });
+    
+    document.getElementById('resetPasswordBtn')?.addEventListener('click', function() {
+        var newPassword = document.getElementById('newPassword').value;
+        var phone = localStorage.getItem('shopxand_reset_phone');
         
-        // Отправляем код в Telegram владельцу
-        var msg = '🔐 *ВОССТАНОВЛЕНИЕ ПАРОЛЯ*\n\n' +
-            '👤 Аккаунт: ' + user.name + '\n' +
-            '📞 Телефон: ' + user.phone + '\n' +
-            '🔑 Код подтверждения: *' + code + '*\n\n' +
-            'Код действителен 5 минут. Если это не вы — проигнорируйте.';
+        if (!newPassword || newPassword.length < 6) { showToast('Ошибка', 'Пароль минимум 6 символов', 'error'); return; }
         
-        fetch('https://api.telegram.org/bot' + BOT_ORDER + '/sendMessage', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: CHAT_ID,
-                text: msg,
-                parse_mode: 'Markdown'
-            })
-        });
-        
-        showToast(
-            'Код отправлен',
-            'Код подтверждения отправлен владельцу номера. Введите код ниже.',
-            'success'
-        );
+        var users = JSON.parse(localStorage.getItem('shopxand_users') || '[]');
+        var idx = users.findIndex(function(u) { return u.phone === phone; });
+        if (idx >= 0) {
+            users[idx].password = newPassword;
+            localStorage.setItem('shopxand_users', JSON.stringify(users));
+            localStorage.removeItem('shopxand_reset_phone');
+            
+            document.getElementById('codeBlock').style.display = 'none';
+            document.getElementById('forgotBtn').textContent = 'Проверить';
+            document.getElementById('forgotBtn').disabled = false;
+            document.getElementById('forgotPhone').value = '';
+            document.getElementById('newPassword').value = '';
+            
+            showToast('Пароль изменён!', 'Войдите с новым паролем', 'success');
+            showLoginForm();
+        }
     });
     
     // ============================================
-    // ОКНО ВЫХОДА
+    // ВЫХОД
     // ============================================
     var logoutModal = document.getElementById('logoutModal');
-    var logoutOverlay = document.getElementById('logoutOverlay');
-    var logoutCancel = document.getElementById('logoutCancel');
-    var logoutConfirm = document.getElementById('logoutConfirm');
-    
-    if (logoutCancel) logoutCancel.addEventListener('click', function() {
+    document.getElementById('logoutCancel')?.addEventListener('click', function() {
         logoutModal.classList.remove('active');
         document.body.style.overflow = '';
     });
-    if (logoutOverlay) logoutOverlay.addEventListener('click', function() {
+    document.getElementById('logoutOverlay')?.addEventListener('click', function() {
         logoutModal.classList.remove('active');
         document.body.style.overflow = '';
     });
-    if (logoutConfirm) logoutConfirm.addEventListener('click', function() {
+    document.getElementById('logoutConfirm')?.addEventListener('click', function() {
         logout();
         logoutModal.classList.remove('active');
         document.body.style.overflow = '';
+        showToast('Вы вышли', 'До встречи!', 'success');
     });
-    
-    // ============================================
-    // ПРОВЕРКА СЕССИИ ПРИ ЗАГРУЗКЕ
-    // ============================================
-    function validateSession() {
-        var savedUser = localStorage.getItem('shopxand_user');
-        var savedToken = localStorage.getItem('shopxand_token');
-        
-        if (savedUser && savedToken) {
-            var user = JSON.parse(savedUser);
-            // Проверяем что пользователь всё ещё в базе
-            var exists = findUserByPhone(user.phone);
-            if (exists && exists.password === user.password) {
-                currentUser = exists;
-                isLoggedIn = true;
-                authToken = savedToken;
-            } else {
-                clearSession();
-            }
+
+    // Синхронизация на сервер
+async function syncUserData() {
+    if (!isLoggedIn || !API_TOKEN) return;
+    try {
+        await fetch(API_URL + '/user/sync', {
+            method: 'POST',
+            headers: { ...apiHeaders() },
+            body: JSON.stringify({ cart: cart, favorites: favorites })
+        });
+    } catch (err) {
+        console.error('Ошибка синхронизации:', err);
+    }
+}
+
+// Загрузка данных с сервера
+async function loadUserData() {
+    if (!isLoggedIn || !API_TOKEN) return;
+    try {
+        const response = await fetch(API_URL + '/user/data', {
+            headers: apiHeaders()
+        });
+        if (response.ok) {
+            const data = await response.json();
+            cart = data.cart || [];
+            favorites = data.favorites || [];
+            renderCart();
+            renderFavorites();
+            updateCartCount();
+            updateFavCount();
+            updateAllHeartIcons();
         }
+    } catch (err) {
+        console.error('Ошибка загрузки данных:', err);
+    }
+}
+
+// Авто-синхронизация при изменениях
+const origAddToCart = addToCart;
+addToCart = function(product) { origAddToCart(product); syncUserData(); };
+
+const origToggleFavorite = toggleFavorite;
+toggleFavorite = function(product) { const r = origToggleFavorite(product); syncUserData(); return r; };
+
+// Загрузка при входе
+const origCompleteLogin = completeLogin;
+completeLogin = function(user, token) { origCompleteLogin(user, token); loadUserData(); };
+
+
+    // ============================================
+    // СИНХРОНИЗАЦИЯ ДАННЫХ С СЕРВЕРОМ
+    // ============================================
+    
+    async function syncUserData() {
+        if (!isLoggedIn || !API_TOKEN) return;
+        try {
+            await fetch(API_URL + '/user/sync', {
+                method: 'POST',
+                headers: apiHeaders(),
+                body: JSON.stringify({ cart: cart, favorites: favorites })
+            });
+        } catch (err) {}
     }
     
-    // ============================================
-    // ЗАЩИТА ДЕЙСТВИЙ (без входа — окно входа)
-    // ============================================
-    var originalOpenCart = openCart;
-    openCart = function() {
-        if (!isLoggedIn) { openAuth(); return; }
-        originalOpenCart();
-    };
+    async function loadUserData() {
+        if (!isLoggedIn || !API_TOKEN) return;
+        try {
+            var response = await fetch(API_URL + '/user/data', { headers: apiHeaders() });
+            if (response.ok) {
+                var data = await response.json();
+                cart = data.cart || [];
+                favorites = data.favorites || [];
+                renderCart();
+                renderFavorites();
+                updateCartCount();
+                updateFavCount();
+                updateAllHeartIcons();
+            }
+        } catch (err) {}
+    }
     
-    var originalOpenFavorites = openFavorites;
-    openFavorites = function() {
-        if (!isLoggedIn) { openAuth(); return; }
-        originalOpenFavorites();
-    };
+    var origToggleFav = toggleFavorite;
+    toggleFavorite = function(product) { var r = origToggleFav(product); syncUserData(); return r; };
     
-    var originalOpenOrders = openOrders;
-    openOrders = function() {
-        if (!isLoggedIn) { openAuth(); return; }
-        originalOpenOrders();
-    };
-    
-    var originalAddToCart = addToCart;
-    addToCart = function(product) {
-        if (!isLoggedIn) { openAuth(); return; }
-        originalAddToCart(product);
-    };
-    
-    var originalToggleFavorite = toggleFavorite;
-    toggleFavorite = function(product) {
-        if (!isLoggedIn) { openAuth(); return false; }
-        return originalToggleFavorite(product);
-    };
+    // Загрузка при входе
+    var origSaveSession = saveSession;
+    saveSession = function(user, token) { origSaveSession(user, token); loadUserData(); };
     
     // ============================================
-    // ЗАПУСК
+    // ЗАЩИТА
     // ============================================
-    validateSession();
-    loadUser();
-    updateUserUI();
-    
-    console.log('🔐 Система авторизации загружена. Пользователь:', isLoggedIn ? currentUser.name : 'не вошёл');
-    
+    var origOpenCart = openCart;
+    openCart = function() { if (!isLoggedIn) { openAuth(); return; } origOpenCart(); };
+    var origOpenFav = openFavorites;
+    openFavorites = function() { if (!isLoggedIn) { openAuth(); return; } origOpenFav(); };
+    var origOpenOrd = openOrders;
+    openOrders = function() { if (!isLoggedIn) { openAuth(); return; } origOpenOrd(); };
+    // Запуск
+    checkAuth();
+    console.log('🔐 Auth загружен. Пользователь:', isLoggedIn ? currentUser?.name : 'не вошёл');
+
+        
 
     // ============================================
     // CATEGORY FILTER - Фильтр по категориям
@@ -4177,9 +4177,8 @@ setTimeout(function() {
                 date: new Date().toISOString()
             };
             
-            if (!reviewsData[productId]) reviewsData[productId] = [];
-            reviewsData[productId].push(review);
-            saveReviewsLocal();
+            
+            console.log('Отправляю отзыв:', { productId, review });
             
             try {
                 await apiRequest('/reviews', {
@@ -4194,7 +4193,7 @@ setTimeout(function() {
             
             updateProductRating(productId);
             renderProductReviews(productId);
-            showToast('Спасибо!', 'Ваш отзыв добавлен', 'success');
+            showToast('Отзыв отправлен!', 'Он появится после проверки модератором', 'success');
         });
     }
     
@@ -4436,187 +4435,6 @@ setTimeout(function() {
     window.notifyPromo = notifyPromo;
     
     console.log('🔔 Push-уведомления загружены');
-
-
-        // ============================================
-    // ВХОД — С ПРОВЕРКОЙ УСТРОЙСТВА
-    // ============================================
-    document.getElementById('loginBtn')?.addEventListener('click', async function() {
-        var phone = document.getElementById('loginPhone').value.trim();
-        var password = document.getElementById('loginPassword').value;
-        var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
         
-        if (!phone) {
-            showToast('Ошибка', 'Введите телефон или email', 'error');
-            return;
-        }
-        if (!password) {
-            showToast('Ошибка', 'Введите пароль', 'error');
-            return;
-        }
-        
-        var user = null;
-        
-        if (phone.includes('@')) {
-            user = findUserByEmail(phone);
-        } else {
-            if (!cleanPhone.startsWith('992') || cleanPhone.length !== 12) {
-                showToast('Ошибка', 'Введите номер в формате 992XXXXXXXXX', 'error');
-                return;
-            }
-            user = findUserByPhone(cleanPhone);
-        }
-        
-        if (!user) {
-            showToast('Ошибка', 'Пользователь не найден', 'error');
-            return;
-        }
-        
-        if (user.password !== password) {
-            showToast('Неверный пароль', 'Проверьте пароль или восстановите его', 'error');
-            return;
-        }
-        
-        // ===== ПРОВЕРКА УСТРОЙСТВА =====
-        var deviceId = getDeviceId();
-        var knownDevices = JSON.parse(localStorage.getItem('shopxand_trusted_devices') || '{}');
-        
-        // Если устройство уже доверенное — входим сразу
-        if (knownDevices[user.phone] === deviceId) {
-            completeLogin(user);
-            return;
-        }
-        
-        // Новое устройство — отправляем код подтверждения
-        var loginCode = Math.floor(100000 + Math.random() * 900000).toString();
-        
-        // Сохраняем временные данные
-        localStorage.setItem('shopxand_login_code', loginCode);
-        localStorage.setItem('shopxand_login_phone', user.phone);
-        localStorage.setItem('shopxand_login_device', deviceId);
-        localStorage.setItem('shopxand_login_expire', Date.now() + 300000);
-        
-        // Отправляем код тебе в Telegram
-        fetch('https://api.telegram.org/bot' + BOT_ORDER + '/sendMessage', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: CHAT_ID,
-                text: '🔐 *НОВЫЙ ВХОД В АККАУНТ*\n\n' +
-                    '👤 ' + user.name + '\n' +
-                    '📞 ' + user.phone + '\n' +
-                    '📱 Новое устройство!\n' +
-                    '🔑 Код подтверждения: *' + loginCode + '*\n\n' +
-                    'Сообщите код клиенту для входа.',
-                parse_mode: 'Markdown'
-            })
-        });
-        
-        // Показываем поле для кода
-        showLoginCodeForm(user, deviceId);
-    });
     
-       function getDeviceId() {
-        var id = localStorage.getItem('shopxand_device_id');
-        if (!id) {
-            id = 'dev_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
-            localStorage.setItem('shopxand_device_id', id);
-        }
-        return id;
-    }
-       function completeLogin(user) {
-        // Сохраняем устройство как доверенное
-        var deviceId = getDeviceId();
-        var trustedDevices = JSON.parse(localStorage.getItem('shopxand_trusted_devices') || '{}');
-        trustedDevices[user.phone] = deviceId;
-        localStorage.setItem('shopxand_trusted_devices', JSON.stringify(trustedDevices));
-        
-        // Входим
-        saveSession(user);
-        updateUserUI();
-        closeAuth();
-        showToast('С возвращением!', user.name + ', вы вошли в аккаунт', 'success');
-    }
-    
-    function showLoginCodeForm(user, deviceId) {
-        // Скрываем форму входа
-        loginForm.classList.remove('active');
-        
-        // Показываем форму кода
-        var codeForm = document.getElementById('loginCodeForm');
-        if (!codeForm) {
-            codeForm = document.createElement('div');
-            codeForm.id = 'loginCodeForm';
-            codeForm.className = 'auth-form active';
-            codeForm.innerHTML = 
-                '<div class="auth-form__header">' +
-                    '<h2>Подтверждение входа</h2>' +
-                    '<p>Новое устройство обнаружено. Код отправлен менеджеру.</p>' +
-                '</div>' +
-                '<div class="auth-form__body">' +
-                    '<div class="auth-form__group">' +
-                        '<label>Код подтверждения</label>' +
-                        '<input type="text" placeholder="6-значный код" id="loginCodeInput" maxlength="6">' +
-                    '</div>' +
-                    '<button class="auth-form__submit" id="verifyLoginCodeBtn">Подтвердить</button>' +
-                '</div>' +
-                '<div class="auth-form__footer">' +
-                    '<p><a href="#" id="backToLogin">← Назад</a></p>' +
-                '</div>';
-            
-            authModal.querySelector('.auth-modal__container').appendChild(codeForm);
-            
-            // Обработчики
-            document.getElementById('verifyLoginCodeBtn').addEventListener('click', function() {
-                verifyLoginCode(user, deviceId);
-            });
-            
-            document.getElementById('backToLogin').addEventListener('click', function(e) {
-                e.preventDefault();
-                codeForm.classList.remove('active');
-                loginForm.classList.add('active');
-            });
-        } else {
-            codeForm.classList.add('active');
-        }
-    }
-    
-    function verifyLoginCode(user, deviceId) {
-        var inputCode = document.getElementById('loginCodeInput')?.value.trim();
-        var savedCode = localStorage.getItem('shopxand_login_code');
-        var savedPhone = localStorage.getItem('shopxand_login_phone');
-        var expireTime = parseInt(localStorage.getItem('shopxand_login_expire') || '0');
-        
-        if (!inputCode) {
-            showToast('Ошибка', 'Введите код подтверждения', 'error');
-            return;
-        }
-        
-        if (inputCode !== savedCode) {
-            showToast('Неверный код', 'Проверьте код и попробуйте снова', 'error');
-            return;
-        }
-        
-        if (Date.now() > expireTime) {
-            showToast('Код истёк', 'Запросите новый код', 'error');
-            return;
-        }
-        
-        // Сохраняем устройство как доверенное
-        var trustedDevices = JSON.parse(localStorage.getItem('shopxand_trusted_devices') || '{}');
-        trustedDevices[user.phone] = deviceId;
-        localStorage.setItem('shopxand_trusted_devices', JSON.stringify(trustedDevices));
-        
-        // Очищаем временные данные
-        localStorage.removeItem('shopxand_login_code');
-        localStorage.removeItem('shopxand_login_phone');
-        localStorage.removeItem('shopxand_login_device');
-        localStorage.removeItem('shopxand_login_expire');
-        
-        // Входим
-        completeLogin(user);
-        
-        // Удаляем форму кода
-        var codeForm = document.getElementById('loginCodeForm');
-        if (codeForm) codeForm.remove();
-    }
+       

@@ -6,28 +6,40 @@ const path = require('path');
 const PRODUCTS_FILE = path.join(__dirname, '..', 'data', 'products.json');
 
 function getProducts() {
-    if (!fs.existsSync(PRODUCTS_FILE)) return [];
-    return JSON.parse(fs.readFileSync(PRODUCTS_FILE, 'utf-8'));
+    try {
+        if (!fs.existsSync(PRODUCTS_FILE)) return [];
+        return JSON.parse(fs.readFileSync(PRODUCTS_FILE, 'utf-8'));
+    } catch (err) {
+        console.error('Ошибка чтения:', err);
+        return [];
+    }
+}
+
+function saveProducts(products) {
+    try {
+        fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(products, null, 2));
+        console.log('Файл сохранён');
+    } catch (err) {
+        console.error('Ошибка сохранения:', err);
+    }
 }
 
 router.get('/', (req, res) => {
-    const products = getProducts();
-    res.json({ products });
-});
-
-router.get('/:id', (req, res) => {
-    const products = getProducts();
-    const product = products.find(p => p.id === req.params.id);
-    if (!product) return res.status(404).json({ error: 'Товар не найден' });
-    res.json({ product });
+    res.json({ products: getProducts() });
 });
 
 router.post('/', (req, res) => {
-    const products = getProducts();
-    const product = { id: Date.now().toString(), ...req.body };
-    products.push(product);
-    saveProducts(products);
-    res.json({ success: true, product: product });
+    try {
+        var products = getProducts();
+        var product = { id: Date.now().toString(), ...req.body };
+        products.push(product);
+        saveProducts(products);
+        console.log('Товар сохранён:', product.name);
+        res.json({ success: true, product: product });
+    } catch (err) {
+        console.error('Ошибка:', err);
+        res.status(500).json({ error: err.message });
+    }
 });
 
 module.exports = router;

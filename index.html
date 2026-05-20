@@ -164,16 +164,18 @@
                     <!-- Catalog Button (Desktop) -->
                     <button class="header__catalog-btn">
 <i class="fas fa-bars"></i>
-<span>Каталог</span>
+<span data-translate="catalog">Каталог</span>
                     </button>
 
-                    <!-- Search -->
                     <div class="header__search" id="searchBlock">
-<input type="text" class="header__search-input" placeholder="Я ищу..." id="searchInput">
-<button class="header__search-btn">
-    <i class="fas fa-search"></i>
-</button>
-                    </div>
+    <input type="text" class="header__search-input" placeholder="Я ищу..." id="searchInput" autocomplete="off">
+    <button class="header__search-btn">
+        <i class="fas fa-search"></i>
+    </button>
+    
+        <!-- Выпадающие подсказки -->
+        <div class="search-suggestions" id="searchSuggestions"></div>
+    </div>
 
                     <!-- User Actions -->
                     <div class="header__actions">
