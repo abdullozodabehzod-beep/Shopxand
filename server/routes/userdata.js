@@ -16,32 +16,36 @@ function saveAllData(data) {
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 }
 
-// Middleware проверки токена
-function verifyToken(req, res, next) {
-    const token = req.headers['authorization'];
-    if (!token) return res.status(401).json({ error: 'Требуется авторизация' });
-    try {
-        req.user = jwt.verify(token.replace('Bearer ', ''), SECRET);
-        next();
-    } catch (err) {
-        return res.status(403).json({ error: 'Неверный токен' });
-    }
-}
-
 // Сохранить корзину и избранное
-router.post('/sync', verifyToken, (req, res) => {
-    const { cart, favorites } = req.body;
-    const allData = getAllData();
-    allData[req.user.id] = { cart: cart || [], favorites: favorites || [] };
-    saveAllData(allData);
-    res.json({ success: true });
+router.post('/sync', (req, res) => {
+    try {
+        var token = req.headers['authorization']?.replace('Bearer ', '');
+        if (!token) return res.status(401).json({ error: 'Требуется авторизация' });
+        
+        var decoded = jwt.verify(token, SECRET);
+        var { cart, favorites } = req.body;
+        var allData = getAllData();
+        allData[decoded.id] = { cart: cart || [], favorites: favorites || [] };
+        saveAllData(allData);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // Загрузить корзину и избранное
-router.get('/data', verifyToken, (req, res) => {
-    const allData = getAllData();
-    const userData = allData[req.user.id] || { cart: [], favorites: [] };
-    res.json(userData);
+router.get('/data', (req, res) => {
+    try {
+        var token = req.headers['authorization']?.replace('Bearer ', '');
+        if (!token) return res.status(401).json({ error: 'Требуется авторизация' });
+        
+        var decoded = jwt.verify(token, SECRET);
+        var allData = getAllData();
+        var userData = allData[decoded.id] || { cart: [], favorites: [] };
+        res.json(userData);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 module.exports = router;

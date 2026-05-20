@@ -4565,3 +4565,80 @@ setTimeout(function() {
             });
         }
     });
+
+    
+
+
+        // ============================================
+    // BOTTOM NAVIGATION
+    // ============================================
+    
+    var bnHome = document.getElementById('bnHome');
+    var bnFavorites = document.getElementById('bnFavorites');
+    var bnCart = document.getElementById('bnCart');
+    var bnOrders = document.getElementById('bnOrders');
+    var bnMenu = document.getElementById('bnMenu');
+    var bnCartBadge = document.getElementById('bnCartBadge');
+    
+    // Главная
+    if (bnHome) {
+        bnHome.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+    
+    // Избранное
+    if (bnFavorites) {
+        bnFavorites.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (!isLoggedIn) { openAuth(); return; }
+            openFavorites();
+        });
+    }
+    
+    // Корзина
+    if (bnCart) {
+        bnCart.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (!isLoggedIn) { openAuth(); return; }
+            openCart();
+        });
+    }
+    
+    // Заказы
+    if (bnOrders) {
+        bnOrders.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (!isLoggedIn) { openAuth(); return; }
+            openOrders();
+        });
+    }
+    
+    // Меню (бургер)
+    if (bnMenu) {
+        bnMenu.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (mobileMenu.classList.contains('active')) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        });
+    }
+    
+    // Обновление счётчика корзины
+    function updateBottomNavCart(count) {
+        if (bnCartBadge) {
+            bnCartBadge.textContent = count;
+            bnCartBadge.style.display = count > 0 ? 'flex' : 'none';
+        }
+    }
+    
+    // Вызывай при обновлении корзины
+    var origUpdateCartCount = updateCartCount;
+    updateCartCount = function() {
+        origUpdateCartCount();
+        var total = cart.reduce(function(s, i) { return s + i.quantity; }, 0);
+        updateBottomNavCart(total);
+    };

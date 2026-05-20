@@ -20,6 +20,8 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
+app.use('/api/user', require('./routes/userdata'));
+
 app.listen(PORT, () => {
     console.log('🛒 ShopXand сервер на порту ' + PORT);
 });

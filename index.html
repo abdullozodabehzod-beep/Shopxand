@@ -1716,7 +1716,30 @@ console.log('Service Worker ошибка:', err);
         </div>
     </div>
 
-
+           <!-- Нижняя панель навигации (мобильная) -->
+    <nav class="bottom-nav" id="bottomNav">
+        <a href="#" class="bottom-nav__item" id="bnHome">
+            <i class="fas fa-home"></i>
+            <span>Главная</span>
+        </a>
+        <a href="#" class="bottom-nav__item" id="bnFavorites">
+            <i class="fas fa-heart"></i>
+            <span>Избранное</span>
+        </a>
+        <a href="#" class="bottom-nav__item" id="bnCart">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="bottom-nav__badge" id="bnCartBadge" style="display:none;">0</span>
+            <span>Корзина</span>
+        </a>
+        <a href="#" class="bottom-nav__item" id="bnOrders">
+            <i class="fas fa-box"></i>
+            <span>Заказы</span>
+        </a>
+        <button class="bottom-nav__item" id="bnMenu">
+            <i class="fas fa-bars"></i>
+            <span>Меню</span>
+        </button>
+    </nav>
     
 
 
