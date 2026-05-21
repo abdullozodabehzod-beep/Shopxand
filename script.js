@@ -59,7 +59,7 @@ var favorites = [];
 var productsData = {};
 
 // API
-var API_URL = 'http://localhost:3000/api';
+var API_URL = 'https://shopxand-3.onrender.com/api';
 var API_TOKEN = localStorage.getItem('shopxand_token') || '';
 
 function showToast(title, message, type) {
