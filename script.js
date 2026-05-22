@@ -184,31 +184,34 @@ document.addEventListener('DOMContentLoaded', async function()  {
         mobileMenu.classList.add('active');
         burgerBtn.classList.add('active');
         document.body.style.overflow = 'hidden';
-    }
+        document.body.classList.add('menu-open');
 
-    
-    
-          function closeMenu() {
-        mobileMenu.classList.remove('active');
-        burgerBtn.classList.remove('active');
-    
-        
-        // Не убираем overflow hidden если открыта другая панель
-        if (!langModal.classList.contains('active') && 
-            !cityModal.classList.contains('active') &&
-            !cartPanel.classList.contains('active') &&
-            !favPanel.classList.contains('active')) {
-            document.body.style.overflow = '';
+        var bottomNav = document.getElementById('bottomNav');
+        if (bottomNav) {
+            bottomNav.style.display = 'none';
         }
-        
-        // Сбрасываем transform после закрытия
-        setTimeout(function() {
-            if (menuContent) {
-                menuContent.style.transform = '';
-                menuContent.style.transition = '';
-            }
-        }, 350);
     }
+    
+            function closeMenu() {
+    mobileMenu.classList.remove('active');
+    burgerBtn.classList.remove('active');
+    document.body.style.overflow = '';
+    document.body.classList.remove('menu-open');
+    
+    // Показываем нижнюю панель обратно
+    var bottomNav = document.getElementById('bottomNav');
+    if (bottomNav && window.innerWidth <= 768) {
+        bottomNav.style.display = 'flex';
+    }
+    
+    setTimeout(function() {
+        if (menuContent) {
+            menuContent.style.transform = '';
+            menuContent.style.transition = '';
+        }
+    }, 350);
+}  
+    
 
      window.closeMenu = closeMenu;
     
@@ -287,70 +290,81 @@ document.addEventListener('DOMContentLoaded', async function()  {
     
         // Закрытие при клике на ссылку меню
     const menuLinks = menuContent.querySelectorAll('a');
-    menuLinks.forEach(function(link) {
+       menuLinks.forEach(function(link) {
         link.addEventListener('click', function(e) {
-            const text = this.textContent.trim();
-
-    
-    // Войти
-    if (text.includes('Войти') || text.includes('Ворид') || text.includes('Sign In')) {
-        e.preventDefault();
-        e.stopPropagation();
-        closeMenu();
-        setTimeout(function() {
-            openAuth();
-        }, 400);
-        return;
-    }
+            var text = this.textContent.trim();
+            var href = this.getAttribute('href');
             
-            // Мои заказы
-            if (text.includes('Мои заказы') || text.includes('Заказы') || text.includes('Фармоиш') || text.includes('Orders')) {
+            // Город (по id)
+            if (this.id === 'mobileCitySelector') {
                 e.preventDefault();
                 e.stopPropagation();
                 closeMenu();
-                setTimeout(function() {
-                    openOrders();
-                }, 400);
+                setTimeout(openCityModal, 350);
                 return;
             }
             
-            // Корзина
-            if (text.includes('Корзина') || text.includes('Сабад') || text.includes('Cart')) {
+            // Язык (по id)
+            if (this.id === 'mobileLangSelector') {
                 e.preventDefault();
                 e.stopPropagation();
                 closeMenu();
-                setTimeout(function() {
-                    openCart();
-                }, 400);
+                setTimeout(openLangModal, 350);
+                return;
+            }
+            
+            // Мои заказы
+            if (text.includes('Мои заказы') || text.includes('Фармоиш')) {
+                e.preventDefault();
+                e.stopPropagation();
+                closeMenu();
+                setTimeout(function() { openOrders(); }, 400);
                 return;
             }
             
             // Избранное
-            if (text.includes('Избранное') || text.includes('Интихобшуда') || text.includes('Favorites')) {
+            if (text.includes('Избранное') || text.includes('Интихобшуда')) {
                 e.preventDefault();
                 e.stopPropagation();
                 closeMenu();
+                setTimeout(function() { openFavorites(); }, 400);
+                return;
+            }
+            
+            // Корзина
+            if (text.includes('Корзина') || text.includes('Сабад')) {
+                e.preventDefault();
+                e.stopPropagation();
+                closeMenu();
+                setTimeout(function() { openCart(); }, 400);
+                return;
+            }
+            
+            // Войти
+            if (text.includes('Войти') || text.includes('Ворид')) {
+                e.preventDefault();
+                e.stopPropagation();
+                closeMenu();
+                setTimeout(function() { openAuth(); }, 400);
+                return;
+            }
+            
+            // Категории
+            var category = text.replace(/[^а-яА-Яa-zA-Z]/g, '').trim().toLowerCase();
+            if (['одежда', 'электроника', 'домисад'].some(function(c) { return category.includes(c); })) {
+                e.preventDefault();
+                e.stopPropagation();
+                var categoryText = text.trim();
+                closeMenu();
                 setTimeout(function() {
-                    openFavorites();
+                    filterByCategory(categoryText);
+                    var grid = document.querySelector('.products__grid');
+                    if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }, 400);
                 return;
             }
-
-             // Для остальных ссылок проверяем категории
-    var category = text.replace(/[^а-яА-Яa-zA-Z]/g, '').trim().toLowerCase();
-    if (['одежда', 'электроника', 'домисад', 'детскиетовары'].some(function(c) { return category.includes(c); })) {
-        e.preventDefault();
-        e.stopPropagation();
-        closeMenu();
-        setTimeout(function() {
-            filterByCategory(text.trim());
-        }, 400);
-        return;
-    }
-    
-    setTimeout(closeMenu, 200);
             
-            
+            setTimeout(closeMenu, 200);
         });
     });
 
