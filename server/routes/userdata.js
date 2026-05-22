@@ -19,32 +19,32 @@ function saveAllData(data) {
 // Сохранить корзину и избранное
 router.post('/sync', (req, res) => {
     try {
-        var token = req.headers['authorization']?.replace('Bearer ', '');
-        if (!token) return res.status(401).json({ error: 'Требуется авторизация' });
-        
-        var decoded = jwt.verify(token, SECRET);
-        var { cart, favorites } = req.body;
-        var allData = getAllData();
-        allData[decoded.id] = { cart: cart || [], favorites: favorites || [] };
-        saveAllData(allData);
-        res.json({ success: true });
+   var token = req.headers['authorization']?.replace('Bearer ', '');
+   if (!token) return res.status(401).json({ error: 'Требуется авторизация' });
+   
+   var decoded = jwt.verify(token, SECRET);
+   var { cart, favorites } = req.body;
+   var allData = getAllData();
+   allData[decoded.id] = { cart: cart || [], favorites: favorites || [] };
+   saveAllData(allData);
+   res.json({ success: true });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+   res.status(500).json({ error: err.message });
     }
 });
 
 // Загрузить корзину и избранное
 router.get('/data', (req, res) => {
     try {
-        var token = req.headers['authorization']?.replace('Bearer ', '');
-        if (!token) return res.status(401).json({ error: 'Требуется авторизация' });
-        
-        var decoded = jwt.verify(token, SECRET);
-        var allData = getAllData();
-        var userData = allData[decoded.id] || { cart: [], favorites: [] };
-        res.json(userData);
+   var token = req.headers['authorization']?.replace('Bearer ', '');
+   if (!token) return res.status(401).json({ error: 'Требуется авторизация' });
+   
+   var decoded = jwt.verify(token, SECRET);
+   var allData = getAllData();
+   var userData = allData[decoded.id] || { cart: [], favorites: [] };
+   res.json(userData);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+   res.status(500).json({ error: err.message });
     }
 });
 

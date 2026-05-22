@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopXand — Статус оплаты</title>
+    <style>
+   * { margin: 0; padding: 0; box-sizing: border-box; }
+   body { font-family: 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #f5f5f5; }
+   .result { text-align: center; background: #fff; padding: 40px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+   .result__icon { font-size: 64px; margin-bottom: 16px; }
+   .result h2 { margin-bottom: 8px; }
+   .result p { color: #666; margin-bottom: 20px; }
+   .result button { padding: 12px 24px; background: #0066ff; color: #fff; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="result">
+   <div class="result__icon">✅</div>
+   <h2>Оплата прошла успешно!</h2>
+   <p>Ваш заказ оформлен. Ожидайте доставку.</p>
+   <button onclick="window.location.href='/'">Вернуться в магазин</button>
+    </div>
+    <script>
+   var orderId = new URLSearchParams(window.location.search).get('order');
+   if (orderId) {
+  var order = JSON.parse(localStorage.getItem('pending_order') || '{}');
+  if (order.id === orderId) {
+ // Отправляем на сервер что оплачено
+ fetch('/api/orders/' + orderId + '/pay', { method: 'PUT' });
+  }
+   }
+    </script>
+</body>
+</html>

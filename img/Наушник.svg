@@ -3,41 +3,41 @@
   <desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Реалистичная иконка синих наушников</desc>
   <defs>
     <linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0a1628"/>
-      <stop offset="100%" stop-color="#0d1f3c"/>
+ <stop offset="0%" stop-color="#0a1628"/>
+ <stop offset="100%" stop-color="#0d1f3c"/>
     </linearGradient>
     <linearGradient id="band3" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#2a6dd9"/>
-      <stop offset="40%" stop-color="#4d9fff"/>
-      <stop offset="100%" stop-color="#1a4fa0"/>
+ <stop offset="0%" stop-color="#2a6dd9"/>
+ <stop offset="40%" stop-color="#4d9fff"/>
+ <stop offset="100%" stop-color="#1a4fa0"/>
     </linearGradient>
     <linearGradient id="padOut3" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1e5cbf"/>
-      <stop offset="100%" stop-color="#0b2d6e"/>
+ <stop offset="0%" stop-color="#1e5cbf"/>
+ <stop offset="100%" stop-color="#0b2d6e"/>
     </linearGradient>
     <linearGradient id="padIn3" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0d2d5e"/>
-      <stop offset="100%" stop-color="#071830"/>
+ <stop offset="0%" stop-color="#0d2d5e"/>
+ <stop offset="100%" stop-color="#071830"/>
     </linearGradient>
     <linearGradient id="armL3" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#2a6dd9"/>
-      <stop offset="100%" stop-color="#1a4fa0"/>
+ <stop offset="0%" stop-color="#2a6dd9"/>
+ <stop offset="100%" stop-color="#1a4fa0"/>
     </linearGradient>
     <linearGradient id="armR3" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#1a4fa0"/>
-      <stop offset="100%" stop-color="#2a6dd9"/>
+ <stop offset="0%" stop-color="#1a4fa0"/>
+ <stop offset="100%" stop-color="#2a6dd9"/>
     </linearGradient>
     <radialGradient id="meshL3" cx="40%" cy="40%" r="55%">
-      <stop offset="0%" stop-color="#1a4a9e"/>
-      <stop offset="100%" stop-color="#071830"/>
+ <stop offset="0%" stop-color="#1a4a9e"/>
+ <stop offset="100%" stop-color="#071830"/>
     </radialGradient>
     <radialGradient id="meshR3" cx="60%" cy="40%" r="55%">
-      <stop offset="0%" stop-color="#1a4a9e"/>
-      <stop offset="100%" stop-color="#071830"/>
+ <stop offset="0%" stop-color="#1a4a9e"/>
+ <stop offset="100%" stop-color="#071830"/>
     </radialGradient>
     <linearGradient id="shine3" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/>
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+ <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/>
+ <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
     </linearGradient>
   </defs>
 

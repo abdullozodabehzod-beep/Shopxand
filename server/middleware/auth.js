@@ -5,15 +5,15 @@ function verifyToken(req, res, next) {
     const token = req.headers['authorization'];
     
     if (!token) {
-        return res.status(401).json({ error: 'Требуется авторизация' });
+   return res.status(401).json({ error: 'Требуется авторизация' });
     }
     
     try {
-        const decoded = jwt.verify(token.replace('Bearer ', ''), SECRET);
-        req.user = decoded;
-        next();
+   const decoded = jwt.verify(token.replace('Bearer ', ''), SECRET);
+   req.user = decoded;
+   next();
     } catch (err) {
-        return res.status(403).json({ error: 'Неверный токен' });
+   return res.status(403).json({ error: 'Неверный токен' });
     }
 }
 

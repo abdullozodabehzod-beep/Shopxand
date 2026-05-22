@@ -9,74 +9,74 @@
 </head>
 <body>
     <div class="admin-sidebar">
-        <div class="admin-sidebar__logo">ShopXand Admin</div>
-        <nav class="admin-sidebar__nav">
-            <a href="dashboard.html">📊 Панель</a>
-            <a href="orders.html">📦 Заказы</a>
-            <a href="products.html">🛍️ Товары</a>
-            <a href="reviews.html">⭐ Отзывы</a>
-            <a href="analytics.html" class="active">📈 Аналитика</a>
-        </nav>
+   <div class="admin-sidebar__logo">ShopXand Admin</div>
+   <nav class="admin-sidebar__nav">
+  <a href="dashboard.html">📊 Панель</a>
+  <a href="orders.html">📦 Заказы</a>
+  <a href="products.html">🛍️ Товары</a>
+  <a href="reviews.html">⭐ Отзывы</a>
+  <a href="analytics.html" class="active">📈 Аналитика</a>
+   </nav>
     </div>
     <div class="admin-main">
-        <div class="admin-header">
-            <h1>📈 Аналитика продаж</h1>
-            <button onclick="logoutAdmin()">Выйти</button>
-        </div>
-        
-        <!-- Карточки -->
-        <div class="admin-cards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
-            <div class="admin-card" style="background:#fff;padding:20px;border-radius:12px;text-align:center;">
-                <div style="font-size:28px;font-weight:800;" id="totalRevenue">0</div>
-                <div style="color:#999;font-size:13px;">Выручка (сомони)</div>
-            </div>
-            <div class="admin-card" style="background:#fff;padding:20px;border-radius:12px;text-align:center;">
-                <div style="font-size:28px;font-weight:800;" id="totalOrders">0</div>
-                <div style="color:#999;font-size:13px;">Всего заказов</div>
-            </div>
-            <div class="admin-card" style="background:#fff;padding:20px;border-radius:12px;text-align:center;">
-                <div style="font-size:28px;font-weight:800;" id="avgCheck">0</div>
-                <div style="color:#999;font-size:13px;">Средний чек (с.)</div>
-            </div>
-            <div class="admin-card" style="background:#fff;padding:20px;border-radius:12px;text-align:center;">
-                <div style="font-size:28px;font-weight:800;" id="totalClients">0</div>
-                <div style="color:#999;font-size:13px;">Клиентов</div>
-            </div>
-        </div>
-        
-        <!-- Графики -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
-            <div style="background:#fff;padding:20px;border-radius:12px;">
-                <h3 style="margin-bottom:16px;">📊 Продажи по дням</h3>
-                <canvas id="salesChart" height="200"></canvas>
-            </div>
-            <div style="background:#fff;padding:20px;border-radius:12px;">
-                <h3 style="margin-bottom:16px;">🏆 Топ товаров</h3>
-                <div id="topProducts"></div>
-            </div>
-        </div>
-        
-        <!-- Последние заказы -->
-        <div style="background:#fff;padding:20px;border-radius:12px;">
-            <h3 style="margin-bottom:16px;">📋 Последние заказы</h3>
-            <table class="admin-table">
-                <thead>
-                    <tr>
-                        <th>Номер</th>
-                        <th>Клиент</th>
-                        <th>Сумма</th>
-                        <th>Статус</th>
-                        <th>Дата</th>
-                    </tr>
-                </thead>
-                <tbody id="recentOrders"></tbody>
-            </table>
-        </div>
+   <div class="admin-header">
+  <h1>📈 Аналитика продаж</h1>
+  <button onclick="logoutAdmin()">Выйти</button>
+   </div>
+   
+   <!-- Карточки -->
+   <div class="admin-cards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+  <div class="admin-card" style="background:#fff;padding:20px;border-radius:12px;text-align:center;">
+ <div style="font-size:28px;font-weight:800;" id="totalRevenue">0</div>
+ <div style="color:#999;font-size:13px;">Выручка (сомони)</div>
+  </div>
+  <div class="admin-card" style="background:#fff;padding:20px;border-radius:12px;text-align:center;">
+ <div style="font-size:28px;font-weight:800;" id="totalOrders">0</div>
+ <div style="color:#999;font-size:13px;">Всего заказов</div>
+  </div>
+  <div class="admin-card" style="background:#fff;padding:20px;border-radius:12px;text-align:center;">
+ <div style="font-size:28px;font-weight:800;" id="avgCheck">0</div>
+ <div style="color:#999;font-size:13px;">Средний чек (с.)</div>
+  </div>
+  <div class="admin-card" style="background:#fff;padding:20px;border-radius:12px;text-align:center;">
+ <div style="font-size:28px;font-weight:800;" id="totalClients">0</div>
+ <div style="color:#999;font-size:13px;">Клиентов</div>
+  </div>
+   </div>
+   
+   <!-- Графики -->
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+  <div style="background:#fff;padding:20px;border-radius:12px;">
+ <h3 style="margin-bottom:16px;">📊 Продажи по дням</h3>
+ <canvas id="salesChart" height="200"></canvas>
+  </div>
+  <div style="background:#fff;padding:20px;border-radius:12px;">
+ <h3 style="margin-bottom:16px;">🏆 Топ товаров</h3>
+ <div id="topProducts"></div>
+  </div>
+   </div>
+   
+   <!-- Последние заказы -->
+   <div style="background:#fff;padding:20px;border-radius:12px;">
+  <h3 style="margin-bottom:16px;">📋 Последние заказы</h3>
+  <table class="admin-table">
+ <thead>
+<tr>
+    <th>Номер</th>
+    <th>Клиент</th>
+    <th>Сумма</th>
+    <th>Статус</th>
+    <th>Дата</th>
+</tr>
+ </thead>
+ <tbody id="recentOrders"></tbody>
+  </table>
+   </div>
     </div>
     <script src="js/admin.js"></script>
     <script>
-        checkAdmin();
-        loadAnalytics();
+   checkAdmin();
+   loadAnalytics();
     </script>
 </body>
 </html>

@@ -20,51 +20,51 @@ function saveUsers(users) {
 // Регистрация
 router.post('/register', async (req, res) => {
     try {
-        const { name, phone, email, password } = req.body;
-        const users = getUsers();
-        
-        if (users.find(u => u.phone === phone)) {
-            return res.status(400).json({ error: 'Номер уже зарегистрирован' });
-        }
-        
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = { id: Date.now().toString(), name, phone, email: email || '', password: hashedPassword };
-        users.push(user);
-        saveUsers(users);
-        
-        const token = jwt.sign({ id: user.id, phone: user.phone }, SECRET, { expiresIn: '30d' });
-        res.json({ token, user: { id: user.id, name: user.name, phone: user.phone } });
+   const { name, phone, email, password } = req.body;
+   const users = getUsers();
+   
+   if (users.find(u => u.phone === phone)) {
+  return res.status(400).json({ error: 'Номер уже зарегистрирован' });
+   }
+   
+   const hashedPassword = await bcrypt.hash(password, 10);
+   const user = { id: Date.now().toString(), name, phone, email: email || '', password: hashedPassword };
+   users.push(user);
+   saveUsers(users);
+   
+   const token = jwt.sign({ id: user.id, phone: user.phone }, SECRET, { expiresIn: '30d' });
+   res.json({ token, user: { id: user.id, name: user.name, phone: user.phone } });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+   res.status(500).json({ error: err.message });
     }
 });
 
 // Вход
 router.post('/login', async (req, res) => {
     try {
-        const { phone, password } = req.body;
-        const users = getUsers();
-        const user = users.find(u => u.phone === phone || u.email === phone);
-        
-        if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
-        
-        const valid = await bcrypt.compare(password, user.password);
-               if (!valid) return res.status(401).json({ error: 'Неверный пароль' });
-        
-        // ===== ПРОВЕРКА УСТРОЙСТВА =====
-        const deviceId = req.body.deviceId || 'unknown';
-        const devices = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'devices.json'), 'utf-8') || '{}');
-        const userDevices = devices[phone] || [];
-        const isNewDevice = !userDevices.includes(deviceId);
-        
-        if (isNewDevice && user.email) {
-            console.log('Уведомление на почту:', user.email, 'Новое устройство');
-        }
-        
-        const token = jwt.sign({ id: user.id, phone: user.phone }, SECRET, { expiresIn: '30d' });
-        res.json({ token, user: { id: user.id, name: user.name, phone: user.phone } });
+   const { phone, password } = req.body;
+   const users = getUsers();
+   const user = users.find(u => u.phone === phone || u.email === phone);
+   
+   if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
+   
+   const valid = await bcrypt.compare(password, user.password);
+if (!valid) return res.status(401).json({ error: 'Неверный пароль' });
+   
+   // ===== ПРОВЕРКА УСТРОЙСТВА =====
+   const deviceId = req.body.deviceId || 'unknown';
+   const devices = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'devices.json'), 'utf-8') || '{}');
+   const userDevices = devices[phone] || [];
+   const isNewDevice = !userDevices.includes(deviceId);
+   
+   if (isNewDevice && user.email) {
+  console.log('Уведомление на почту:', user.email, 'Новое устройство');
+   }
+   
+   const token = jwt.sign({ id: user.id, phone: user.phone }, SECRET, { expiresIn: '30d' });
+   res.json({ token, user: { id: user.id, name: user.name, phone: user.phone } });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+   res.status(500).json({ error: err.message });
     }
 });
 
@@ -72,23 +72,23 @@ module.exports = router;
 
 router.get('/me', (req, res) => {
     try {
-        var token = req.headers['authorization'];
-        if (!token) return res.status(401).json({ error: 'Требуется авторизация' });
-        
-        var decoded = jwt.verify(token.replace('Bearer ', ''), SECRET);
-        console.log('Декодирован токен:', decoded); // ← ДОБАВЬ
-        
-        var users = getUsers();
-        console.log('Пользователи:', users); // ← ДОБАВЬ
-        
-        var user = users.find(u => u.id === decoded.id);
-        console.log('Найден:', user); // ← ДОБАВЬ
-        
-        if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
-        
-        res.json({ user: { id: user.id, name: user.name, phone: user.phone, email: user.email } });
+   var token = req.headers['authorization'];
+   if (!token) return res.status(401).json({ error: 'Требуется авторизация' });
+   
+   var decoded = jwt.verify(token.replace('Bearer ', ''), SECRET);
+   console.log('Декодирован токен:', decoded); // ← ДОБАВЬ
+   
+   var users = getUsers();
+   console.log('Пользователи:', users); // ← ДОБАВЬ
+   
+   var user = users.find(u => u.id === decoded.id);
+   console.log('Найден:', user); // ← ДОБАВЬ
+   
+   if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
+   
+   res.json({ user: { id: user.id, name: user.name, phone: user.phone, email: user.email } });
     } catch (err) {
-        res.status(401).json({ error: 'Неверный токен' });
+   res.status(401).json({ error: 'Неверный токен' });
     }
 });
 
@@ -114,8 +114,8 @@ router.post('/send-code', async (req, res) => {
     
     // Отправляем код на почту (если есть email)
     if (user.email) {
-        console.log('Отправка кода на email:', user.email, 'Код:', code);
-        // Здесь интеграция с email-сервисом
+   console.log('Отправка кода на email:', user.email, 'Код:', code);
+   // Здесь интеграция с email-сервисом
     }
     
     // Отправляем в Telegram тебе
@@ -123,12 +123,12 @@ router.post('/send-code', async (req, res) => {
     const CHAT_ID = '5282056467';
     
     fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            chat_id: CHAT_ID,
-            text: '🔐 Код для входа\n📞 ' + phone + '\n👤 ' + user.name + '\n🔑 Код: ' + code
-        })
+   method: 'POST',
+   headers: { 'Content-Type': 'application/json' },
+   body: JSON.stringify({
+  chat_id: CHAT_ID,
+  text: '🔐 Код для входа\n📞 ' + phone + '\n👤 ' + user.name + '\n🔑 Код: ' + code
+   })
     });
     
     res.json({ success: true, message: 'Код отправлен' });
@@ -157,8 +157,8 @@ router.post('/verify-code', async (req, res) => {
     const devices = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'devices.json'), 'utf-8') || '{}');
     if (!devices[phone]) devices[phone] = [];
     if (!devices[phone].includes(deviceId)) {
-        devices[phone].push(deviceId);
-        fs.writeFileSync(path.join(__dirname, '..', 'data', 'devices.json'), JSON.stringify(devices, null, 2));
+   devices[phone].push(deviceId);
+   fs.writeFileSync(path.join(__dirname, '..', 'data', 'devices.json'), JSON.stringify(devices, null, 2));
     }
     
     const token = jwt.sign({ id: user.id, phone: user.phone }, SECRET, { expiresIn: '30d' });

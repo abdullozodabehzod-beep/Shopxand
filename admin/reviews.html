@@ -8,51 +8,51 @@
 </head>
 <body>
     <div class="admin-sidebar">
-        <div class="admin-sidebar__logo">ShopXand Admin</div>
-        <nav class="admin-sidebar__nav">
-            <a href="dashboard.html">📊 Панель</a>
-            <a href="orders.html">📦 Заказы</a>
-            <a href="products.html">🛍️ Товары</a>
-            <a href="reviews.html" class="active">⭐ Отзывы</a>
-            <a href="analytics.html">📈 Аналитика</a>
-        </nav>
+   <div class="admin-sidebar__logo">ShopXand Admin</div>
+   <nav class="admin-sidebar__nav">
+  <a href="dashboard.html">📊 Панель</a>
+  <a href="orders.html">📦 Заказы</a>
+  <a href="products.html">🛍️ Товары</a>
+  <a href="reviews.html" class="active">⭐ Отзывы</a>
+  <a href="analytics.html">📈 Аналитика</a>
+   </nav>
     </div>
     <div class="admin-main">
-        <div class="admin-header">
-            <h1>⭐ Модерация отзывов</h1>
-            <button onclick="logoutAdmin()">Выйти</button>
-        </div>
-        
-        <!-- Статистика -->
-        <div class="admin-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:20px;">
-            <div class="admin-card" style="background:#fff;padding:20px;border-radius:12px;text-align:center;">
-                <h3 id="pendingCount" style="color:#ff9100;">0</h3>
-                <p>Ожидают</p>
-            </div>
-            <div class="admin-card" style="background:#fff;padding:20px;border-radius:12px;text-align:center;">
-                <h3 id="approvedCount" style="color:#00c853;">0</h3>
-                <p>Одобрены</p>
-            </div>
-            <div class="admin-card" style="background:#fff;padding:20px;border-radius:12px;text-align:center;">
-                <h3 id="rejectedCount" style="color:#ff4757;">0</h3>
-                <p>Отклонены</p>
-            </div>
-        </div>
-        
-        <!-- Список отзывов -->
-        <div style="display:flex;gap:10px;margin-bottom:16px;">
-            <button onclick="loadReviews('pending')" class="btn-sm" style="background:#ff9100;color:#fff;">Ожидают</button>
-            <button onclick="loadReviews('approved')" class="btn-sm" style="background:#00c853;color:#fff;">Одобрены</button>
-            <button onclick="loadReviews('rejected')" class="btn-sm" style="background:#ff4757;color:#fff;">Отклонены</button>
-            <button onclick="loadReviews('all')" class="btn-sm">Все</button>
-        </div>
-        
-        <div id="reviewsList"></div>
+   <div class="admin-header">
+  <h1>⭐ Модерация отзывов</h1>
+  <button onclick="logoutAdmin()">Выйти</button>
+   </div>
+   
+   <!-- Статистика -->
+   <div class="admin-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:20px;">
+  <div class="admin-card" style="background:#fff;padding:20px;border-radius:12px;text-align:center;">
+ <h3 id="pendingCount" style="color:#ff9100;">0</h3>
+ <p>Ожидают</p>
+  </div>
+  <div class="admin-card" style="background:#fff;padding:20px;border-radius:12px;text-align:center;">
+ <h3 id="approvedCount" style="color:#00c853;">0</h3>
+ <p>Одобрены</p>
+  </div>
+  <div class="admin-card" style="background:#fff;padding:20px;border-radius:12px;text-align:center;">
+ <h3 id="rejectedCount" style="color:#ff4757;">0</h3>
+ <p>Отклонены</p>
+  </div>
+   </div>
+   
+   <!-- Список отзывов -->
+   <div style="display:flex;gap:10px;margin-bottom:16px;">
+  <button onclick="loadReviews('pending')" class="btn-sm" style="background:#ff9100;color:#fff;">Ожидают</button>
+  <button onclick="loadReviews('approved')" class="btn-sm" style="background:#00c853;color:#fff;">Одобрены</button>
+  <button onclick="loadReviews('rejected')" class="btn-sm" style="background:#ff4757;color:#fff;">Отклонены</button>
+  <button onclick="loadReviews('all')" class="btn-sm">Все</button>
+   </div>
+   
+   <div id="reviewsList"></div>
     </div>
     <script src="js/admin.js"></script>
     <script>
-        checkAdmin();
-        loadReviews('pending');
+   checkAdmin();
+   loadReviews('pending');
     </script>
 </body>
 </html>

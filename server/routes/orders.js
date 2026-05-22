@@ -17,10 +17,10 @@ function saveOrders(orders) {
 router.post('/', (req, res) => {
     const orders = getOrders();
     const order = {
-        id: 'SX-' + Date.now().toString().slice(-8),
-        ...req.body,
-        status: 'processing',
-        date: new Date().toISOString()
+   id: 'SX-' + Date.now().toString().slice(-8),
+   ...req.body,
+   status: 'processing',
+   date: new Date().toISOString()
     };
     orders.push(order);
     saveOrders(orders);
@@ -39,9 +39,9 @@ module.exports = router;
 // Получить ВСЕ заказы (для админа)
 router.get('/admin/all', async (req, res) => {
     try {
-        const orders = await Order.find().sort({ date: -1 });
-        res.json({ orders });
+   const orders = await Order.find().sort({ date: -1 });
+   res.json({ orders });
     } catch (err) {
-        res.json({ orders: [] });
+   res.json({ orders: [] });
     }
 });

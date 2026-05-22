@@ -3,20 +3,20 @@
   <desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Милая иконка с медвежонком для детского магазина</desc>
   <defs>
     <linearGradient id="bgKids" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#fff0f5"/>
-      <stop offset="100%" stop-color="#ffe4f0"/>
+ <stop offset="0%" stop-color="#fff0f5"/>
+ <stop offset="100%" stop-color="#ffe4f0"/>
     </linearGradient>
     <linearGradient id="bearBody" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#f5c97a"/>
-      <stop offset="100%" stop-color="#e8a93c"/>
+ <stop offset="0%" stop-color="#f5c97a"/>
+ <stop offset="100%" stop-color="#e8a93c"/>
     </linearGradient>
     <linearGradient id="bearBelly" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#fde8b0"/>
-      <stop offset="100%" stop-color="#f8d080"/>
+ <stop offset="0%" stop-color="#fde8b0"/>
+ <stop offset="100%" stop-color="#f8d080"/>
     </linearGradient>
     <linearGradient id="shine4" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+ <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
+ <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
     </linearGradient>
   </defs>
 

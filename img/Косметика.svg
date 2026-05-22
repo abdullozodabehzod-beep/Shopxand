@@ -3,39 +3,39 @@
   <desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Иконка с помадой и духами для магазина косметики</desc>
   <defs>
     <linearGradient id="bgCos" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#2d0a1f"/>
-      <stop offset="100%" stop-color="#1a0612"/>
+ <stop offset="0%" stop-color="#2d0a1f"/>
+ <stop offset="100%" stop-color="#1a0612"/>
     </linearGradient>
     <!-- Lipstick tube -->
     <linearGradient id="tubeGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#c0a060"/>
-      <stop offset="40%" stop-color="#f0d080"/>
-      <stop offset="100%" stop-color="#a07840"/>
+ <stop offset="0%" stop-color="#c0a060"/>
+ <stop offset="40%" stop-color="#f0d080"/>
+ <stop offset="100%" stop-color="#a07840"/>
     </linearGradient>
     <!-- Lipstick bullet -->
     <linearGradient id="lipGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#c0203a"/>
-      <stop offset="40%" stop-color="#f03060"/>
-      <stop offset="100%" stop-color="#900018"/>
+ <stop offset="0%" stop-color="#c0203a"/>
+ <stop offset="40%" stop-color="#f03060"/>
+ <stop offset="100%" stop-color="#900018"/>
     </linearGradient>
     <!-- Perfume bottle -->
     <linearGradient id="perfGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#e8b4d8" stop-opacity="0.9"/>
-      <stop offset="100%" stop-color="#c070a0" stop-opacity="0.95"/>
+ <stop offset="0%" stop-color="#e8b4d8" stop-opacity="0.9"/>
+ <stop offset="100%" stop-color="#c070a0" stop-opacity="0.95"/>
     </linearGradient>
     <linearGradient id="perfBody" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#d090c0" stop-opacity="0.85"/>
-      <stop offset="35%" stop-color="#f0c0e0" stop-opacity="0.95"/>
-      <stop offset="100%" stop-color="#b060a0" stop-opacity="0.85"/>
+ <stop offset="0%" stop-color="#d090c0" stop-opacity="0.85"/>
+ <stop offset="35%" stop-color="#f0c0e0" stop-opacity="0.95"/>
+ <stop offset="100%" stop-color="#b060a0" stop-opacity="0.85"/>
     </linearGradient>
     <linearGradient id="capGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#b08840"/>
-      <stop offset="50%" stop-color="#e8c060"/>
-      <stop offset="100%" stop-color="#906020"/>
+ <stop offset="0%" stop-color="#b08840"/>
+ <stop offset="50%" stop-color="#e8c060"/>
+ <stop offset="100%" stop-color="#906020"/>
     </linearGradient>
     <linearGradient id="shineL" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.5"/>
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+ <stop offset="0%" stop-color="#ffffff" stop-opacity="0.5"/>
+ <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
     </linearGradient>
   </defs>
 
