@@ -25,3 +25,5 @@ app.use('/api/user', require('./routes/userdata'));
 app.listen(PORT, () => {
     console.log('🛒 ShopXand сервер на порту ' + PORT);
 });
+
+app.use('/api/email', require('./routes/email'));
