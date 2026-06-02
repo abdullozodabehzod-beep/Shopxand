@@ -146,14 +146,19 @@
         <span data-translate="catalog">Каталог</span>
         </button>
 
-        <div class="header__search" id="searchBlock">
-            <input type="text" class="header__search-input" placeholder="Я ищу..." id="searchInput" autocomplete="off">
-            <button class="header__search-btn">
+     <div class="header__search" id="searchBlock">
+    <input type="text" class="header__search-input" placeholder="Я ищу..." id="searchInput" autocomplete="off">
+    <button class="header__search-by-photo" id="searchByPhotoBtn" title="Поиск по фото">
+        <i class="fas fa-camera"></i>
+    </button>
+    <button class="header__search-btn">
         <i class="fas fa-search"></i>
-            </button>
-            </div>
-        <!-- Выпадающие подсказки -->
-        <div class="search-suggestions" id="searchSuggestions"></div>
+    </button>
+</div>
+<input type="file" id="photoSearchInput" accept="image/*" style="display:none;">
+
+ <!-- Выпадающие подсказки -->
+    <div class="search-suggestions" id="searchSuggestions"></div>
 
         <!-- User Actions -->
         <div class="header__actions">
@@ -1731,6 +1736,30 @@
         </div>
     </div>
 
+    <!-- Результат поиска по фото -->
+    <div class="photo-search-modal" id="photoSearchModal">
+        <div class="photo-search-modal__overlay" id="photoSearchOverlay"></div>
+        <div class="photo-search-modal__content">
+            <div class="photo-search-modal__header">
+                <h3>📸 Поиск по фото</h3>
+                <button class="photo-search-modal__close" id="photoSearchClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="photo-search-modal__body">
+                <div class="photo-search-upload" id="photoSearchUpload">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Загрузите фото товара</p>
+                    <button id="photoSearchSelectBtn">Выбрать фото</button>
+                </div>
+                <div class="photo-search-loading" id="photoSearchLoading" style="display:none;">
+                    <div class="photo-search-spinner"></div>
+                    <p>Ищем похожие товары...</p>
+                </div>
+                <div class="photo-search-results" id="photoSearchResults"></div>
+            </div>
+        </div>
+    </div>
 
             <script src="script.js"></script> 
         </body>

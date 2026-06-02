@@ -1896,6 +1896,15 @@ langModalContent.style.transform = '';
    
    // Сохраняем заказ
    saveOrder(order);
+
+           // Отправляем Email-уведомление
+        if (currentUser && currentUser.email) {
+            fetch(API_URL + '/email/order-confirmation', {
+                method: 'POST',
+                headers: apiHeaders(),
+                body: JSON.stringify({ email: currentUser.email, order: order })
+            }).catch(function() {});
+        }
    
    // Отправляем в Telegram
    sendOrderToTelegram(order);
@@ -3172,22 +3181,29 @@ checkDeliveryNotifications();
    // ============================================
     // PRODUCTS - Загрузка с сервера или локально
     // ============================================
-   async function loadProducts() {
-   try {
-  var data = await apiRequest('/products');
-  if (data && data.products && data.products.length > 0) {
- productsData = {};
- data.products.forEach(function(p) {
-productsData[p.id] = p;
- });
- console.log('📦 Товары с сервера:', Object.keys(productsData).length);
- renderProductCards(); // ← ДОБАВЬ ЭТУ СТРОКУ
-  }
-   } catch (err) {
-  console.log('Загружаем локально');
-  loadLocalProducts();
-  renderProductCards(); // ← И ЗДЕСЬ
-   }
+     async function loadProducts() {
+        try {
+            var data = await apiRequest('/products');
+            if (data && data.products && data.products.length > 0) {
+                productsData = {};
+                data.products.forEach(function(p) {
+                    // Исправляем путь к картинке
+                    if (p.img && !p.img.startsWith('http') && !p.img.startsWith('/')) {
+                        p.img = '/' + p.img;
+                    }
+                    if (p.thumbs) {
+                        p.thumbs = p.thumbs.map(function(t) {
+                            return (!t.startsWith('http') && !t.startsWith('/')) ? '/' + t : t;
+                        });
+                    }
+                    productsData[p.id] = p;
+                });
+                renderProductCards();
+            }
+        } catch (err) {
+            loadLocalProducts();
+            renderProductCards();
+        }
     }
     
     function loadLocalProducts() {
@@ -4917,3 +4933,165 @@ review: {
     document.getElementById('trackingClose')?.addEventListener('click', function() {
         document.getElementById('trackingModal').classList.remove('active');
     });
+
+
+        // ============================================
+    // SEARCH BY PHOTO — Поиск по фото
+    // ============================================
+    
+    var photoSearchBtn = document.getElementById('searchByPhotoBtn');
+    var photoSearchInput = document.getElementById('photoSearchInput');
+    var photoSearchModal = document.getElementById('photoSearchModal');
+    
+    if (photoSearchBtn) {
+        photoSearchBtn.addEventListener('click', function() {
+            photoSearchModal.classList.add('active');
+            // Сбрасываем окно
+            document.getElementById('photoSearchUpload').style.display = 'block';
+            document.getElementById('photoSearchLoading').style.display = 'none';
+            document.getElementById('photoSearchResults').innerHTML = '';
+            // Сбрасываем input чтобы можно было выбрать тот же файл
+            photoSearchInput.value = '';
+        });
+    }
+    
+    document.getElementById('photoSearchOverlay')?.addEventListener('click', function() {
+        photoSearchModal.classList.remove('active');
+    });
+    
+    document.getElementById('photoSearchClose')?.addEventListener('click', function() {
+        photoSearchModal.classList.remove('active');
+    });
+    
+    document.getElementById('photoSearchSelectBtn')?.addEventListener('click', function() {
+        photoSearchInput.value = ''; // Сбрасываем перед выбором
+        photoSearchInput.click();
+    });
+    
+    // Клик по области загрузки тоже открывает выбор
+    document.getElementById('photoSearchUpload')?.addEventListener('click', function(e) {
+        if (e.target.tagName !== 'BUTTON') {
+            photoSearchInput.value = '';
+            photoSearchInput.click();
+        }
+    });
+    
+    if (photoSearchInput) {
+        photoSearchInput.addEventListener('change', function() {
+            var file = this.files[0];
+            if (!file) return;
+            
+            // Показываем загрузку
+            document.getElementById('photoSearchUpload').style.display = 'none';
+            document.getElementById('photoSearchLoading').style.display = 'block';
+            document.getElementById('photoSearchResults').innerHTML = '';
+            
+            // Читаем файл
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                analyzeImage(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    function analyzeImage(imageData) {
+        var img = new Image();
+        img.onload = function() {
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+            canvas.width = 100;
+            canvas.height = 100;
+            ctx.drawImage(img, 0, 0, 100, 100);
+            
+            var imageData = ctx.getImageData(0, 0, 100, 100);
+            var pixels = imageData.data;
+            
+            // Анализируем цвета более точно
+            var colors = analyzeColors(pixels);
+            
+            // Ищем похожие товары по цветам
+            searchSimilarProducts(colors);
+        };
+        img.src = imageData;
+    }
+    
+    function analyzeColors(pixels) {
+        var totalR = 0, totalG = 0, totalB = 0, count = 0;
+        
+        // Берём каждый 4-й пиксель для скорости
+        for (var i = 0; i < pixels.length; i += 16) {
+            totalR += pixels[i];
+            totalG += pixels[i + 1];
+            totalB += pixels[i + 2];
+            count++;
+        }
+        
+        return {
+            r: Math.floor(totalR / count),
+            g: Math.floor(totalG / count),
+            b: Math.floor(totalB / count)
+        };
+    }
+    
+    function colorDistance(c1, c2) {
+        return Math.sqrt(
+            Math.pow(c1.r - c2.r, 2) +
+            Math.pow(c1.g - c2.g, 2) +
+            Math.pow(c1.b - c2.b, 2)
+        );
+    }
+    
+    function getProductColors(product) {
+        // Предопределённые цвета для товаров (можно расширить)
+        var colorMap = {
+            '1': { r: 50, g: 30, b: 30 },    // Вельветовая рубашка (тёмная)
+            '2': { r: 240, g: 240, b: 240 },  // Кроссовка AF1 (белая)
+            '3': { r: 180, g: 140, b: 100 },  // Кроссовка британская (коричневая)
+            '4': { r: 30, g: 30, b: 30 },     // Наушник (чёрный)
+            '5': { r: 200, g: 180, b: 150 },  // Часы (золотые)
+            '6': { r: 40, g: 30, b: 25 },     // Тапочки (тёмно-коричневые)
+            '7': { r: 200, g: 200, b: 200 },  // Знак Mercedes (серебристый)
+            '8': { r: 240, g: 240, b: 240 }   // Рубашка белая
+        };
+        return colorMap[product.id] || { r: 128, g: 128, b: 128 };
+    }
+    
+    function searchSimilarProducts(targetColor) {
+        var allProducts = getAllProductsData();
+        
+        // Считаем "похожесть" для каждого товара
+        var scored = allProducts.map(function(p) {
+            var productColor = getProductColors(p);
+            var distance = colorDistance(targetColor, productColor);
+            return { product: p, score: distance };
+        });
+        
+        // Сортируем: чем меньше расстояние — тем похожее
+        scored.sort(function(a, b) { return a.score - b.score; });
+        
+        // Берём топ-6 самых похожих
+        var results = scored.slice(0, 6).map(function(s) { return s.product; });
+        
+        showPhotoSearchResults(results);
+    }
+    
+    function showPhotoSearchResults(products) {
+        document.getElementById('photoSearchLoading').style.display = 'none';
+        var container = document.getElementById('photoSearchResults');
+        
+        if (products.length === 0) {
+            container.innerHTML = '<p style="text-align:center;color:#999;">Ничего не найдено</p>';
+            return;
+        }
+        
+        container.innerHTML = products.map(function(p) {
+            return '<div class="related-card" onclick="window.openQuickview(\'' + p.id + '\'); document.getElementById(\'photoSearchModal\').classList.remove(\'active\');">' +
+                '<div class="related-card__img">' +
+                    (p.img ? '<img src="' + p.img + '" alt="' + p.name + '">' : '<span>📦</span>') +
+                '</div>' +
+                '<div class="related-card__name">' + p.name + '</div>' +
+                '<div class="related-card__price">' + p.price.toLocaleString() + ' с.</div>' +
+            '</div>';
+        }).join('');
+    }
