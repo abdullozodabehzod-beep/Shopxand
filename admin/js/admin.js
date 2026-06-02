@@ -109,7 +109,9 @@ async function saveProduct() {
    reviews: 0,
    specs: [],
    thumbs: [],
-   inStock: true
+   inStock: true,
+   brightness: 128,
+    colors: [{ r: 128, g: 128, b: 128 }],
     };
     
     if (!product.name || !product.price) {

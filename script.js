@@ -3181,21 +3181,35 @@ checkDeliveryNotifications();
    // ============================================
     // PRODUCTS - Загрузка с сервера или локально
     // ============================================
-     async function loadProducts() {
+           async function loadProducts() {
         try {
             var data = await apiRequest('/products');
             if (data && data.products && data.products.length > 0) {
                 productsData = {};
                 data.products.forEach(function(p) {
-                    // Исправляем путь к картинке
-                    if (p.img && !p.img.startsWith('http') && !p.img.startsWith('/')) {
-                        p.img = '/' + p.img;
+                    // Определяем базовый путь в зависимости от хостинга
+                    var isGitHub = window.location.hostname.includes('github.io');
+                    
+                    // Исправляем путь
+                    if (p.img && !p.img.startsWith('http')) {
+                        if (isGitHub) {
+                            p.img = p.img.replace(/^\//, ''); // убираем / в начале
+                        } else {
+                            if (!p.img.startsWith('/')) p.img = '/' + p.img;
+                        }
                     }
+                    
                     if (p.thumbs) {
                         p.thumbs = p.thumbs.map(function(t) {
-                            return (!t.startsWith('http') && !t.startsWith('/')) ? '/' + t : t;
+                            if (!t || t.startsWith('http')) return t;
+                            if (isGitHub) return t.replace(/^\//, '');
+                            return t.startsWith('/') ? t : '/' + t;
                         });
                     }
+                    
+                    if (!p.brightness) p.brightness = 128;
+                    if (!p.colors || p.colors.length === 0) p.colors = [{ r: 128, g: 128, b: 128 }];
+                    
                     productsData[p.id] = p;
                 });
                 renderProductCards();
@@ -3208,14 +3222,14 @@ checkDeliveryNotifications();
     
     function loadLocalProducts() {
    productsData = {
-  '1': { id: '1', name: 'Вельветовая рубашка', cat: 'Одежда', price: 120, oldPrice: 180, discount: '-33%', img: 'img/Рубашка.jpeg', rating: 4.8, reviews: 0, desc: 'Стильная вельветовая рубашка.', sizes: ['X', 'XL', '2XL', '3XL'], specs: [['Материал', 'Вельвет 100%'], ['Размеры', 'X-3XL']], thumbs: ['img/Рубашка.jpeg', 'img/Рубашка.jpeg', 'img/Рубашка.jpeg'] },
-  '2': { id: '2', name: 'Крассовка AF1', cat: 'Одежда', price: 110, img: 'img/Крассовка.jpeg', rating: 4.6, reviews: 0, desc: 'Лучшая модель', shoeSizes: ['38','39','40','41','42','43','44'], specs: [['Материал', 'Кожа']], thumbs: ['img/Крассовка.jpeg', 'img/Крассовка.jpeg', 'img/Крассовка.jpeg'] },
-  '3': { id: '3', name: 'Крассовка британская', cat: 'Одежда', price: 140, oldPrice: 250, img: 'img/Крассовка-2.jpeg', rating: 4.9, reviews: 0, desc: 'Британский стиль', shoeSizes: ['38','39','40','41','42','43','44'], specs: [['Материал', 'Премиум']], thumbs: ['img/Крассовка-2.jpeg', 'img/Крассовка-2.jpeg', 'img/Крассовка-2.jpeg'] },
-  '4': { id: '4', name: 'Проводной наушник', cat: 'Электроника', price: 30, img: 'img/Наушник.jpeg', rating: 4.7, reviews: 0, desc: 'Качественный звук', specs: [['Тип', 'Проводные']], thumbs: ['img/Наушник.jpeg', 'img/Наушник.jpeg', 'img/Наушник.jpeg'] },
-  '5': { id: '5', name: 'Часы CHENXI', cat: 'Электроника', price: 230, oldPrice: 300, img: 'img/watch.jpeg', rating: 4.9, reviews: 0, desc: 'Стильные часы', specs: [['Бренд', 'CHENXI']], thumbs: ['img/watch.jpeg', 'img/watch.jpeg', 'img/watch.jpeg'] },
-  '6': { id: '6', name: 'Кожаные тапочки', cat: 'Одежда', price: 100, img: 'img/Шилопка-2.jpeg', rating: 4.7, reviews: 0, desc: 'Натуральная кожа', shoeSizes: ['38','39','40','41','42','43','44'], specs: [['Материал', 'Кожа']], thumbs: ['img/Шилопка-2.jpeg', 'img/Шилопка-2.jpeg', 'img/Шилопка-2.jpeg'] },
-  '7': { id: '7', name: 'Знак Mercedes', cat: 'Электроника', price: 80, oldPrice: 90, img: 'img/Знак Мерса.jpeg', rating: 4.8, reviews: 0, desc: 'Металлический знак', specs: [['Бренд', 'Mercedes']], thumbs: ['img/Знак Мерса.jpeg', 'img/Знак Мерса.jpeg', 'img/Знак Мерса.jpeg'] },
-  '8': { id: '8', name: 'Рубашка белая', cat: 'Одежда', price: 120, img: 'img/Рубашка-3.jpeg', rating: 4.5, reviews: 0, desc: 'Качественная рубашка', sizes: ['X','XL','2XL','3XL'], specs: [['Материал', 'Хлопок']], thumbs: ['img/Рубашка-3.jpeg', 'img/Рубашка-3.jpeg', 'img/Рубашка-3.jpeg'] }
+  '1': { id: '1', name: 'Вельветовая рубашка', cat: 'Одежда', price: 120, oldPrice: 180, discount: '-33%', img: 'img/Рубашка.jpeg', rating: 4.8, reviews: 0, desc: 'Стильная вельветовая рубашка.', sizes: ['X', 'XL', '2XL', '3XL'], specs: [['Материал', 'Вельвет 100%'], ['Размеры', 'X-3XL']], thumbs: ['img/Рубашка.jpeg', 'img/Рубашка.jpeg', 'img/Рубашка.jpeg'], brightness: 60, colors: [{r:50,g:30,b:30}]},
+  '2': { id: '2', name: 'Крассовка AF1', cat: 'Одежда', price: 110, img: 'img/Крассовка.jpeg', rating: 4.6, reviews: 0, desc: 'Лучшая модель', shoeSizes: ['38','39','40','41','42','43','44'], specs: [['Материал', 'Кожа']], thumbs: ['img/Крассовка.jpeg', 'img/Крассовка.jpeg', 'img/Крассовка.jpeg'],  brightness: 230, colors: [{r:240,g:240,b:240}] },
+  '3': { id: '3', name: 'Крассовка британская', cat: 'Одежда', price: 140, oldPrice: 250, img: 'img/Крассовка-2.jpeg', rating: 4.9, reviews: 0, desc: 'Британский стиль', shoeSizes: ['38','39','40','41','42','43','44'], specs: [['Материал', 'Премиум']], thumbs: ['img/Крассовка-2.jpeg', 'img/Крассовка-2.jpeg', 'img/Крассовка-2.jpeg'], brightness: 150, colors: [{r:180,g:140,b:100}]},
+  '4': { id: '4', name: 'Проводной наушник', cat: 'Электроника', price: 30, img: 'img/Наушник.jpeg', rating: 4.7, reviews: 0, desc: 'Качественный звук', specs: [['Тип', 'Проводные']], thumbs: ['img/Наушник.jpeg', 'img/Наушник.jpeg', 'img/Наушник.jpeg', ],  brightness: 40, colors: [{r:30,g:30,b:30}]},
+  '5': { id: '5', name: 'Часы CHENXI', cat: 'Электроника', price: 230, oldPrice: 300, img: 'img/watch.jpeg', rating: 4.9, reviews: 0, desc: 'Стильные часы', specs: [['Бренд', 'CHENXI']], thumbs: ['img/watch.jpeg', 'img/watch.jpeg', 'img/watch.jpeg'],  brightness: 180, colors: [{r:200,g:180,b:150}]},
+  '6': { id: '6', name: 'Кожаные тапочки', cat: 'Одежда', price: 100, img: 'img/Шилопка-2.jpeg', rating: 4.7, reviews: 0, desc: 'Натуральная кожа', shoeSizes: ['38','39','40','41','42','43','44'], specs: [['Материал', 'Кожа']], thumbs: ['img/Шилопка-2.jpeg', 'img/Шилопка-2.jpeg', 'img/Шилопка-2.jpeg'], brightness: 50, colors: [{r:40,g:30,b:25}] },
+  '7': { id: '7', name: 'Знак Mercedes', cat: 'Электроника', price: 80, oldPrice: 90, img: 'img/Знак Мерса.jpeg', rating: 4.8, reviews: 0, desc: 'Металлический знак', specs: [['Бренд', 'Mercedes']], thumbs: ['img/Знак Мерса.jpeg', 'img/Знак Мерса.jpeg', 'img/Знак Мерса.jpeg'],   brightness: 200, colors: [{r:200,g:200,b:200}]},
+  '8': { id: '8', name: 'Рубашка белая', cat: 'Одежда', price: 120, img: 'img/Рубашка-3.jpeg', rating: 4.5, reviews: 0, desc: 'Качественная рубашка', sizes: ['X','XL','2XL','3XL'], specs: [['Материал', 'Хлопок']], thumbs: ['img/Рубашка-3.jpeg', 'img/Рубашка-3.jpeg', 'img/Рубашка-3.jpeg'], brightness: 235, colors: [{r:240,g:240,b:240}] }
    };
    productsLoaded = true;
     }
@@ -4994,27 +5008,96 @@ review: {
             reader.readAsDataURL(file);
         });
     }
-    
-    function analyzeImage(imageData) {
+     function analyzeImage(imageData) {
         var img = new Image();
         img.onload = function() {
             var canvas = document.createElement('canvas');
             var ctx = canvas.getContext('2d');
-            canvas.width = 100;
-            canvas.height = 100;
-            ctx.drawImage(img, 0, 0, 100, 100);
             
-            var imageData = ctx.getImageData(0, 0, 100, 100);
+            // Уменьшаем до 50x50 для анализа
+            canvas.width = 50;
+            canvas.height = 50;
+            ctx.drawImage(img, 0, 0, 50, 50);
+            
+            var imageData = ctx.getImageData(0, 0, 50, 50);
             var pixels = imageData.data;
             
-            // Анализируем цвета более точно
-            var colors = analyzeColors(pixels);
+            // Создаём "отпечаток" изображения (image hash)
+            var hash = createImageHash(pixels, 50, 50);
             
-            // Ищем похожие товары по цветам
-            searchSimilarProducts(colors);
+            // Определяем доминирующие цвета
+            var dominantColors = getDominantColors(pixels);
+            
+            // Определяем яркость и контраст
+            var brightness = getBrightness(pixels);
+            
+            // Ищем похожие по всем параметрам
+            searchSimilarProducts(hash, dominantColors, brightness);
         };
         img.src = imageData;
     }
+
+    // Создаём простой "хеш" изображения
+    function createImageHash(pixels, width, height) {
+        var hash = [];
+        // Берём 10x10 сетку
+        var stepX = Math.floor(width / 10);
+        var stepY = Math.floor(height / 10);
+        
+        for (var y = 0; y < 10; y++) {
+            for (var x = 0; x < 10; x++) {
+                var idx = ((y * stepY * width) + (x * stepX)) * 4;
+                var avg = (pixels[idx] + pixels[idx + 1] + pixels[idx + 2]) / 3;
+                hash.push(avg);
+            }
+        }
+        return hash;
+    }
+
+     function getDominantColors(pixels) {
+        var colorBuckets = {};
+        var step = 32; // Группируем похожие цвета
+        
+        for (var i = 0; i < pixels.length; i += 40) {
+            var r = Math.floor(pixels[i] / step) * step;
+            var g = Math.floor(pixels[i + 1] / step) * step;
+            var b = Math.floor(pixels[i + 2] / step) * step;
+            var key = r + ',' + g + ',' + b;
+            colorBuckets[key] = (colorBuckets[key] || 0) + 1;
+        }
+        
+        // Сортируем по частоте
+        var sorted = Object.entries(colorBuckets).sort(function(a, b) { return b[1] - a[1]; });
+        return sorted.slice(0, 3).map(function(c) {
+            var rgb = c[0].split(',');
+            return { r: parseInt(rgb[0]), g: parseInt(rgb[1]), b: parseInt(rgb[2]) };
+        });
+    }
+    
+    function getBrightness(pixels) {
+        var total = 0, count = 0;
+        for (var i = 0; i < pixels.length; i += 40) {
+            total += (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
+            count++;
+        }
+        return total / count;
+    }
+
+     // Хеши для товаров (предварительно вычисленные)
+    function getProductHash(product) {
+        var hashes = {
+            '1': 'dark_fabric',      // Вельветовая рубашка
+            '2': 'white_sneaker',    // Кроссовка AF1
+            '3': 'brown_sneaker',    // Кроссовка британская
+            '4': 'black_small',      // Наушник
+            '5': 'golden_watch',     // Часы
+            '6': 'dark_slipper',     // Тапочки
+            '7': 'silver_badge',     // Знак Mercedes
+            '8': 'white_shirt'       // Рубашка белая
+        };
+        return hashes[product.id] || 'unknown';
+    }
+
     
     function analyzeColors(pixels) {
         var totalR = 0, totalG = 0, totalB = 0, count = 0;
@@ -5057,24 +5140,57 @@ review: {
         return colorMap[product.id] || { r: 128, g: 128, b: 128 };
     }
     
-    function searchSimilarProducts(targetColor) {
+    function searchSimilarProducts(uploadedHash, uploadedColors, uploadedBrightness) {
         var allProducts = getAllProductsData();
         
-        // Считаем "похожесть" для каждого товара
         var scored = allProducts.map(function(p) {
-            var productColor = getProductColors(p);
-            var distance = colorDistance(targetColor, productColor);
-            return { product: p, score: distance };
+            var score = 0;
+            
+            // 1. Сравниваем по типу товара (хеш)
+            var productType = getProductHash(p);
+            var uploadedType = classifyImage(uploadedColors, uploadedBrightness);
+            if (productType.includes(uploadedType)) score += 50;
+            
+            // 2. Сравниваем по яркости
+            var productBrightness = p.brightness || 128;
+            var brightnessDiff = Math.abs(uploadedBrightness - productBrightness);
+            score += Math.max(0, 30 - brightnessDiff / 10);
+            
+            // 3. Сравниваем по количеству цветов
+            if (p.colors && uploadedColors.length > 0) {
+                var colorMatch = 0;
+                uploadedColors.forEach(function(uc) {
+                    (p.colors || []).forEach(function(pc) {
+                        if (colorDistance(uc, pc) < 60) colorMatch++;
+                    });
+                });
+                score += colorMatch * 10;
+            }
+            
+            return { product: p, score: score };
         });
+
+         // Сортируем: больше score = похожее
+        scored.sort(function(a, b) { return b.score - a.score; });
         
-        // Сортируем: чем меньше расстояние — тем похожее
-        scored.sort(function(a, b) { return a.score - b.score; });
-        
-        // Берём топ-6 самых похожих
+        // Берём топ-6
         var results = scored.slice(0, 6).map(function(s) { return s.product; });
         
         showPhotoSearchResults(results);
     }
+    
+    function classifyImage(colors, brightness) {
+        if (brightness > 180) return 'white';
+        if (brightness < 80) return 'dark';
+        if (colors.length > 0) {
+            var main = colors[0];
+            if (main.r > 150 && main.g < 100 && main.b < 100) return 'red';
+            if (main.r < 100 && main.g > 120 && main.b < 100) return 'green';
+            if (main.r < 80 && main.g < 80 && main.b < 80) return 'black';
+        }
+        return 'other';
+    }
+
     
     function showPhotoSearchResults(products) {
         document.getElementById('photoSearchLoading').style.display = 'none';
