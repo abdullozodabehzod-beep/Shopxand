@@ -34,4 +34,9 @@ router.post('/', (req, res) => {
     res.json({ success: true });
 });
 
+router.get('/admin', (req, res) => {
+    const reviews = getReviews();
+    res.json({ reviews: reviews.reverse() });
+});
+
 module.exports = router;
