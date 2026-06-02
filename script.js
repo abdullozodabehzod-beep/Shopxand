@@ -1951,7 +1951,7 @@ langModalContent.style.transform = '';
     // ============================================
     function processElsomPayment(order) {
    // Номер кошелька Элсом магазина
-   var SHOP_WALLET = '992XXXXXXXXX'; // ← ЗАМЕНИ НА СВОЙ
+   var SHOP_WALLET = '992300003230'; // ← ЗАМЕНИ НА СВОЙ
    
    showToast('Элсом', 'Переведите ' + order.total + ' с. на кошелёк ' + SHOP_WALLET, 'success');
    
@@ -1960,7 +1960,7 @@ langModalContent.style.transform = '';
    
    // После оплаты клиент нажимает кнопку
    showConfirm(
-  'Оплата через Элсом',
+  'Оплата через D/C',
   'Переведите ' + order.total.toLocaleString() + ' сомони на номер ' + SHOP_WALLET + ' и нажмите "Я оплатил"',
   function() {
  completeOrder(order);
@@ -2247,7 +2247,7 @@ if (data_text.startsWith('reject_cancel_')) {
     });
     }
     
-    checkTelegramUpdates();
+   // checkTelegramUpdates();
 
    // ============================================
     // SUPPORT WIDGET
