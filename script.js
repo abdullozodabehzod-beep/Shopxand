@@ -74,6 +74,7 @@ function showToast(title, message, type) {
     clearTimeout(toast._timeout);
     toast._timeout = setTimeout(function() { toast.classList.remove('show'); }, 3000);
 }
+var reviewsData = {};
 
 document.addEventListener('DOMContentLoaded', async function()  {
      await loadReviews();
@@ -696,10 +697,8 @@ cityModalContent.style.transform = '';
   clothing: 'Одежда',
   electronics: 'Электроника',
   home: 'Дом и сад',
-  kids: 'Детские товары',
-  beauty: 'Красота и здоровье',
-  sport: 'Спорт и отдых',
-  food: 'Продукты',
+  computers: 'Компьютеры',
+ cosmetics: 'Косметика',
   sales: 'Акции',
   menuTitle: 'Каталог',
   myOrders: 'Мои заказы',
@@ -719,10 +718,8 @@ cityModalContent.style.transform = '';
   clothing: 'Либос',
   electronics: 'Электроника',
   home: 'Хона ва боғ',
-  kids: 'Молҳои кӯдакона',
-  beauty: 'Зебоӣ ва саломатӣ',
-  sport: 'Варзиш ва истироҳат',
-  food: 'Маҳсулот',
+  computers: 'Компютерҳо',
+    cosmetics: 'Косметика',
   sales: 'Тафхҳо',
   menuTitle: 'Каталог',
   myOrders: 'Фармоишҳои ман',
@@ -742,10 +739,8 @@ cityModalContent.style.transform = '';
   clothing: 'Clothing',
   electronics: 'Electronics',
   home: 'Home & Garden',
-  kids: 'Kids',
-  beauty: 'Beauty & Health',
-  sport: 'Sports & Leisure',
-  food: 'Groceries',
+   computers: 'Computers',
+    cosmetics: 'Cosmetics',
   sales: 'Sales',
   menuTitle: 'Catalog',
   myOrders: 'My Orders',
@@ -819,7 +814,7 @@ cityModalContent.style.transform = '';
    
    // Навигация (Одежда, Электроника...)
    const navLinks = document.querySelectorAll('.header__nav-link');
-   const navTexts = [t.clothing, t.electronics, t.home, t.kids, t.beauty, t.sport, t.food, t.sales];
+   const navTexts = [t.clothing, t.electronics, t.home, t.computers, t.cosmetics, t.sales];
    navLinks.forEach(function(link, index) {
   if (navTexts[index]) {
  link.textContent = navTexts[index];
@@ -2134,151 +2129,124 @@ text: channelMsg
     var lastUpdateId = 0;
     
     function checkTelegramUpdates() {
-   var url = 'https://api.telegram.org/bot' + BOT_ORDER + '/getUpdates?timeout=5&limit=5';
-   if (lastUpdateId > 0) {
-  url += '&offset=' + (lastUpdateId + 1);
-   }
-   
-   fetch(url)
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
- if (data.ok && data.result && data.result.length > 0) {
-data.result.forEach(function(update) {
-    lastUpdateId = update.update_id;
-    
-    if (update.callback_query) {
-   var cb = update.callback_query;
-   var data_text = cb.data;
-   var chatId = cb.message.chat.id;
-   var messageId = cb.message.message_id;
-   var callbackId = cb.id;
-   
-   console.log('🔘 Кнопка нажата:', data_text);
-   
-   // Удаляем сообщение с кнопками
-   fetch('https://api.telegram.org/bot' + BOT_ORDER + '/deleteMessage', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ chat_id: chatId, message_id: messageId })
-   });
-   
-   // ✅ Доставлен
-   if (data_text.startsWith('delivered_')) {
-  var orderId = data_text.replace('delivered_', '');
-  
-  var order = orders.find(function(o) { return o.id === orderId; });
-  if (order) {
- order.status = 'completed';
- order.trackSteps = [
-{ label: 'Заказ принят', completed: true, current: false },
-{ label: 'В обработке', completed: true, current: false },
-{ label: 'В пути', completed: true, current: false },
-{ label: 'Доставлен', completed: true, current: false }
- ];
- localStorage.setItem('shopxand_orders', JSON.stringify(orders));
-  }
-  
-  fetch('https://api.telegram.org/bot' + BOT_ORDER + '/sendMessage', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
-chat_id: CHANNEL_ID,
-text: '✅ ЗАКАЗ ДОСТАВЛЕН!\n📦 ' + orderId
- })
-  });
-  
-  fetch('https://api.telegram.org/bot' + BOT_ORDER + '/answerCallbackQuery', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ callback_query_id: callbackId, text: '✅ Доставка подтверждена!' })
-  });
-   }
-   
-   // ❌ Отменить
-   if (data_text.startsWith('cancel_')) {
-  var orderId = data_text.replace('cancel_', '');
-  
-  orders = orders.filter(function(o) { return o.id !== orderId; });
-  localStorage.setItem('shopxand_orders', JSON.stringify(orders));
-  
-  fetch('https://api.telegram.org/bot' + BOT_ORDER + '/sendMessage', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
-chat_id: CHANNEL_ID,
-text: '❌ ЗАКАЗ ОТМЕНЁН!\n📦 ' + orderId
- })
-  });
-  
-  fetch('https://api.telegram.org/bot' + BOT_ORDER + '/answerCallbackQuery', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ callback_query_id: callbackId, text: '❌ Заказ отменён!' })
-  });
-   }
-   
-   // ✅ Да, отменить (запрос от клиента)
-   if (data_text.startsWith('approve_cancel_')) {
-  var orderId = data_text.replace('approve_cancel_', '');
-  
-  orders = orders.filter(function(o) { return o.id !== orderId; });
-  localStorage.setItem('shopxand_orders', JSON.stringify(orders));
-  
-  fetch('https://api.telegram.org/bot' + BOT_ORDER + '/sendMessage', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
-chat_id: CHANNEL_ID,
-text: '❌ ЗАКАЗ ОТМЕНЁН!\n📦 ' + orderId
- })
-  });
-  
-  fetch('https://api.telegram.org/bot' + BOT_ORDER + '/answerCallbackQuery', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ callback_query_id: callbackId, text: '✅ Заказ отменён!' })
-  });
-   }
-   
-   // ❌ Нет, оставить
-   if (data_text.startsWith('reject_cancel_')) {
-  var orderId = data_text.replace('reject_cancel_', '');
-  
-  var order = orders.find(function(o) { return o.id === orderId; });
-  if (order) {
- order.status = 'processing';
- order.trackSteps = [
-{ label: 'Заказ принят', completed: true, current: false },
-{ label: 'В обработке', completed: false, current: true },
-{ label: 'В пути', completed: false, current: false },
-{ label: 'Доставлен', completed: false, current: false }
- ];
- localStorage.setItem('shopxand_orders', JSON.stringify(orders));
-  }
-  
-  fetch('https://api.telegram.org/bot' + BOT_ORDER + '/answerCallbackQuery', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ callback_query_id: callbackId, text: '❌ Отмена отклонена' })
-  });
-   }
-    }
-});
+    var url = 'https://api.telegram.org/bot' + BOT_ORDER + '/getUpdates?timeout=5&limit=5';
+    if (lastUpdateId > 0) url += '&offset=' + (lastUpdateId + 1);
 
-// Продолжаем проверку сразу
-setTimeout(checkTelegramUpdates, 500);
- } else {
-// Проверяем снова через 2 секунды
-setTimeout(checkTelegramUpdates, 2000);
- }
-  })
-  .catch(function(err) {
- console.log('Ошибка:', err);
- setTimeout(checkTelegramUpdates, 3000);
-  });
+    fetch(url)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+    if (data.ok && data.result && data.result.length > 0) {
+    data.result.forEach(function(update) {
+    lastUpdateId = update.update_id;
+
+    if (update.callback_query) {
+        var cb = update.callback_query;
+        var data_text = cb.data;
+        var chatId = cb.message.chat.id;
+        var messageId = cb.message.message_id;
+        var callbackId = cb.id;
+        
+        console.log('🔘 Кнопка нажата:', data_text);
+        
+        // Удаляем сообщение с кнопками
+        fetch('https://api.telegram.org/bot' + BOT_ORDER + '/deleteMessage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: chatId, message_id: messageId })
+        });
+        
+        var orderId = '';
+        var order = null;
+        
+if (data_text.startsWith('delivered_')) {
+    orderId = data_text.replace('delivered_', '');
+    order = orders.find(function(o) { return o.id === orderId; });
+    if (order) {
+        order.status = 'completed';
+        order.trackSteps = [
+            { label: 'Заказ принят', completed: true, current: false },
+            { label: 'В обработке', completed: true, current: false },
+            { label: 'В пути', completed: true, current: false },
+            { label: 'Доставлен', completed: true, current: false }
+        ];
+        localStorage.setItem('shopxand_orders', JSON.stringify(orders));
     }
     
-    // Запускаем проверку
+    fetch('https://api.telegram.org/bot' + BOT_ORDER + '/sendMessage', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: CHANNEL_ID, text: '✅ ЗАКАЗ ДОСТАВЛЕН!\n📦 ' + orderId })
+    });
+    
+    fetch('https://api.telegram.org/bot' + BOT_ORDER + '/answerCallbackQuery', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callback_query_id: callbackId, text: '✅ Доставка подтверждена!' })
+    });
+}
+
+if (data_text.startsWith('cancel_')) {
+    orderId = data_text.replace('cancel_', '');
+    orders = orders.filter(function(o) { return o.id !== orderId; });
+    localStorage.setItem('shopxand_orders', JSON.stringify(orders));
+    
+    fetch('https://api.telegram.org/bot' + BOT_ORDER + '/sendMessage', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: CHANNEL_ID, text: '❌ ЗАКАЗ ОТМЕНЁН!\n📦 ' + orderId })
+    });
+    
+    fetch('https://api.telegram.org/bot' + BOT_ORDER + '/answerCallbackQuery', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callback_query_id: callbackId, text: '❌ Заказ отменён!' })
+    });
+}
+
+if (data_text.startsWith('approve_cancel_')) {
+    orderId = data_text.replace('approve_cancel_', '');
+    orders = orders.filter(function(o) { return o.id !== orderId; });
+    localStorage.setItem('shopxand_orders', JSON.stringify(orders));
+    
+    fetch('https://api.telegram.org/bot' + BOT_ORDER + '/sendMessage', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: CHANNEL_ID, text: '❌ ЗАКАЗ ОТМЕНЁН!\n📦 ' + orderId })
+    });
+    
+    fetch('https://api.telegram.org/bot' + BOT_ORDER + '/answerCallbackQuery', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ callback_query_id: callbackId, text: '✅ Заказ отменён!' })
+    });
+}
+
+if (data_text.startsWith('reject_cancel_')) {
+    orderId = data_text.replace('reject_cancel_', '');
+    order = orders.find(function(o) { return o.id === orderId; });
+    if (order) {
+        order.status = 'processing';
+        order.trackSteps = [
+            { label: 'Заказ принят', completed: true, current: false },
+            { label: 'В обработке', completed: false, current: true },
+            { label: 'В пути', completed: false, current: false },
+            { label: 'Доставлен', completed: false, current: false }
+        ];
+        localStorage.setItem('shopxand_orders', JSON.stringify(orders));
+    }
+    
+            fetch('https://api.telegram.org/bot' + BOT_ORDER + '/answerCallbackQuery', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ callback_query_id: callbackId, text: '❌ Отмена отклонена' })
+            });
+        }
+    }
+    });
+    setTimeout(checkTelegramUpdates, 500);
+    } else {
+    setTimeout(checkTelegramUpdates, 2000);
+    }
+    })
+    .catch(function(err) {
+    console.log('Ошибка:', err);
+    setTimeout(checkTelegramUpdates, 3000);
+    });
+    }
+    
     checkTelegramUpdates();
 
    // ============================================
@@ -3182,44 +3150,44 @@ checkDeliveryNotifications();
    // ============================================
     // PRODUCTS - Загрузка с сервера или локально
     // ============================================
-           async function loadProducts() {
-        try {
-            var data = await apiRequest('/products');
-            if (data && data.products && data.products.length > 0) {
-                productsData = {};
-                data.products.forEach(function(p) {
-                    // Определяем базовый путь в зависимости от хостинга
-                    var isGitHub = window.location.hostname.includes('github.io');
-                    
-                    // Исправляем путь
-                    if (p.img && !p.img.startsWith('http')) {
-                        if (isGitHub) {
-                            p.img = p.img.replace(/^\//, ''); // убираем / в начале
-                        } else {
-                            if (!p.img.startsWith('/')) p.img = '/' + p.img;
-                        }
-                    }
-                    
-                    if (p.thumbs) {
-                        p.thumbs = p.thumbs.map(function(t) {
-                            if (!t || t.startsWith('http')) return t;
-                            if (isGitHub) return t.replace(/^\//, '');
-                            return t.startsWith('/') ? t : '/' + t;
-                        });
-                    }
-                    
-                    if (!p.brightness) p.brightness = 128;
-                    if (!p.colors || p.colors.length === 0) p.colors = [{ r: 128, g: 128, b: 128 }];
-                    
-                    productsData[p.id] = p;
-                });
-                renderProductCards();
+    async function loadProducts() {
+try {
+    var data = await apiRequest('/products');
+    if (data && data.products && data.products.length > 0) {
+        productsData = {};
+        data.products.forEach(function(p) {
+            // Определяем базовый путь в зависимости от хостинга
+            var isGitHub = window.location.hostname.includes('github.io');
+            
+            // Исправляем путь
+            if (p.img && !p.img.startsWith('http')) {
+                if (isGitHub) {
+                    p.img = p.img.replace(/^\//, ''); // убираем / в начале
+                } else {
+                    if (!p.img.startsWith('/')) p.img = '/' + p.img;
+                }
             }
-        } catch (err) {
-            loadLocalProducts();
-            renderProductCards();
-        }
+            
+            if (p.thumbs) {
+                p.thumbs = p.thumbs.map(function(t) {
+                    if (!t || t.startsWith('http')) return t;
+                    if (isGitHub) return t.replace(/^\//, '');
+                    return t.startsWith('/') ? t : '/' + t;
+                });
+            }
+            
+            if (!p.brightness) p.brightness = 128;
+            if (!p.colors || p.colors.length === 0) p.colors = [{ r: 128, g: 128, b: 128 }];
+            
+            productsData[p.id] = p;
+        });
+        renderProductCards();
     }
+} catch (err) {
+    loadLocalProducts();
+    renderProductCards();
+}
+}
     
     function loadLocalProducts() {
    productsData = {
@@ -4281,7 +4249,7 @@ setTimeout(function() {
     var qvReviewsList = document.getElementById('qvReviewsList');
     
     var selectedRating = 0;
-    var reviewsData = {};
+    
     
         async function loadReviews() {
         try {
@@ -5262,4 +5230,79 @@ review: {
                 '<div class="related-card__price">' + p.price.toLocaleString() + ' с.</div>' +
             '</div>';
         }).join('');
+    }
+
+        // ============================================
+    // CATEGORIES BAR
+    // ============================================
+    
+    document.querySelectorAll('.category-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var cat = this.getAttribute('data-cat');
+            
+            // Убираем активный класс у всех
+            document.querySelectorAll('.category-btn').forEach(function(b) {
+                b.classList.remove('active');
+            });
+            
+            // Добавляем активный класс
+            this.classList.add('active');
+            
+            // Фильтруем товары
+            filterByCategory(cat);
+        });
+    });
+
+        // Переключение информации о платеже
+    document.querySelectorAll('input[name="payment"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            var infoBox = document.getElementById('paymentDetails');
+            var dcBlock = document.getElementById('dcBlock');
+            var infoSpan = infoBox?.querySelector('.checkout-payment__info-box span');
+            
+            switch(this.value) {
+                case 'elsom':
+                case 'dc':
+                    if (infoSpan) infoSpan.textContent = 'Переведите сумму на номер D/C и подтвердите оплату';
+                    if (dcBlock) dcBlock.style.display = 'block';
+                    break;
+                case 'card':
+                    if (infoSpan) infoSpan.textContent = 'Оплата картой временно недоступна';
+                    if (dcBlock) dcBlock.style.display = 'none';
+                    break;
+                case 'cash':
+                    if (infoSpan) infoSpan.textContent = 'Оплата наличными при получении заказа';
+                    if (dcBlock) dcBlock.style.display = 'none';
+                    break;
+            }
+            
+            document.querySelectorAll('.checkout-payment__option').forEach(function(opt) {
+                opt.classList.remove('active');
+            });
+            this.closest('.checkout-payment__option').classList.add('active');
+        });
+    });
+    
+        window.copyDCNumber = function() {
+        var text = '300003230';
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function() {
+                showToast('Скопировано!', 'Номер D/C скопирован', 'success');
+            }).catch(function() {
+                fallbackCopy(text);
+            });
+        } else {
+            fallbackCopy(text);
+        }
+    };
+    
+    function fallbackCopy(text) {
+        var input = document.createElement('input');
+        input.value = text;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        showToast('Скопировано!', 'Номер D/C скопирован', 'success');
     }

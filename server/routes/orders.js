@@ -15,26 +15,23 @@ function saveOrders(orders) {
 }
 
 router.post('/', (req, res) => {
-    const orders = getOrders();
-    const order = {
-   id: 'SX-' + Date.now().toString().slice(-8),
-   ...req.body,
-   status: 'processing',
-   date: new Date().toISOString()
-    };
-    orders.push(order);
-    saveOrders(orders);
-    res.json({ order });
+    try {
+        var orders = getOrders();
+        var order = req.body;
+        orders.push(order);
+        saveOrders(orders);
+        console.log('Заказ сохранён:', order.id);
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Ошибка сохранения заказа:', err);
+        res.status(500).json({ error: err.message });
+    }
 });
 
 router.get('/', (req, res) => {
     const orders = getOrders();
     res.json({ orders });
 });
-
-module.exports = router;
-
-
 
 // Получить ВСЕ заказы (для админа)
 router.get('/admin/all', async (req, res) => {
@@ -45,3 +42,8 @@ router.get('/admin/all', async (req, res) => {
    res.json({ orders: [] });
     }
 });
+
+module.exports = router;
+
+
+
