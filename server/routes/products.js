@@ -50,4 +50,16 @@ router.delete('/:id', (req, res) => {
     res.json({ success: true });
 });
 
+// Обновить рейтинг товара
+router.put('/:id/rating', (req, res) => {
+    var products = getProducts();
+    var product = products.find(p => p.id === req.params.id);
+    if (product) {
+        product.rating = req.body.rating || product.rating;
+        product.reviews = req.body.reviews || product.reviews;
+        saveProducts(products);
+    }
+    res.json({ success: true });
+});
+
 module.exports = router;

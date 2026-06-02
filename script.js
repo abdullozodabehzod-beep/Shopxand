@@ -76,6 +76,7 @@ function showToast(title, message, type) {
 }
 
 document.addEventListener('DOMContentLoaded', async function()  {
+     await loadReviews();
     await checkAuth();
     await loadProducts();
     if (isLoggedIn) await loadOrders();
@@ -4282,13 +4283,14 @@ setTimeout(function() {
     var selectedRating = 0;
     var reviewsData = {};
     
-    async function loadReviews() {
-   try {
-  var data = await apiRequest('/reviews');
-  reviewsData = data.reviews || {};
-   } catch (err) {
-  reviewsData = JSON.parse(localStorage.getItem('shopxand_reviews') || '{}');
-   }
+        async function loadReviews() {
+        try {
+            var data = await apiRequest('/reviews');
+            reviewsData = data.reviews || {};
+            console.log('⭐ Отзывы загружены:', JSON.stringify(reviewsData));
+        } catch (err) {
+            reviewsData = JSON.parse(localStorage.getItem('shopxand_reviews') || '{}');
+        }
     }
     
     function saveReviewsLocal() {
@@ -4356,7 +4358,16 @@ setTimeout(function() {
  text: text,
  date: new Date().toISOString()
   };
+
+     if (!reviewsData[productId]) reviewsData[productId] = [];
+            reviewsData[productId].push(review);
   
+        var originalOpenQuickview = openQuickview;
+    openQuickview = function(productId) {
+        originalOpenQuickview(productId);
+        renderProductReviews(productId);
+        qvReviewForm.style.display = 'none';
+    };
   
   console.log('Отправляю отзыв:', { productId, review });
   
@@ -4396,19 +4407,60 @@ body: JSON.stringify({ productId, review })
    }).join('');
     }
     
-    function updateProductRating(productId) {
-   var reviews = reviewsData[productId] || [];
-   if (reviews.length === 0) return;
-   var total = reviews.reduce(function(s, r) { return s + r.rating; }, 0);
-   var avg = (total / reviews.length).toFixed(1);
-   if (productsData[productId]) {
-  productsData[productId].rating = parseFloat(avg);
-  productsData[productId].reviews = reviews.length;
-   }
-   if (currentQvProduct && currentQvProduct.id === productId) {
-  document.querySelector('.quickview__rating-num').textContent = avg;
-  document.querySelector('.quickview__reviews').textContent = reviews.length + ' отзывов';
-   }
+       function updateProductRating(productId) {
+        var reviews = reviewsData[productId] || [];
+        if (reviews.length === 0) return;
+        
+        var total = 0;
+        reviews.forEach(function(r) {
+            total += r.rating || 0;
+        });
+        var avg = (total / reviews.length).toFixed(1);
+        
+        // Обновляем в productsData
+        if (productsData[productId]) {
+            productsData[productId].rating = parseFloat(avg);
+            productsData[productId].reviews = reviews.length;
+        }
+        
+        // Обновляем на странице
+        if (currentQvProduct && currentQvProduct.id === productId) {
+            document.querySelector('.quickview__rating-num').textContent = avg;
+            document.querySelector('.quickview__reviews').textContent = reviews.length + ' ' + getReviewWord(reviews.length);
+            document.querySelector('.quickview__stars').innerHTML = generateStars(parseFloat(avg));
+        }
+        
+        // Обновляем карточку товара
+        updateProductCardRating(productId, parseFloat(avg), reviews.length);
+        
+        // Отправляем обновление на сервер
+        try {
+            fetch(API_URL + '/products/' + productId + '/rating', {
+                method: 'PUT',
+                headers: apiHeaders(),
+                body: JSON.stringify({ rating: parseFloat(avg), reviews: reviews.length })
+            });
+        } catch (err) {}
+    }
+    
+    function getReviewWord(count) {
+        if (count % 10 === 1 && count % 100 !== 11) return 'отзыв';
+        if (count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20)) return 'отзыва';
+        return 'отзывов';
+    }
+    
+    function updateProductCardRating(productId, rating, reviewsCount) {
+        var card = document.querySelector('.product-card[data-cat]'); // найдём по data-id позже
+        var allCards = document.querySelectorAll('.product-card');
+        allCards.forEach(function(card) {
+            var btn = card.querySelector('.product-card__cart-btn');
+            if (btn && btn.getAttribute('data-id') === productId) {
+                var ratingNum = card.querySelector('.product-card__rating span:first-of-type');
+                var reviewsEl = card.querySelector('.product-card__reviews');
+                if (ratingNum) ratingNum.textContent = rating;
+                if (reviewsEl) reviewsEl.textContent = '(' + reviewsCount + ' ' + getReviewWord(reviewsCount) + ')';
+            }
+        });
     }
     
     var originalOpenQuickview = openQuickview;

@@ -112,6 +112,8 @@ async function saveProduct() {
    inStock: true,
    brightness: 128,
     colors: [{ r: 128, g: 128, b: 128 }],
+    rating: parseFloat(document.getElementById('prodRating')?.value) || 0,
+    reviews: parseInt(document.getElementById('prodReviews')?.value) || 0,
     };
     
     if (!product.name || !product.price) {
