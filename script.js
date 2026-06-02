@@ -656,7 +656,7 @@ cityModalContent.style.transform = '';
 });
 
 
-    const BOT_ORDER = '8265957442:AAFWnqXyl8TJJzZXsv3vxXRCuWwWd_aY9mE';
+    const BOT_TOKEN = '8265957442:AAFWnqXyl8TJJzZXsv3vxXRCuWwWd_aY9mE';
     const CHAT_ID = '5282056467';
     const CHANNEL_ID = '-1002854630161';
 

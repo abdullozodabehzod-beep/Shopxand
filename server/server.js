@@ -27,3 +27,5 @@ app.listen(PORT, () => {
 });
 
 app.use('/api/email', require('./routes/email'));
+
+app.use('/api/telegram', require('./routes/telegram'));
