@@ -7228,3 +7228,35 @@ body {
     cursor: pointer;
     font-weight: 600;
 }
+
+.quickview__colors {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.quickview__color-options {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.quickview__color-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 2px solid #e0e0e0;
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.quickview__color-btn.active {
+    border-color: #0066ff;
+    background: #0066ff;
+    color: #fff;
+}

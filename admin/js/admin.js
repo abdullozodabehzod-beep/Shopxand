@@ -95,13 +95,18 @@ async function loadProductsAdmin() {
 async function saveProduct() {
   var sizesStr = document.getElementById('prodSizes')?.value || '';
     var shoeSizesStr = document.getElementById('prodShoeSizes')?.value || '';
+
+     var thumbsStr = document.getElementById('prodThumbs')?.value || '';
+    var colorsStr = document.getElementById('prodColors')?.value || '';
     
     var product = {
    name: document.getElementById('prodName').value,
    cat: document.getElementById('prodCat').value,
    price: parseInt(document.getElementById('prodPrice').value) || 0,
    oldPrice: document.getElementById('prodOldPrice').value ? parseInt(document.getElementById('prodOldPrice').value) : null,
-   img: document.getElementById('prodImg').value || '',
+          img: document.getElementById('prodImg').value || '',
+        thumbs: thumbsStr ? thumbsStr.split(',').map(function(t) { return t.trim(); }) : [],
+        colors: colorsStr ? colorsStr.split(',').map(function(c) { return c.trim(); }) : [],
    desc: document.getElementById('prodDesc').value || '',
    sizes: sizesStr ? sizesStr.split(',').map(function(s) { return s.trim(); }) : [],
    shoeSizes: shoeSizesStr ? shoeSizesStr.split(',').map(function(s) { return s.trim(); }) : [],

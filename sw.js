@@ -39,7 +39,7 @@ self.addEventListener('push', function(event) {
     var data = event.data ? event.data.json() : {};
     self.registration.showNotification(data.title || 'ShopXand', {
    body: data.body || '',
-   icon: '/img/icons/icon-192x192.png'
+   icon: '/img/icons/logo.svg'
     });
 });
 

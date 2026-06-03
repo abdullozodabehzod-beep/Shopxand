@@ -14,5 +14,13 @@
     "text": "this good i buy this",
     "status": "rejected",
     "date": "2026-05-20T14:25:28.127Z"
+  },
+  {
+    "productId": "1",
+    "name": "Test",
+    "rating": 5,
+    "text": "Test",
+    "status": "approved",
+    "date": "2026-06-03T11:16:41.773Z"
   }
 ]

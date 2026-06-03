@@ -5,7 +5,7 @@
 // ============================================
 // API CONFIG
 // ============================================
-var API_URL = 'https://shopxand-3.onrender.com/api';
+var API_URL = 'http://localhost:3000/api';
 var API_TOKEN = localStorage.getItem('shopxand_token') || '';
 
 function apiHeaders() {
@@ -58,9 +58,7 @@ var orders = [];
 var favorites = [];
 var productsData = {};
 
-// API
-var API_URL = 'https://shopxand-3.onrender.com/api';
-var API_TOKEN = localStorage.getItem('shopxand_token') || '';
+
 
 function showToast(title, message, type) {
     var toast = document.getElementById('toast');
@@ -2052,10 +2050,6 @@ break;
    const CHAT_ID = '5282056467';
    const CHANNEL_ID = '-1002854630161';
    
-   const itemsList = order.items.map(function(item, i) {
-  return (i + 1) + '. ' + item.name + ' ×' + item.quantity + ' — ' + (item.price * item.quantity).toLocaleString() + ' с.';
-   }).join('\n');
-   
    const message = 
   '🛍 НОВЫЙ ЗАКАЗ!\n\n' +
   '📦 Заказ: ' + order.id + '\n' +
@@ -2111,6 +2105,17 @@ text: channelMsg
   }).then(function(r) { return r.json(); })
     .then(function(d) { console.log('📢 В канал:', d.ok ? '✅' : '❌'); });
    }, 15000);
+
+           // Получаем выбранный цвет
+        var selectedColor = '';
+        var activeColorBtn = document.querySelector('.quickview__color-btn.active');
+        if (activeColorBtn) {
+            selectedColor = ' (' + activeColorBtn.getAttribute('data-color') + ')';
+        }
+        
+        var itemsList = order.items.map(function(item, i) {
+            return (i + 1) + '. ' + item.name + selectedColor + ' ×' + item.quantity + ' — ' + (item.price * item.quantity).toLocaleString() + ' с.';
+        }).join('\n');
     }
     
     // Уведомление о доставке
@@ -3177,13 +3182,19 @@ try {
             }
             
             if (!p.brightness) p.brightness = 128;
-            if (!p.colors || p.colors.length === 0) p.colors = [{ r: 128, g: 128, b: 128 }];
-            
+        if (!p.colors || !Array.isArray(p.colors) || p.colors.length === 0) {
+            p.colors = [];
+        } else if (typeof p.colors[0] === 'object') {
+            // Если старый формат (объекты) — очищаем
+            p.colors = [];
+        }            
             productsData[p.id] = p;
         });
+                    console.log('productsData:', Object.keys(productsData).length, 'товаров');
         renderProductCards();
     }
 } catch (err) {
+    console.log('Ошибка загрузки:', err);
     loadLocalProducts();
     renderProductCards();
 }
@@ -3191,14 +3202,14 @@ try {
     
     function loadLocalProducts() {
    productsData = {
-  '1': { id: '1', name: 'Вельветовая рубашка', cat: 'Одежда', price: 120, oldPrice: 180, discount: '-33%', img: 'img/Рубашка.jpeg', rating: 4.8, reviews: 0, desc: 'Стильная вельветовая рубашка.', sizes: ['X', 'XL', '2XL', '3XL'], specs: [['Материал', 'Вельвет 100%'], ['Размеры', 'X-3XL']], thumbs: ['img/Рубашка.jpeg', 'img/Рубашка.jpeg', 'img/Рубашка.jpeg'], brightness: 60, colors: [{r:50,g:30,b:30}]},
-  '2': { id: '2', name: 'Крассовка AF1', cat: 'Одежда', price: 110, img: 'img/Крассовка.jpeg', rating: 4.6, reviews: 0, desc: 'Лучшая модель', shoeSizes: ['38','39','40','41','42','43','44'], specs: [['Материал', 'Кожа']], thumbs: ['img/Крассовка.jpeg', 'img/Крассовка.jpeg', 'img/Крассовка.jpeg'],  brightness: 230, colors: [{r:240,g:240,b:240}] },
-  '3': { id: '3', name: 'Крассовка британская', cat: 'Одежда', price: 140, oldPrice: 250, img: 'img/Крассовка-2.jpeg', rating: 4.9, reviews: 0, desc: 'Британский стиль', shoeSizes: ['38','39','40','41','42','43','44'], specs: [['Материал', 'Премиум']], thumbs: ['img/Крассовка-2.jpeg', 'img/Крассовка-2.jpeg', 'img/Крассовка-2.jpeg'], brightness: 150, colors: [{r:180,g:140,b:100}]},
-  '4': { id: '4', name: 'Проводной наушник', cat: 'Электроника', price: 30, img: 'img/Наушник.jpeg', rating: 4.7, reviews: 0, desc: 'Качественный звук', specs: [['Тип', 'Проводные']], thumbs: ['img/Наушник.jpeg', 'img/Наушник.jpeg', 'img/Наушник.jpeg', ],  brightness: 40, colors: [{r:30,g:30,b:30}]},
-  '5': { id: '5', name: 'Часы CHENXI', cat: 'Электроника', price: 230, oldPrice: 300, img: 'img/watch.jpeg', rating: 4.9, reviews: 0, desc: 'Стильные часы', specs: [['Бренд', 'CHENXI']], thumbs: ['img/watch.jpeg', 'img/watch.jpeg', 'img/watch.jpeg'],  brightness: 180, colors: [{r:200,g:180,b:150}]},
-  '6': { id: '6', name: 'Кожаные тапочки', cat: 'Одежда', price: 100, img: 'img/Шилопка-2.jpeg', rating: 4.7, reviews: 0, desc: 'Натуральная кожа', shoeSizes: ['38','39','40','41','42','43','44'], specs: [['Материал', 'Кожа']], thumbs: ['img/Шилопка-2.jpeg', 'img/Шилопка-2.jpeg', 'img/Шилопка-2.jpeg'], brightness: 50, colors: [{r:40,g:30,b:25}] },
-  '7': { id: '7', name: 'Знак Mercedes', cat: 'Электроника', price: 80, oldPrice: 90, img: 'img/Знак Мерса.jpeg', rating: 4.8, reviews: 0, desc: 'Металлический знак', specs: [['Бренд', 'Mercedes']], thumbs: ['img/Знак Мерса.jpeg', 'img/Знак Мерса.jpeg', 'img/Знак Мерса.jpeg'],   brightness: 200, colors: [{r:200,g:200,b:200}]},
-  '8': { id: '8', name: 'Рубашка белая', cat: 'Одежда', price: 120, img: 'img/Рубашка-3.jpeg', rating: 4.5, reviews: 0, desc: 'Качественная рубашка', sizes: ['X','XL','2XL','3XL'], specs: [['Материал', 'Хлопок']], thumbs: ['img/Рубашка-3.jpeg', 'img/Рубашка-3.jpeg', 'img/Рубашка-3.jpeg'], brightness: 235, colors: [{r:240,g:240,b:240}] }
+  '1': { id: '1', name: 'Вельветовая рубашка', cat: 'Одежда', price: 120, oldPrice: 180, discount: '-33%', img: 'img/Рубашка.jpeg', rating: 4.8, reviews: 0, desc: 'Стильная вельветовая рубашка.', sizes: ['X', 'XL', '2XL', '3XL'], specs: [['Материал', 'Вельвет 100%'], ['Размеры', 'X-3XL']], thumbs: ['img/Рубашка.jpeg', 'img/Рубашка.jpeg', 'img/Рубашка.jpeg'], brightness: 60, colors: [{r:50,g:30,b:30}], colors: []},
+  '2': { id: '2', name: 'Крассовка AF1', cat: 'Одежда', price: 110, img: 'img/Крассовка.jpeg', rating: 4.6, reviews: 0, desc: 'Лучшая модель', shoeSizes: ['38','39','40','41','42','43','44'], specs: [['Материал', 'Кожа']], thumbs: ['img/Крассовка.jpeg', 'img/Крассовка.jpeg', 'img/Крассовка.jpeg'],  brightness: 230, colors: [{r:240,g:240,b:240}], colors: [] },
+  '3': { id: '3', name: 'Крассовка британская', cat: 'Одежда', price: 140, oldPrice: 250, img: 'img/Крассовка-2.jpeg', rating: 4.9, reviews: 0, desc: 'Британский стиль', shoeSizes: ['38','39','40','41','42','43','44'], specs: [['Материал', 'Премиум']], thumbs: ['img/Крассовка-2.jpeg', 'img/Крассовка-2.jpeg', 'img/Крассовка-2.jpeg'], brightness: 150, colors: [{r:180,g:140,b:100}], colors: []},
+  '4': { id: '4', name: 'Проводной наушник', cat: 'Электроника', price: 30, img: 'img/Наушник.jpeg', rating: 4.7, reviews: 0, desc: 'Качественный звук', specs: [['Тип', 'Проводные']], thumbs: ['img/Наушник.jpeg', 'img/Наушник.jpeg', 'img/Наушник.jpeg', ],  brightness: 40, colors: [{r:30,g:30,b:30}], colors: []},
+  '5': { id: '5', name: 'Часы CHENXI', cat: 'Электроника', price: 230, oldPrice: 300, img: 'img/watch.jpeg', rating: 4.9, reviews: 0, desc: 'Стильные часы', specs: [['Бренд', 'CHENXI']], thumbs: ['img/watch.jpeg', 'img/watch.jpeg', 'img/watch.jpeg'],  brightness: 180, colors: [{r:200,g:180,b:150}], colors: []},
+  '6': { id: '6', name: 'Кожаные тапочки', cat: 'Одежда', price: 100, img: 'img/Шилопка-2.jpeg', rating: 4.7, reviews: 0, desc: 'Натуральная кожа', shoeSizes: ['38','39','40','41','42','43','44'], specs: [['Материал', 'Кожа']], thumbs: ['img/Шилопка-2.jpeg', 'img/Шилопка-2.jpeg', 'img/Шилопка-2.jpeg'], brightness: 50, colors: [{r:40,g:30,b:25}], colors: [] },
+  '7': { id: '7', name: 'Знак Mercedes', cat: 'Электроника', price: 80, oldPrice: 90, img: 'img/Знак Мерса.jpeg', rating: 4.8, reviews: 0, desc: 'Металлический знак', specs: [['Бренд', 'Mercedes']], thumbs: ['img/Знак Мерса.jpeg', 'img/Знак Мерса.jpeg', 'img/Знак Мерса.jpeg'],   brightness: 200, colors: [{r:200,g:200,b:200}], colors: []},
+  '8': { id: '8', name: 'Рубашка белая', cat: 'Одежда', price: 120, img: 'img/Рубашка-3.jpeg', rating: 4.5, reviews: 0, desc: 'Качественная рубашка', sizes: ['X','XL','2XL','3XL'], specs: [['Материал', 'Хлопок']], thumbs: ['img/Рубашка-3.jpeg', 'img/Рубашка-3.jpeg', 'img/Рубашка-3.jpeg'], brightness: 235, colors: [{r:240,g:240,b:240}], colors: [] }
    };
    productsLoaded = true;
     }
@@ -3345,6 +3356,39 @@ sizeBlock.style.display = 'none';
    quickview.classList.add('active');
    document.body.style.overflow = 'hidden';
    document.title = product.name + ' — купить в ShopXand | Цена ' + product.price + ' сомони';
+
+           // Показ цветов/вариантов
+        if (product.colors && product.colors.length > 0) {
+            var colorBlock = document.getElementById('quickviewColors');
+            if (!colorBlock) {
+                colorBlock = document.createElement('div');
+                colorBlock.id = 'quickviewColors';
+                colorBlock.className = 'quickview__colors';
+                colorBlock.innerHTML = '<span>Цвет:</span><div class="quickview__color-options" id="qvColorOptions"></div>';
+                document.querySelector('.quickview__size')?.after(colorBlock);
+            }
+            
+            var colorOptions = document.getElementById('qvColorOptions');
+            colorOptions.innerHTML = product.colors.map(function(color, i) {
+                return '<button class="quickview__color-btn' + (i === 0 ? ' active' : '') + '" data-color="' + color + '">' + color + '</button>';
+            }).join('');
+            
+            // Обработчики клика
+            colorOptions.querySelectorAll('.quickview__color-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    colorOptions.querySelectorAll('.quickview__color-btn').forEach(function(b) { b.classList.remove('active'); });
+                    this.classList.add('active');
+                    
+                    // Меняем главное фото на соответствующее
+                    var index = Array.from(colorOptions.children).indexOf(this);
+                    if (product.thumbs && product.thumbs[index]) {
+                        var mainImg = document.getElementById('quickviewMainImg');
+                        mainImg.innerHTML = '<img src="' + product.thumbs[index] + '" alt="" style="width:100%;height:100%;object-fit:contain;">';
+                    }
+                });
+            });
+        }
+
     }
     
     window.openQuickview = openQuickview;
@@ -4596,6 +4640,7 @@ function showPushBanner() {
 
 
    function renderProductCards() {
+     console.log('renderProductCards вызвана');
    var grid = document.getElementById('productsGrid');
    if (!grid) return;
    
@@ -4698,27 +4743,28 @@ self.style.background = '';
         console.log('Отправляю отзыв:', { productId, review });
         
         fetch(API_URL + '/reviews', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productId, review })
-        }).then(function(r) { return r.json(); })
-          .then(function(data) {
-            console.log('Ответ сервера:', data);
-            document.getElementById('qvReviewForm').style.display = 'none';
-            selectedRating = 0;
-            document.getElementById('qvReviewText').value = '';
-            
-            // Обновляем отзывы
-            loadReviews().then(function() {
-                updateProductRating(productId);
-                renderProductReviews(productId);
-            });
-            
-            showToast('Отзыв отправлен!', 'Спасибо за ваш отзыв!', 'success');
-        }).catch(function(err) {
-            console.error('Ошибка:', err);
-            showToast('Ошибка', 'Не удалось отправить', 'error');
-        });
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ productId, review })
+}).then(function(r) { return r.json(); })
+    .then(function(data) {
+    console.log('Ответ сервера:', data);
+    
+    // Принудительно добавляем отзыв в reviewsData
+    if (!reviewsData[productId]) reviewsData[productId] = [];
+    reviewsData[productId].push(review);
+    
+    document.getElementById('qvReviewForm').style.display = 'none';
+    selectedRating = 0;
+    document.getElementById('qvReviewText').value = '';
+    
+    updateProductRating(productId);
+    renderProductReviews(productId);
+    
+    showToast('Отзыв отправлен!', 'Спасибо за ваш отзыв!', 'success');
+}).catch(function(err) {
+    console.error('Ошибка:', err);
+});
     });
     
 
