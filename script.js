@@ -3195,9 +3195,11 @@ try {
     }
 } catch (err) {
     console.log('Ошибка загрузки:', err);
-    loadLocalProducts();
-    renderProductCards();
-}
+   if (Object.keys(productsData).length === 0) {
+            loadLocalProducts();
+        }
+        renderProductCards();
+    }
 }
     
     function loadLocalProducts() {
