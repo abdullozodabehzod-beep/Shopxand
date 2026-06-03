@@ -4311,50 +4311,14 @@ setTimeout(function() {
    });
     }
     
-    // Отправить отзыв
-    if (qvReviewSubmit) {
-   qvReviewSubmit.addEventListener('click', async function() {
-  var text = qvReviewText.value.trim();
-  
-  if (selectedRating === 0) { showToast('Ошибка', 'Поставьте оценку', 'error'); return; }
-  if (!text) { showToast('Ошибка', 'Напишите отзыв', 'error'); return; }
-  
-  var productId = currentQvProduct.id;
-  var review = {
- name: currentUser.name,
- rating: selectedRating,
- text: text,
- date: new Date().toISOString()
-  };
 
-     if (!reviewsData[productId]) reviewsData[productId] = [];
-            reviewsData[productId].push(review);
-  
-        var originalOpenQuickview = openQuickview;
+        // ЗАГРУЗКА ОТЗЫВОВ ПРИ ОТКРЫТИИ ТОВАРА
+    var originalOpenQuickview = openQuickview;
     openQuickview = function(productId) {
         originalOpenQuickview(productId);
         renderProductReviews(productId);
         qvReviewForm.style.display = 'none';
     };
-  
-  console.log('Отправляю отзыв:', { productId, review });
-  
-  try {
- await apiRequest('/reviews', {
-method: 'POST',
-body: JSON.stringify({ productId, review })
- });
-  } catch (err) {}
-  
-  qvReviewForm.style.display = 'none';
-  selectedRating = 0;
-  qvReviewText.value = '';
-  
-  updateProductRating(productId);
-  renderProductReviews(productId);
-  showToast('Отзыв отправлен!', 'Он появится после проверки модератором', 'success');
-   });
-    }
     
     function renderProductReviews(productId) {
    var reviews = reviewsData[productId] || [];
@@ -4431,12 +4395,6 @@ body: JSON.stringify({ productId, review })
         });
     }
     
-    var originalOpenQuickview = openQuickview;
-    openQuickview = function(productId) {
-   originalOpenQuickview(productId);
-   renderProductReviews(productId);
-   qvReviewForm.style.display = 'none';
-    };
     
     loadReviews();
 
@@ -4717,54 +4675,51 @@ self.style.background = '';
     // ============================================
     // ОТПРАВКА ОТЗЫВА — финальная версия
     // ============================================
+    
     document.addEventListener('click', function(e) {
-   var target = e.target;
-   if (target.id === 'qvReviewSubmit' || target.closest('#qvReviewSubmit')) {
-  e.preventDefault();
-  e.stopPropagation();
-  
-  console.log('Кнопка Отправить отзыв нажата');
-  
-  if (!currentQvProduct) {
- console.log('Нет товара');
- return;
-  }
-  
-  var text = document.getElementById('qvReviewText')?.value?.trim();
-  var selected = document.querySelector('#qvReviewStars .fas.fa-star')?.parentElement?.getAttribute('data-star');
-  var rating = selected ? parseInt(selected) : 0;
-  
-  console.log('Текст:', text, 'Рейтинг:', rating);
-  
-  if (!text) { alert('Напишите отзыв'); return; }
-  if (rating === 0) { alert('Поставьте оценку'); return; }
-  
-  // Отправляем
-  fetch(API_URL + '/reviews', {
- method: 'POST',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
-productId: currentQvProduct.id,
-review: {
-    name: currentUser ? currentUser.name : 'Гость',
-    rating: rating,
-    text: text,
-    date: new Date().toISOString()
-}
- })
-  }).then(function(r) { return r.json(); })
-    .then(function(data) {
- console.log('Ответ:', data);
- document.getElementById('qvReviewForm').style.display = 'none';
- document.getElementById('qvReviewText').value = '';
- alert('Отзыв отправлен на модерацию!');
-  }).catch(function(err) {
- console.error('Ошибка:', err);
- alert('Ошибка отправки');
-  });
-   }
+        if (!e.target.closest('#qvReviewSubmit')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (!currentQvProduct) return;
+        
+        var text = document.getElementById('qvReviewText').value.trim();
+        if (selectedRating === 0) { showToast('Ошибка', 'Поставьте оценку', 'error'); return; }
+        if (!text) { showToast('Ошибка', 'Напишите отзыв', 'error'); return; }
+        
+        var productId = currentQvProduct.id;
+        var review = {
+            name: currentUser ? currentUser.name : 'Гость',
+            rating: selectedRating,
+            text: text,
+            date: new Date().toISOString()
+        };
+        
+        console.log('Отправляю отзыв:', { productId, review });
+        
+        fetch(API_URL + '/reviews', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId, review })
+        }).then(function(r) { return r.json(); })
+          .then(function(data) {
+            console.log('Ответ сервера:', data);
+            document.getElementById('qvReviewForm').style.display = 'none';
+            selectedRating = 0;
+            document.getElementById('qvReviewText').value = '';
+            
+            // Обновляем отзывы
+            loadReviews().then(function() {
+                updateProductRating(productId);
+                renderProductReviews(productId);
+            });
+            
+            showToast('Отзыв отправлен!', 'Спасибо за ваш отзыв!', 'success');
+        }).catch(function(err) {
+            console.error('Ошибка:', err);
+            showToast('Ошибка', 'Не удалось отправить', 'error');
+        });
     });
-
     
 
 
@@ -5306,3 +5261,93 @@ review: {
         document.body.removeChild(input);
         showToast('Скопировано!', 'Номер D/C скопирован', 'success');
     }
+
+        window.searchAndFilter = function(query) {
+        // Закрываем каталог
+        closeCatalog();
+        
+        // Вставляем запрос в поиск
+        var searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.value = query;
+        }
+        
+        // Фильтруем товары
+        searchProducts(query);
+        
+        // Прокручиваем к товарам
+        var productGrid = document.getElementById('productsGrid');
+        if (productGrid) {
+            setTimeout(function() {
+                productGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 200);
+        }
+    };
+
+        function searchProducts(query) {
+        var allCards = document.querySelectorAll('.product-card');
+        var foundCount = 0;
+        
+        allCards.forEach(function(card) {
+            var name = card.querySelector('.product-card__name')?.textContent || '';
+            var cat = card.querySelector('.product-card__cat')?.textContent || '';
+            var lowerName = name.toLowerCase();
+            var lowerQuery = query.toLowerCase();
+            
+            if (query === '' || lowerName.includes(lowerQuery) || cat.toLowerCase().includes(lowerQuery)) {
+                card.style.display = '';
+                foundCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        return foundCount;
+    }
+
+        window.searchAndFilter = function(query) {
+        closeCatalog();
+        
+        var searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.value = query;
+        }
+        
+        searchProducts(query);
+        
+        // Показываем кнопку сброса
+        showSearchReset(query);
+        
+        var productGrid = document.getElementById('productsGrid');
+        if (productGrid) {
+            setTimeout(function() {
+                productGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 200);
+        }
+    };
+    
+    function showSearchReset(query) {
+        var old = document.querySelector('.search-reset-bar');
+        if (old) old.remove();
+        
+        if (!query) return;
+        
+        var bar = document.createElement('div');
+        bar.className = 'search-reset-bar';
+        bar.innerHTML = 
+            '<span>🔍 Результаты по запросу: <strong>' + query + '</strong></span>' +
+            '<button onclick="window.resetSearch()">✕ Сбросить</button>';
+        
+        var header = document.querySelector('.products__header');
+        if (header) header.after(bar);
+    }
+    
+    window.resetSearch = function() {
+        var searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.value = '';
+        
+        searchProducts('');
+        
+        var bar = document.querySelector('.search-reset-bar');
+        if (bar) bar.remove();
+    };

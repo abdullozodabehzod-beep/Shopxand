@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /cart/
-Sitemap: https://shopxand.tj/sitemap.xml
+Sitemap: https://shopxand-3.onrender.com/sitemap.xml

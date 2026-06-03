@@ -1,27 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-   <loc>https://shopxand.tj/</loc>
-   <lastmod>2026-04-09</lastmod>
-   <changefreq>daily</changefreq>
-   <priority>1.0</priority>
+        <loc>https://shopxand-3.onrender.com/</loc>
+        <lastmod>2026-06-02</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
     </url>
     <url>
-   <loc>https://shopxand.tj/catalog/electronics</loc>
-   <lastmod>2026-04-09</lastmod>
-   <changefreq>weekly</changefreq>
-   <priority>0.8</priority>
-    </url>
-    <url>
-   <loc>https://shopxand.tj/catalog/clothing</loc>
-   <lastmod>2026-04-09</lastmod>
-   <changefreq>weekly</changefreq>
-   <priority>0.8</priority>
-    </url>
-    <url>
-   <loc>https://shopxand.tj/catalog/home</loc>
-   <lastmod>2026-04-09</lastmod>
-   <changefreq>weekly</changefreq>
-   <priority>0.8</priority>
+        <loc>https://shopxand-3.onrender.com/admin/</loc>
+        <lastmod>2026-06-02</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.5</priority>
     </url>
 </urlset>
