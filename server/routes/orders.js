@@ -14,31 +14,15 @@ function saveOrders(orders) {
     fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2));
 }
 
-router.post('/', (req, res) => {
-    try {
-        var orders = getOrders();
-        var order = req.body;
-        orders.push(order);
-        saveOrders(orders);
-        console.log('Заказ сохранён:', order.id);
-        res.json({ success: true });
-    } catch (err) {
-        console.error('Ошибка сохранения заказа:', err);
-        res.status(500).json({ error: err.message });
-    }
-});
-
 router.get('/', (req, res) => {
-    const orders = getOrders();
-    res.json({ orders });
+    res.json({ orders: getOrders() });
 });
 
-router.get('/admin/all', (req, res) => {
+router.post('/', (req, res) => {
     const orders = getOrders();
-    res.json({ orders });
+    orders.push(req.body);
+    saveOrders(orders);
+    res.json({ success: true });
 });
 
 module.exports = router;
-
-
-
