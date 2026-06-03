@@ -16,6 +16,22 @@ app.use('/api/orders', require('./routes/orders'));
 app.use('/api/reviews', require('./routes/reviews'));
 app.use('/api/user', require('./routes/userdata')); // ← новая строка
 
+// robots.txt
+app.get('/robots.txt', (req, res) => {
+    res.type('text/plain');
+    res.send(`User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /cart/
+
+Sitemap: https://shopxand-3.onrender.com/sitemap.xml`);
+});
+
+// sitemap.xml
+app.get('/sitemap.xml', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'sitemap.xml'));
+});
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
