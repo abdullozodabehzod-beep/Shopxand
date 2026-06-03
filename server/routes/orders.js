@@ -33,14 +33,9 @@ router.get('/', (req, res) => {
     res.json({ orders });
 });
 
-// Получить ВСЕ заказы (для админа)
-router.get('/admin/all', async (req, res) => {
-    try {
-   const orders = await Order.find().sort({ date: -1 });
-   res.json({ orders });
-    } catch (err) {
-   res.json({ orders: [] });
-    }
+router.get('/admin/all', (req, res) => {
+    const orders = getOrders();
+    res.json({ orders });
 });
 
 module.exports = router;
