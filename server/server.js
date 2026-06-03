@@ -7,7 +7,6 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '..')));
 
 // API routes
 app.use('/api/auth', require('./routes/auth'));
@@ -26,6 +25,9 @@ Disallow: /cart/
 
 Sitemap: https://shopxand-3.onrender.com/sitemap.xml`);
 });
+
+app.use(express.static(path.join(__dirname, '..')));
+
 
 // sitemap.xml
 app.get('/sitemap.xml', (req, res) => {
