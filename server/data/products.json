@@ -6,75 +6,40 @@
     "price": 120,
     "oldPrice": 180,
     "discount": "-33%",
-    "img": "img/Рубашка.jpeg",
+    "img": "/img/Рубашка.jpeg",
     "rating": 4.8,
     "reviews": 0,
     "desc": "Стильная вельветовая рубашка. Мягкая ткань.",
-    "sizes": [
-      "X",
-      "XL",
-      "2XL",
-      "3XL"
-    ],
+    "sizes": ["X", "XL", "2XL", "3XL"],
+    "colors": ["Чёрный"],
     "specs": [
-      [
-        "Материал",
-        "Вельвет 100%"
-      ],
-      [
-        "Размеры",
-        "X, XL, 2XL, 3XL"
-      ],
-      [
-        "Качество",
-        "Премиум"
-      ],
-      [
-        "Сезон",
-        "Весна-Осень"
-      ]
+      ["Материал", "Вельвет 100%"],
+      ["Размеры", "X, XL, 2XL, 3XL"],
+      ["Качество", "Премиум"],
+      ["Сезон", "Весна-Осень"]
     ],
-    "thumbs": [
-      "img/Рубашка.jpeg",
-      "img/Рубашка.jpeg",
-      "img/Рубашка.jpeg"
-    ],
-    "inStock": true
+    "thumbs": ["/img/Рубашка.jpeg", "/img/Рубашка.jpeg", "/img/Рубашка.jpeg"],
+    "inStock": true,
+    "brightness": 60
   },
   {
     "id": "2",
     "name": "Крассовка AF1 Air Force 1",
     "cat": "Одежда",
     "price": 110,
-    "img": "img/Крассовка.jpeg",
+    "img": "/img/Крассовка.jpeg",
     "rating": 4.6,
     "reviews": 0,
     "desc": "Крассовка AF1, лучшая модель",
-    "shoeSizes": [
-      "38",
-      "39",
-      "40",
-      "41",
-      "42",
-      "43",
-      "44"
-    ],
+    "shoeSizes": ["38", "39", "40", "41", "42", "43", "44"],
+    "colors": ["Белый"],
     "specs": [
-      [
-        "Материал",
-        "Кожа"
-      ],
-      [
-        "Стиль",
-        "Повседневный"
-      ]
+      ["Материал", "Кожа"],
+      ["Стиль", "Повседневный"]
     ],
-    "thumbs": [
-      "img/Крассовка.jpeg",
-      "img/Крассовка.jpeg",
-      "img/Крассовка.jpeg"
-    ],
-    "inStock": true
+    "thumbs": ["/img/Крассовка.jpeg", "/img/Крассовка.jpeg", "/img/Крассовка.jpeg"],
+    "inStock": true,
+    "brightness": 230
   },
   {
     "id": "3",
@@ -83,61 +48,37 @@
     "price": 140,
     "oldPrice": 250,
     "discount": "-44%",
-    "img": "img/Крассовка-2.jpeg",
+    "img": "/img/Крассовка-2.jpeg",
     "rating": 4.9,
     "reviews": 0,
     "desc": "Британский стиль, премиум качество",
-    "shoeSizes": [
-      "38",
-      "39",
-      "40",
-      "41",
-      "42",
-      "43",
-      "44"
-    ],
+    "shoeSizes": ["38", "39", "40", "41", "42", "43", "44"],
+    "colors": ["Коричневый"],
     "specs": [
-      [
-        "Материал",
-        "Премиум"
-      ],
-      [
-        "Стиль",
-        "Повседневный"
-      ]
+      ["Материал", "Премиум"],
+      ["Стиль", "Повседневный"]
     ],
-    "thumbs": [
-      "img/Крассовка-2.jpeg",
-      "img/Крассовка-2.jpeg",
-      "img/Крассовка-2.jpeg"
-    ],
-    "inStock": true
+    "thumbs": ["/img/Крассовка-2.jpeg", "/img/Крассовка-2.jpeg", "/img/Крассовка-2.jpeg"],
+    "inStock": true,
+    "brightness": 150
   },
   {
     "id": "4",
     "name": "Проводной наушник",
     "cat": "Электроника",
     "price": 30,
-    "img": "img/Наушник.jpeg",
+    "img": "/img/Наушник.jpeg",
     "rating": 4.7,
     "reviews": 0,
     "desc": "Качественный звук с микрофоном",
+    "colors": ["Чёрный"],
     "specs": [
-      [
-        "Тип",
-        "Проводные"
-      ],
-      [
-        "Коннектор",
-        "3.5мм"
-      ]
+      ["Тип", "Проводные"],
+      ["Коннектор", "3.5мм"]
     ],
-    "thumbs": [
-      "img/Наушник.jpeg",
-      "img/Наушник.jpeg",
-      "img/Наушник.jpeg"
-    ],
-    "inStock": true
+    "thumbs": ["/img/Наушник.jpeg", "/img/Наушник.jpeg", "/img/Наушник.jpeg"],
+    "inStock": true,
+    "brightness": 40
   },
   {
     "id": "5",
@@ -146,61 +87,37 @@
     "price": 230,
     "oldPrice": 300,
     "discount": "-23%",
-    "img": "img/watch.jpeg",
+    "img": "/img/watch.jpeg",
     "rating": 4.9,
     "reviews": 0,
     "desc": "Стильные кварцевые часы",
+    "colors": ["Золотой"],
     "specs": [
-      [
-        "Бренд",
-        "CHENXI"
-      ],
-      [
-        "Тип",
-        "Кварцевые"
-      ]
+      ["Бренд", "CHENXI"],
+      ["Тип", "Кварцевые"]
     ],
-    "thumbs": [
-      "img/watch.jpeg",
-      "img/watch.jpeg",
-      "img/watch.jpeg"
-    ],
-    "inStock": true
+    "thumbs": ["/img/watch.jpeg", "/img/watch.jpeg", "/img/watch.jpeg"],
+    "inStock": true,
+    "brightness": 180
   },
   {
     "id": "6",
     "name": "Кожаные тапочки",
     "cat": "Одежда",
     "price": 100,
-    "img": "img/Шилопка-2.jpeg",
+    "img": "/img/Шилопка-2.jpeg",
     "rating": 4.7,
     "reviews": 0,
     "desc": "Натуральная кожа, удобные",
-    "shoeSizes": [
-      "38",
-      "39",
-      "40",
-      "41",
-      "42",
-      "43",
-      "44"
-    ],
+    "shoeSizes": ["38", "39", "40", "41", "42", "43", "44"],
+    "colors": ["Чёрный"],
     "specs": [
-      [
-        "Материал",
-        "Натуральная кожа"
-      ],
-      [
-        "Подошва",
-        "Резиновая"
-      ]
+      ["Материал", "Натуральная кожа"],
+      ["Подошва", "Резиновая"]
     ],
-    "thumbs": [
-      "img/Шилопка-2.jpeg",
-      "img/Шилопка-2.jpeg",
-      "img/Шилопка-2.jpeg"
-    ],
-    "inStock": true
+    "thumbs": ["/img/Шилопка-2.jpeg", "/img/Шилопка-2.jpeg", "/img/Шилопка-2.jpeg"],
+    "inStock": true,
+    "brightness": 50
   },
   {
     "id": "7",
@@ -209,58 +126,37 @@
     "price": 80,
     "oldPrice": 90,
     "discount": "-11%",
-    "img": "img/Знак Мерса.jpeg",
+    "img": "/img/Знак Мерса.jpeg",
     "rating": 4.8,
     "reviews": 0,
     "desc": "Металлический знак Mercedes",
+    "colors": ["Серебристый"],
     "specs": [
-      [
-        "Бренд",
-        "Mercedes-Benz"
-      ],
-      [
-        "Материал",
-        "Металл"
-      ]
+      ["Бренд", "Mercedes-Benz"],
+      ["Материал", "Металл"]
     ],
-    "thumbs": [
-      "img/Знак Мерса.jpeg",
-      "img/Знак Мерса.jpeg",
-      "img/Знак Мерса.jpeg"
-    ],
-    "inStock": true
+    "thumbs": ["/img/Знак Мерса.jpeg", "/img/Знак Мерса.jpeg", "/img/Знак Мерса.jpeg"],
+    "inStock": true,
+    "brightness": 200
   },
   {
     "id": "8",
     "name": "Качественная рубашка белая",
     "cat": "Одежда",
     "price": 120,
-    "img": "img/Рубашка-3.jpeg",
+    "img": "/img/Рубашка-3.jpeg",
     "rating": 4.5,
     "reviews": 0,
     "desc": "Качественная рубашка с длинными рукавами",
-    "sizes": [
-      "X",
-      "XL",
-      "2XL",
-      "3XL"
-    ],
+    "sizes": ["X", "XL", "2XL", "3XL"],
+    "colors": ["Белый"],
     "specs": [
-      [
-        "Материал",
-        "Хлопок + Полиэстер"
-      ],
-      [
-        "Цвет",
-        "Белый"
-      ]
+      ["Материал", "Хлопок + Полиэстер"],
+      ["Цвет", "Белый"]
     ],
-    "thumbs": [
-      "img/Рубашка-3.jpeg",
-      "img/Рубашка-3.jpeg",
-      "img/Рубашка-3.jpeg"
-    ],
-    "inStock": true
+    "thumbs": ["/img/Рубашка-3.jpeg", "/img/Рубашка-3.jpeg", "/img/Рубашка-3.jpeg"],
+    "inStock": true,
+    "brightness": 235
   },
   {
     "id": "1779286097889",
@@ -270,18 +166,15 @@
     "oldPrice": 180,
     "img": "/img/Комплект из черного жилета .jpeg",
     "desc": "Комплект из черного жилета с капюшоном и коби Брайанта, размер XL",
-    "sizes": [
-      "X",
-      "XL",
-      "2XL",
-      "3XL"
+    "sizes": ["X", "XL", "2XL", "3XL"],
+    "colors": ["Чёрный"],
+    "specs": [
+      ["Размер", "XL"],
+      ["Цвет", "Чёрный"]
     ],
-    "shoeSizes": [],
-    "rating": 0,
-    "reviews": 0,
-    "specs": [],
-    "thumbs": [],
-    "inStock": true
+    "thumbs": ["/img/Комплект из черного жилета .jpeg"],
+    "inStock": true,
+    "brightness": 40
   },
   {
     "id": "1780490182601",
@@ -290,21 +183,17 @@
     "price": 60,
     "oldPrice": 140,
     "img": "/img/riddary-watch.jpeg",
-    "thumbs": [],
-    "colors": [
-      {
-        "r": 128,
-        "g": 128,
-        "b": 128
-      }
+    "desc": "Часы: Rinnady в стиле ретро с ремешком из нержавеющей стали - универсальный деловой стиль.",
+    "colors": ["Серебристый"],
+    "specs": [
+      ["Бренд", "Rinnady"],
+      ["Стиль", "Ретро"],
+      ["Материал", "Нержавеющая сталь"]
     ],
-    "desc": "Часы: Rinnady в стиле ретро с ремешком  из нержавеющей стали- универсальный деловой стиль.",
-    "sizes": [],
-    "shoeSizes": [],
+    "thumbs": ["/img/riddary-watch.jpeg"],
     "rating": 4,
     "reviews": 0,
-    "specs": [],
     "inStock": true,
-    "brightness": 128
+    "brightness": 160
   }
 ]
