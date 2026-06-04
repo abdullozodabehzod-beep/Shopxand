@@ -1,65 +1,76 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose');
 
-const PRODUCTS_FILE = path.join(__dirname, '..', 'data', 'products.json');
+// Схема товара
+const ProductSchema = new mongoose.Schema({
+    id: String,
+    name: String,
+    cat: String,
+    price: Number,
+    oldPrice: Number,
+    discount: String,
+    img: String,
+    rating: Number,
+    reviews: Number,
+    desc: String,
+    sizes: [String],
+    shoeSizes: [String],
+    specs: [[String]],
+    thumbs: [String],
+    brightness: Number,
+    colors: [mongoose.Schema.Types.Mixed]
+}, { timestamps: true });
 
-function getProducts() {
+const Product = mongoose.model('Product', ProductSchema);
+
+// Получить все товары
+router.get('/', async (req, res) => {
     try {
-   if (!fs.existsSync(PRODUCTS_FILE)) return [];
-   return JSON.parse(fs.readFileSync(PRODUCTS_FILE, 'utf-8'));
+        const products = await Product.find();
+        res.json({ products });
     } catch (err) {
-   console.error('Ошибка чтения:', err);
-   return [];
+        res.status(500).json({ error: err.message });
     }
-}
-
-function saveProducts(products) {
-    try {
-   fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(products, null, 2));
-   console.log('Файл сохранён');
-    } catch (err) {
-   console.error('Ошибка сохранения:', err);
-    }
-}
-
-router.get('/', (req, res) => {
-    res.json({ products: getProducts() });
 });
 
-router.post('/', (req, res) => {
+// Добавить товар
+router.post('/', async (req, res) => {
     try {
-   var products = getProducts();
-   var product = { id: Date.now().toString(), ...req.body };
-   products.push(product);
-   saveProducts(products);
-   console.log('Товар сохранён:', product.name);
-   res.json({ success: true, product: product });
+        const product = new Product({
+            id: Date.now().toString(),
+            ...req.body
+        });
+        await product.save();
+        console.log('✅ Товар сохранён в MongoDB:', product.name);
+        res.json({ success: true, product });
     } catch (err) {
-   console.error('Ошибка:', err);
-   res.status(500).json({ error: err.message });
+        console.error('❌ Ошибка:', err);
+        res.status(500).json({ error: err.message });
     }
 });
 
 // Удалить товар
-router.delete('/:id', (req, res) => {
-    var products = getProducts();
-    products = products.filter(p => p.id !== req.params.id);
-    saveProducts(products);
-    res.json({ success: true });
+router.delete('/:id', async (req, res) => {
+    try {
+        await Product.deleteOne({ id: req.params.id });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
-// Обновить рейтинг товара
-router.put('/:id/rating', (req, res) => {
-    var products = getProducts();
-    var product = products.find(p => p.id === req.params.id);
-    if (product) {
-        product.rating = req.body.rating || product.rating;
-        product.reviews = req.body.reviews || product.reviews;
-        saveProducts(products);
+// Обновить рейтинг
+router.put('/:id/rating', async (req, res) => {
+    try {
+        await Product.updateOne(
+            { id: req.params.id },
+            { rating: req.body.rating, reviews: req.body.reviews }
+        );
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
-    res.json({ success: true });
 });
 
 module.exports = router;

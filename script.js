@@ -3155,52 +3155,32 @@ checkDeliveryNotifications();
    // ============================================
     // PRODUCTS - Загрузка с сервера или локально
     // ============================================
-    async function loadProducts() {
-try {
-    var data = await apiRequest('/products');
-    if (data && data.products && data.products.length > 0) {
-        productsData = {};
-        data.products.forEach(function(p) {
-            // Определяем базовый путь в зависимости от хостинга
-            var isGitHub = window.location.hostname.includes('github.io');
+           async function loadProducts() {
+        // Сначала загружаем локальные
+        loadLocalProducts();
+        
+        // Потом добавляем серверные
+        try {
+            var response = await fetch(API_URL + '/products');
+            var data = await response.json();
+            console.log('Серверные товары:', data.products.length);
             
-            // Исправляем путь
-            if (p.img && !p.img.startsWith('http')) {
-                if (isGitHub) {
-                    p.img = p.img.replace(/^\//, ''); // убираем / в начале
-                } else {
-                    if (!p.img.startsWith('/')) p.img = '/' + p.img;
+            data.products.forEach(function(p) {
+                if (p.img && !p.img.startsWith('http') && !p.img.startsWith('/')) {
+                    p.img = '/' + p.img;
                 }
-            }
-            
-            if (p.thumbs) {
-                p.thumbs = p.thumbs.map(function(t) {
-                    if (!t || t.startsWith('http')) return t;
-                    if (isGitHub) return t.replace(/^\//, '');
-                    return t.startsWith('/') ? t : '/' + t;
-                });
-            }
-            
-            if (!p.brightness) p.brightness = 128;
-        if (!p.colors || !Array.isArray(p.colors) || p.colors.length === 0) {
-            p.colors = [];
-        } else if (typeof p.colors[0] === 'object') {
-            // Если старый формат (объекты) — очищаем
-            p.colors = [];
-        }            
-            productsData[p.id] = p;
-        });
-                    console.log('productsData:', Object.keys(productsData).length, 'товаров');
-        renderProductCards();
-    }
-} catch (err) {
-    console.log('Ошибка загрузки:', err);
-   if (Object.keys(productsData).length === 0) {
-            loadLocalProducts();
+                // Добавляем серверный товар (если его ещё нет)
+                if (!productsData[p.id]) {
+                    productsData[p.id] = p;
+                }
+            });
+            console.log('Всего товаров:', Object.keys(productsData).length);
+        } catch (err) {
+            console.log('Сервер недоступен, только локальные');
         }
+        
         renderProductCards();
     }
-}
     
     function loadLocalProducts() {
    productsData = {
