@@ -3155,29 +3155,24 @@ checkDeliveryNotifications();
    // ============================================
     // PRODUCTS - Загрузка с сервера или локально
     // ============================================
-             async function loadProducts() {
-        loadLocalProducts();
-        
+            async function loadProducts() {
+        // СНАЧАЛА сервер
         try {
             var response = await fetch(API_URL + '/products');
             var data = await response.json();
             console.log('Серверные товары:', data.products.length);
             
+            productsData = {};
             data.products.forEach(function(p) {
                 if (p.img && !p.img.startsWith('http') && !p.img.startsWith('/')) {
                     p.img = '/' + p.img;
-                }
-                if (p.thumbs) {
-                    p.thumbs = p.thumbs.map(function(t) {
-                        if (!t || t.startsWith('http')) return t;
-                        return t.startsWith('/') ? t : '/' + t;
-                    });
                 }
                 productsData[p.id] = p;
             });
             console.log('Всего товаров:', Object.keys(productsData).length);
         } catch (err) {
-            console.log('Сервер недоступен');
+            console.log('Сервер недоступен, загружаем локально');
+            loadLocalProducts();
         }
         
         renderProductCards();

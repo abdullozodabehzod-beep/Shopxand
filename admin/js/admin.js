@@ -2,7 +2,7 @@
 
 const ADMIN_USER = 'admin';
 const ADMIN_PASS = 'shopxand2024';
-const API_URL = 'https://shopxand-3.onrender.com/api';
+const API_URL = 'http://localhost:3000/api';
 // Вход
 document.getElementById('adminLoginForm')?.addEventListener('submit', function(e) {
     e.preventDefault();
