@@ -22,5 +22,13 @@
     "text": "Test",
     "status": "approved",
     "date": "2026-06-03T11:16:41.773Z"
+  },
+  {
+    "productId": "3",
+    "name": "Pedro",
+    "rating": 4,
+    "text": "ето карассовки нет другого цвета",
+    "status": "approved",
+    "date": "2026-06-05T09:46:04.424Z"
   }
 ]
