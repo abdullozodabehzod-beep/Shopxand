@@ -3679,12 +3679,20 @@ openAuth();
     // РЕГИСТРАЦИЯ
     // ============================================
     document.getElementById('registerBtn')?.addEventListener('click', async function() {
-   var name = document.getElementById('regName').value.trim();
-   var phone = document.getElementById('regPhone').value.trim();
-   var email = document.getElementById('regEmail').value.trim();
-   var password = document.getElementById('regPassword').value;
-   var passwordConfirm = document.getElementById('regPasswordConfirm').value;
-   var agree = document.getElementById('regAgree')?.checked;
+    var nameEl = document.getElementById('regName');
+var name = nameEl ? nameEl.value.trim() : '';
+   var phoneEl = document.getElementById('regPhone');
+var phone = phoneEl ? phoneEl.value.trim() : '';
+  var emailEl = document.getElementById('regEmail');
+var email = emailEl ? emailEl.value.trim() : '';
+   var passEl = document.getElementById('regPassword');
+var password = passEl ? passEl.value : '';
+
+var passConfirmEl = document.getElementById('regPasswordConfirm');
+var passwordConfirm = passConfirmEl ? passConfirmEl.value : '';
+
+var agreeEl = document.getElementById('regAgree');
+var agree = agreeEl ? agreeEl.checked : false;
    
    if (!name || name.length < 2) { showToast('Ошибка', 'Имя минимум 2 символа', 'error'); return; }
    var cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
