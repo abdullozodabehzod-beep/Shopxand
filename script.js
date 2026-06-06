@@ -2118,9 +2118,6 @@ text: channelMsg
             selectedColor = ' (' + activeColorBtn.getAttribute('data-color') + ')';
         }
         
-        var itemsList = order.items.map(function(item, i) {
-            return (i + 1) + '. ' + item.name + selectedColor + ' ×' + item.quantity + ' — ' + (item.price * item.quantity).toLocaleString() + ' с.';
-        }).join('\n');
     }
     
     // Уведомление о доставке
