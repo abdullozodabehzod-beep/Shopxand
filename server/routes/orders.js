@@ -25,4 +25,9 @@ router.post('/', (req, res) => {
     res.json({ success: true });
 });
 
+router.get('/admin/all', (req, res) => {
+    const orders = getOrders();
+    res.json({ orders });
+});
+
 module.exports = router;
