@@ -19,9 +19,13 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', (req, res) => {
+    console.log('Тело запроса:', JSON.stringify(req.body));
+    
     const orders = getOrders();
     orders.push(req.body);
     saveOrders(orders);
+    
+    console.log('Заказов после сохранения:', orders.length);
     res.json({ success: true });
 });
 
@@ -29,5 +33,7 @@ router.get('/admin/all', (req, res) => {
     const orders = getOrders();
     res.json({ orders });
 });
+
+
 
 module.exports = router;
