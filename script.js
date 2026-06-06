@@ -3157,28 +3157,24 @@ checkDeliveryNotifications();
    // ============================================
     // PRODUCTS - Загрузка с сервера или локально
     // ============================================
-            async function loadProducts() {
-        // СНАЧАЛА сервер
+        async function loadProducts() {
         try {
             var response = await fetch(API_URL + '/products');
             var data = await response.json();
             console.log('Серверные товары:', data.products.length);
             
-            productsData = {};
+            productsData = {}; // Очищаем перед загрузкой
             data.products.forEach(function(p) {
-                if (p.img && !p.img.startsWith('http') && !p.img.startsWith('/')) {
-                    p.img = '/' + p.img;
-                }
-                productsData[p.id] = p;
+                productsData[p._id || p.id] = p; // ← используем _id из MongoDB
             });
             console.log('Всего товаров:', Object.keys(productsData).length);
         } catch (err) {
-            console.log('Сервер недоступен, загружаем локально');
+            console.log('Сервер недоступен');
             loadLocalProducts();
         }
         
         renderProductCards();
-    }
+    }       
     
     function loadLocalProducts() {
    productsData = {
