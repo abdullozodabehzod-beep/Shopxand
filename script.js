@@ -3157,15 +3157,16 @@ checkDeliveryNotifications();
    // ============================================
     // PRODUCTS - Загрузка с сервера или локально
     // ============================================
-        async function loadProducts() {
+          async function loadProducts() {
         try {
             var response = await fetch(API_URL + '/products');
             var data = await response.json();
             console.log('Серверные товары:', data.products.length);
             
-            productsData = {}; // Очищаем перед загрузкой
+            productsData = {};
             data.products.forEach(function(p) {
-                productsData[p._id || p.id] = p; // ← используем _id из MongoDB
+                var productId = p._id || p.id;
+                productsData[productId] = p;
             });
             console.log('Всего товаров:', Object.keys(productsData).length);
         } catch (err) {
@@ -3174,7 +3175,7 @@ checkDeliveryNotifications();
         }
         
         renderProductCards();
-    }       
+    }     
     
     function loadLocalProducts() {
    productsData = {
@@ -3190,8 +3191,14 @@ checkDeliveryNotifications();
    productsLoaded = true;
     }
     
-    function getProductById(id) {
-   return productsData[id] || null;
+        function getProductById(id) {
+        // Ищем по id или _id
+        for (var key in productsData) {
+            if (key === id || productsData[key]._id === id || productsData[key].id === id) {
+                return productsData[key];
+            }
+        }
+        return null;
     }
     
     function getAllProductsData() {
@@ -4628,12 +4635,12 @@ function showPushBanner() {
    
    var allProducts = getAllProductsData();
    
-   grid.innerHTML = allProducts.map(function(p) {
+      grid.innerHTML = allProducts.map(function(p) {
   return `
   <div class="product-card" data-cat="${p.cat || ''}">
  <div class="product-card__img">
 <img src="${p.img || ''}" alt="${p.name}" onerror="this.style.display='none';this.parentElement.innerHTML='📦'">
-<button class="product-card__fav" data-id="${p.id}" data-name="${p.name}" data-price="${p.price}" data-img="${p.img || ''}" data-cat="${p.cat || ''}">
+<button class="product-card__fav" data-id="${p._id || p.id}" data-name="${p.name}" data-price="${p.price}" data-img="${p.img || ''}" data-cat="${p.cat || ''}">
     <i class="far fa-heart"></i>
 </button>
 ${p.oldPrice ? '<span class="product-card__badge">-' + Math.round((1 - p.price/p.oldPrice)*100) + '%</span>' : ''}
@@ -4650,7 +4657,7 @@ ${p.oldPrice ? '<span class="product-card__badge">-' + Math.round((1 - p.price/p
     ${p.oldPrice ? '<span class="product-card__price-old">' + p.oldPrice + ' сомони</span>' : ''}
     <span class="product-card__price-current">${p.price} сомони</span>
 </div>
-<button class="product-card__cart-btn" data-id="${p.id}" data-name="${p.name}" data-price="${p.price}" data-img="${p.img || ''}" data-cat="${p.cat || ''}">
+<button class="product-card__cart-btn" data-id="${p._id || p.id}" data-name="${p.name}" data-price="${p.price}" data-img="${p.img || ''}" data-cat="${p.cat || ''}">
     <i class="fas fa-shopping-cart"></i> В корзину
 </button>
  </div>
