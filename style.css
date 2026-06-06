@@ -5062,123 +5062,40 @@ body {
 }
 
 /* ========================================
-   PWA INSTALL BANNER
+   PWA INSTALL BANNER — Внизу экрана
    ======================================== */
 
-.pwa-install {
+.pwa-install-btn {
     position: fixed;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 6000;
-    animation: slideUpPwa 0.4s ease;
+    z-index: 10000;
+    display: none;
+    animation: slideUpPwa 0.5s ease;
 }
 
 @keyframes slideUpPwa {
-    from {
-   opacity: 0;
-   transform: translateX(-50%) translateY(20px);
-    }
-    to {
-   opacity: 1;
-   transform: translateX(-50%) translateY(0);
-    }
-}
-
-.pwa-install__content {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--white);
-    border-radius: 16px;
-    padding: 14px 18px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    max-width: 400px;
-}
-
-.pwa-install__icon svg {
-    display: block;
-}
-
-.pwa-install__info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.pwa-install__info strong {
-    font-size: 14px;
-    color: var(--dark);
-}
-
-.pwa-install__info span {
-    font-size: 12px;
-    color: #999;
-}
-
-.pwa-install__btn {
-    padding: 8px 18px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: var(--transition);
-}
-
-.pwa-install__btn:hover {
-    background: var(--primary-dark);
-}
-
-.pwa-install__close {
-    background: none;
-    border: none;
-    font-size: 18px;
-    color: #ccc;
-    cursor: pointer;
-    padding: 4px;
-    position: absolute;
-    top: 4px;
-    right: 8px;
-}
-
-/* ========================================
-   PWA INSTALL BUTTON
-   ======================================== */
-
-.pwa-install-btn {
-    margin: 20px 0;
-    animation: fadeInUp 0.5s ease;
-}
-
-@keyframes fadeInUp {
-    from {
-   opacity: 0;
-   transform: translateY(15px);
-    }
-    to {
-   opacity: 1;
-   transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateX(-50%) translateY(30px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 .pwa-install-btn__content {
     display: flex;
     align-items: center;
-    gap: 14px;
-    background: linear-gradient(135deg, #f0f4ff, #e8f0ff);
-    border: 2px solid var(--primary);
+    gap: 12px;
+    background: #1a1a2e;
+    color: #fff;
+    padding: 14px 20px;
     border-radius: 16px;
-    padding: 16px 18px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    max-width: 420px;
     position: relative;
-    cursor: default;
 }
 
 .pwa-install-btn__icon svg {
     display: block;
+    border-radius: 12px;
     flex-shrink: 0;
 }
 
@@ -5190,34 +5107,35 @@ body {
 }
 
 .pwa-install-btn__text strong {
-    font-size: 15px;
-    color: var(--dark);
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
 }
 
 .pwa-install-btn__text span {
     font-size: 12px;
-    color: #666;
+    opacity: 0.7;
+    color: #ccc;
 }
 
 .pwa-install-btn__action {
-    padding: 10px 20px;
-    background: var(--primary);
-    color: white;
+    padding: 8px 16px;
+    background: #0066ff;
+    color: #fff;
     border: none;
-    border-radius: 10px;
-    font-size: 14px;
+    border-radius: 8px;
+    font-size: 13px;
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
     display: flex;
     align-items: center;
     gap: 6px;
-    transition: var(--transition);
+    transition: 0.2s;
 }
 
 .pwa-install-btn__action:hover {
-    background: var(--primary-dark);
-    transform: translateY(-1px);
+    background: #0052cc;
 }
 
 .pwa-install-btn__action:active {
@@ -5226,35 +5144,35 @@ body {
 
 .pwa-install-btn__dismiss {
     position: absolute;
-    top: 8px;
-    right: 12px;
+    top: 4px;
+    right: 10px;
     background: none;
     border: none;
-    font-size: 16px;
     color: #999;
     cursor: pointer;
+    font-size: 16px;
     padding: 4px;
 }
 
 .pwa-install-btn__dismiss:hover {
-    color: var(--accent);
+    color: #fff;
 }
 
+/* Мобильная версия */
 @media (max-width: 768px) {
-    .pwa-install-btn__content {
-   flex-wrap: wrap;
-   gap: 10px;
-   padding: 14px;
+    .pwa-install-btn {
+        bottom: 80px;
     }
     
-    .pwa-install-btn__action {
-   width: 100%;
-   justify-content: center;
-   padding: 12px;
+    .pwa-install-btn__content {
+        max-width: 90vw;
     }
 }
 
-/* Выбор размера */
+/* ========================================
+   ВЫБОР РАЗМЕРА
+   ======================================== */
+
 .quickview__size {
     display: flex;
     align-items: center;
@@ -5282,10 +5200,7 @@ body {
     font-size: 14px;
     font-weight: 700;
     color: #333;
-    transition: all 0.2s ease;
-    pointer-events: auto;
-    z-index: 10;
-    position: relative;
+    transition: 0.2s;
 }
 
 .quickview__size-btn:hover {
@@ -5301,16 +5216,7 @@ body {
 .quickview__size-btn.active {
     border-color: #0066ff;
     background: #0066ff;
-    color: white;
-}
-
-
-/* ВРЕМЕННО: показываем блок размеров всегда */
-#quickviewSizeBlock {
-    display: flex !important;
-    border: 2px solid red; /* красная рамка чтобы увидеть */
-    padding: 10px;
-    margin: 10px 0;
+    color: #fff;
 }
 
 

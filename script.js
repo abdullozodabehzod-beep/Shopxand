@@ -2049,6 +2049,11 @@ break;
    const BOT_TOKEN = '8265957442:AAFWnqXyl8TJJzZXsv3vxXRCuWwWd_aY9mE';
    const CHAT_ID = '5282056467';
    const CHANNEL_ID = '-1002854630161';
+
+   // ← ДОБАВЬ ЭТУ СТРОКУ
+        const itemsList = order.items.map(function(item, i) {
+            return (i + 1) + '. ' + (item.name || 'Товар') + ' ×' + item.quantity + ' — ' + (item.price * item.quantity).toLocaleString() + ' с.';
+        }).join('\n');
    
    const message = 
   '🛍 НОВЫЙ ЗАКАЗ!\n\n' +
@@ -4066,6 +4071,12 @@ card.style.display = 'none';
    // Показываем нашу кнопку
    if (pwaInstallBtn) {
   pwaInstallBtn.style.display = 'block';
+
+  // Авто-скрытие через 8 секунд
+            clearTimeout(pwaInstallBtn._hideTimeout);
+            pwaInstallBtn._hideTimeout = setTimeout(function() {
+                pwaInstallBtn.style.display = 'none';
+            }, 8000);
    }
     });
     
@@ -5328,27 +5339,6 @@ self.style.background = '';
         
         return foundCount;
     }
-
-        window.searchAndFilter = function(query) {
-        closeCatalog();
-        
-        var searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.value = query;
-        }
-        
-        searchProducts(query);
-        
-        // Показываем кнопку сброса
-        showSearchReset(query);
-        
-        var productGrid = document.getElementById('productsGrid');
-        if (productGrid) {
-            setTimeout(function() {
-                productGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 200);
-        }
-    };
     
     function showSearchReset(query) {
         var old = document.querySelector('.search-reset-bar');
@@ -5374,4 +5364,72 @@ self.style.background = '';
         
         var bar = document.querySelector('.search-reset-bar');
         if (bar) bar.remove();
+    };
+
+        // ============================================
+    // AI SEARCH BY PHOTO — Teachable Machine
+    // ============================================
+    
+    var aiModel = null;
+    
+    // Загружаем модель
+    async function loadAIModel() {
+        try {
+            var modelURL = '/model/model.json';
+            aiModel = await tmImage.load(modelURL);
+            console.log('🤖 AI модель загружена');
+        } catch (err) {
+            console.log('Модель не загружена:', err.message);
+        }
+    }
+    
+    // Вызываем при загрузке
+    loadAIModel();
+    
+    // Анализ изображения через AI
+    async function analyzeImageWithAI(imageData) {
+        if (!aiModel) {
+            originalAnalyzeImage(imageData); // ← замени здесь
+            return;
+        }
+        
+        var img = new Image();
+        img.onload = async function() {
+            // Предсказываем категорию
+            var prediction = await aiModel.predict(img);
+            
+            // Находим лучшую категорию
+            var best = prediction.reduce(function(a, b) {
+                return a.probability > b.probability ? a : b;
+            });
+            
+            console.log('🤖 AI определил:', best.className, '(', Math.round(best.probability * 100), '%)');
+            
+            // Ищем товары по категории
+            var category = best.className;
+            searchByAICategory(category);
+        };
+        img.src = imageData;
+    }
+    
+    function searchByAICategory(category) {
+        var allProducts = getAllProductsData();
+        
+        // Ищем товары по категории
+        var results = allProducts.filter(function(p) {
+            return p.cat === category || 
+                   p.name.toLowerCase().includes(category.toLowerCase());
+        });
+        
+        if (results.length === 0) {
+            results = allProducts.slice(0, 6);
+        }
+        
+        showPhotoSearchResults(results.slice(0, 6));
+    }
+    
+       // Заменяем старый analyzeImage
+    var originalAnalyzeImage = analyzeImage;
+    analyzeImage = function(imageData) {
+        analyzeImageWithAI(imageData);
     };
