@@ -20,51 +20,72 @@ function saveUsers(users) {
 // Регистрация
 router.post('/register', async (req, res) => {
     try {
-   const { name, phone, email, password } = req.body;
-   const users = getUsers();
-   
-   if (users.find(u => u.phone === phone)) {
-  return res.status(400).json({ error: 'Номер уже зарегистрирован' });
-   }
-   
-   const hashedPassword = await bcrypt.hash(password, 10);
-   const user = { id: Date.now().toString(), name, phone, email: email || '', password: hashedPassword };
-   users.push(user);
-   saveUsers(users);
-   
-   const token = jwt.sign({ id: user.id, phone: user.phone }, SECRET, { expiresIn: '30d' });
-   res.json({ token, user: { id: user.id, name: user.name, phone: user.phone } });
+        const { name, phone, email, password } = req.body;
+        const users = getUsers();
+        
+        // Очищаем телефон
+        const cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
+        
+        // ===== ЖЁСТКАЯ ПРОВЕРКА =====
+        // Проверяем номер телефона
+        const phoneExists = users.find(u => u.phone === cleanPhone);
+        if (phoneExists) {
+            return res.status(400).json({ 
+                error: 'Этот номер уже зарегистрирован. Один номер = один аккаунт. Войдите или восстановите пароль.' 
+            });
+        }
+        
+        // Проверяем email (если указан)
+        if (email) {
+            const emailExists = users.find(u => u.email === email);
+            if (emailExists) {
+                return res.status(400).json({ 
+                    error: 'Этот email уже используется. Один email = один аккаунт.' 
+                });
+            }
+        }
+        
+        // Создаём пользователя
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = {
+            id: Date.now().toString(),
+            name,
+            phone: cleanPhone,
+            email: email || '',
+            password: hashedPassword,
+            registeredAt: new Date().toISOString()
+        };
+        
+        users.push(user);
+        saveUsers(users);
+        
+        const token = jwt.sign({ id: user.id, phone: user.phone }, SECRET, { expiresIn: '30d' });
+        res.json({ token, user: { id: user.id, name: user.name, phone: user.phone } });
+        
     } catch (err) {
-   res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message });
     }
 });
 
 // Вход
 router.post('/login', async (req, res) => {
     try {
-   const { phone, password } = req.body;
-   const users = getUsers();
-   const user = users.find(u => u.phone === phone || u.email === phone);
-   
-   if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
-   
-   const valid = await bcrypt.compare(password, user.password);
-if (!valid) return res.status(401).json({ error: 'Неверный пароль' });
-   
-   // ===== ПРОВЕРКА УСТРОЙСТВА =====
-   const deviceId = req.body.deviceId || 'unknown';
-   const devices = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'devices.json'), 'utf-8') || '{}');
-   const userDevices = devices[phone] || [];
-   const isNewDevice = !userDevices.includes(deviceId);
-   
-   if (isNewDevice && user.email) {
-  console.log('Уведомление на почту:', user.email, 'Новое устройство');
-   }
-   
-   const token = jwt.sign({ id: user.id, phone: user.phone }, SECRET, { expiresIn: '30d' });
-   res.json({ token, user: { id: user.id, name: user.name, phone: user.phone } });
+        const { phone, password } = req.body;
+        const users = getUsers();
+        const cleanPhone = phone.replace(/[\+\s\-\(\)]/g, '');
+        
+        const user = users.find(u => u.phone === cleanPhone);
+        
+        if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
+        
+        const valid = await bcrypt.compare(password, user.password);
+        if (!valid) return res.status(401).json({ error: 'Неверный пароль' });
+        
+        const token = jwt.sign({ id: user.id, phone: user.phone }, SECRET, { expiresIn: '30d' });
+        res.json({ token, user: { id: user.id, name: user.name, phone: user.phone } });
+        
     } catch (err) {
-   res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message });
     }
 });
 
