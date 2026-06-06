@@ -65,3 +65,10 @@ app.listen(PORT, () => {
     // Первый пинг через 1 минуту после старта
     setTimeout(keepAlive, 60 * 1000);
 });
+
+const mongoose = require('mongoose');
+const MONGO_URI = 'mongodb+srv://abdullozodabehzod_db_user:shopxand2024@cluster0.kbl37oo.mongodb.net/shopxand?retryWrites=true&w=majority&appName=Cluster0';
+
+mongoose.connect(MONGO_URI)
+    .then(() => console.log('✅ MongoDB подключена'))
+    .catch(err => console.error('❌ Ошибка MongoDB:', err.message));
