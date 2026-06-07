@@ -661,6 +661,24 @@ cityModalContent.style.transform = '';
         }, 2000);
     }
 
+        function updateAppBadge(count) {
+        if (navigator.setAppBadge) {
+            if (count > 0) {
+                navigator.setAppBadge(count);
+            } else {
+                navigator.clearAppBadge();
+            }
+        }
+    }
+    
+    // Вызывай при обновлении корзины
+    var origUpdateCartCount = updateCartCount;
+    updateCartCount = function() {
+        origUpdateCartCount();
+        var total = cart.reduce((s, i) => s + i.quantity, 0);
+        updateAppBadge(total);
+    };
+
 });
 
 
@@ -3378,6 +3396,21 @@ sizeBlock.style.display = 'none';
                 });
             });
         }
+
+            // Кнопка Поделиться
+    if (navigator.share) {
+        var shareBtn = document.createElement('button');
+        shareBtn.className = 'quickview__share-btn';
+        shareBtn.innerHTML = '<i class="fas fa-share-alt"></i>';
+        shareBtn.onclick = function() {
+            navigator.share({
+                title: product.name,
+                text: product.name + ' — ' + product.price + ' сомони',
+                url: window.location.href
+            });
+        };
+        document.querySelector('.quickview__actions').appendChild(shareBtn);
+    }
 
     }
     
