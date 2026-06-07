@@ -1612,42 +1612,39 @@ langModalContent.style.transform = '';
    return 'товаров';
     }
     
-    // Отрисовать корзину
-    function renderCart() {
-   if (!cartItemsContainer) return;
-   
-   if (cart.length === 0) {
-  // Пустая корзина
-  cartItemsContainer.innerHTML = '';
-  cartEmpty.style.display = 'flex';
-  cartFooter.style.display = 'none';
-   } else {
-  // Есть товары
-  cartEmpty.style.display = 'none';
-  cartFooter.style.display = 'block';
-  
-  cartItemsContainer.innerHTML = cart.map(item => `
- <div class="cart-item" data-id="${item.id}">
-<div class="cart-item__img">
-    ${item.img && (item.img.endsWith('.png') || item.img.endsWith('.jpg') || item.img.endsWith('.jpeg') || item.img.endsWith('.webp')) 
-   ? `<img src="${item.img}" alt="${item.name}" style="width:100%;height:100%;object-fit:contain;border-radius:10px;">`
-   : `<span>${item.img || '📦'}</span>`
-    }
-</div>
-<div class="cart-item__info">
-<h4 class="cart-item__name">${item.name}</h4>
-<span class="cart-item__price">${item.price.toLocaleString()} сомони</span>
-</div>
-<div class="cart-item__quantity">
-<button class="cart-item__qty-btn" onclick="window.cartDecrease('${item.id}')">−</button>
-<span class="cart-item__qty-num">${item.quantity}</span>
-<button class="cart-item__qty-btn" onclick="window.cartIncrease('${item.id}')">+</button>
-</div>
-<button class="cart-item__remove" onclick="window.cartRemove('${item.id}')">
-<i class="fas fa-trash-alt"></i>
-</button>
- </div>
-  `).join('');
+        function renderCart() {
+        if (!cartItemsContainer) return;
+
+        if (cart.length === 0) {
+        cartItemsContainer.innerHTML = '';
+        cartEmpty.style.display = 'flex';
+        cartFooter.style.display = 'none';
+        } else {
+        cartEmpty.style.display = 'none';
+        cartFooter.style.display = 'block';
+
+        cartItemsContainer.innerHTML = cart.map(item => `
+    <div class="cart-item" data-id="${item._id || item.id}">
+        <div class="cart-item__img">
+            ${item.img && (item.img.endsWith('.png') || item.img.endsWith('.jpg') || item.img.endsWith('.jpeg') || item.img.endsWith('.webp')) 
+                ? '<img src="' + item.img + '" alt="' + item.name + '" style="width:100%;height:100%;object-fit:contain;border-radius:10px;">'
+                : '<span>' + (item.img || '📦') + '</span>'
+            }
+        </div>
+        <div class="cart-item__info">
+            <h4 class="cart-item__name">${item.name}</h4>
+            <span class="cart-item__price">${item.price.toLocaleString()} сомони</span>
+        </div>
+        <div class="cart-item__quantity">
+            <button class="cart-item__qty-btn" onclick="window.cartDecrease('${item._id || item.id}')">−</button>
+            <span class="cart-item__qty-num">${item.quantity}</span>
+            <button class="cart-item__qty-btn" onclick="window.cartIncrease('${item._id || item.id}')">+</button>
+        </div>
+        <button class="cart-item__remove" onclick="window.cartRemove('${item._id || item.id}')">
+            <i class="fas fa-trash-alt"></i>
+        </button>
+    </div>
+        `).join('');
   
   // Обновить сумму
   cartTotal.textContent = getTotalPrice().toLocaleString() + ' сомони';
