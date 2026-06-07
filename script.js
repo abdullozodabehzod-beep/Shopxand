@@ -650,6 +650,16 @@ cityModalContent.style.transform = '';
    updateCityDisplay(savedCity);
     }
 
+        // Скрываем сплэш-скрин после загрузки
+    var splashScreen = document.getElementById('splashScreen');
+    if (splashScreen) {
+        setTimeout(function() {
+            splashScreen.classList.add('hidden');
+            setTimeout(function() {
+                splashScreen.remove();
+            }, 500);
+        }, 2000);
+    }
 
 });
 
