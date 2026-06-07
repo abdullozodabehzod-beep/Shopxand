@@ -5481,3 +5481,125 @@ self.style.background = '';
     analyzeImage = function(imageData) {
         analyzeImageWithAI(imageData);
     };
+
+
+        // ============================================
+    // КАТЕГОРИИ И ПОДКАТЕГОРИИ
+    // ============================================
+    
+    var subcategories = {
+        'Компьютеры': ['Ноутбуки', 'ПК', 'Мониторы', 'Мыши', 'Клавиатуры', 'Аксессуары'],
+        'Электроника': ['Смартфоны', 'Наушники', 'Часы', 'Планшеты', 'Аксессуары'],
+        'Одежда': ['Рубашки', 'Крассовки', 'Брюки', 'Тапочки', 'Жилеты'],
+        'Косметика': ['Уход за лицом', 'Макияж', 'Парфюмерия', 'Для мужчин'],
+        'Дом и сад': ['Мебель', 'Декор', 'Кухня', 'Садоводство']
+    };
+    
+    var currentCategory = null;
+    var currentSubcategory = null;
+    
+    // Клик по категории
+    document.querySelectorAll('.category-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var cat = this.getAttribute('data-cat');
+            
+            // Убираем активный класс у всех
+            document.querySelectorAll('.category-btn').forEach(function(b) { b.classList.remove('active'); });
+            this.classList.add('active');
+            
+            currentCategory = cat;
+            currentSubcategory = null;
+            
+            // Показываем подкатегории
+            showSubcategories(cat);
+            
+            // Фильтруем товары
+            filterByCategory(cat);
+        });
+    });
+    
+    // Показать подкатегории
+    function showSubcategories(category) {
+        var bar = document.getElementById('subcategoriesBar');
+        var grid = document.getElementById('subcategoriesGrid');
+        var subs = subcategories[category];
+        
+        if (!subs || subs.length === 0) {
+            bar.style.display = 'none';
+            return;
+        }
+        
+        bar.style.display = 'block';
+        
+        grid.innerHTML = '<button class="subcategory-btn active" data-subcat="all">Все</button>' +
+            subs.map(function(sub) {
+                return '<button class="subcategory-btn" data-subcat="' + sub + '">' + sub + '</button>';
+            }).join('');
+        
+        // Клик по подкатегории
+        grid.querySelectorAll('.subcategory-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                grid.querySelectorAll('.subcategory-btn').forEach(function(b) { b.classList.remove('active'); });
+                this.classList.add('active');
+                
+                var subcat = this.getAttribute('data-subcat');
+                currentSubcategory = subcat;
+                
+                if (subcat === 'all') {
+                    filterByCategory(currentCategory);
+                } else {
+                    filterBySubcategory(currentCategory, subcat);
+                }
+            });
+        });
+    }
+    
+    // Фильтр по подкатегории
+    function filterBySubcategory(category, subcategory) {
+        var allCards = document.querySelectorAll('.product-card');
+        var foundCount = 0;
+        
+        allCards.forEach(function(card) {
+            var cat = card.getAttribute('data-cat');
+            var name = (card.querySelector('.product-card__name')?.textContent || '').toLowerCase();
+            var subLower = subcategory.toLowerCase();
+            
+            if (cat === category && name.includes(subLower)) {
+                card.style.display = '';
+                card.style.animation = 'fadeInCard 0.3s ease';
+                foundCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        document.querySelector('.products__title').textContent = category + ' / ' + subcategory;
+        
+        // Сообщение
+        var oldMsg = document.querySelector('.category-message');
+        if (oldMsg) oldMsg.remove();
+        
+        var message = document.createElement('div');
+        message.className = 'category-message';
+        message.innerHTML = '<span>Показано <strong>' + foundCount + '</strong> товаров: ' + category + ' → ' + subcategory + '</span>' +
+            '<button onclick="window.resetCategoryFilter()">✕ Сбросить</button>';
+        document.querySelector('.products__header').after(message);
+    }
+    
+    // Обнови filterByCategory
+    var originalFilterByCategory = filterByCategory;
+    filterByCategory = function(category) {
+        originalFilterByCategory(category);
+        showSubcategories(category);
+    };
+    
+    // Обнови сброс
+    var originalReset = window.resetCategoryFilter;
+    window.resetCategoryFilter = function() {
+        originalReset();
+        document.getElementById('subcategoriesBar').style.display = 'none';
+        currentCategory = null;
+        currentSubcategory = null;
+        document.querySelectorAll('.category-btn').forEach(function(b) { b.classList.remove('active'); });
+    };

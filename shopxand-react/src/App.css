@@ -7012,7 +7012,7 @@ body {
    ======================================== */
 
 .categories-bar {
-    display: block;
+    display: none;
     padding: 16px 0;
     background: #fff;
     border-bottom: 1px solid #f0f0f0;
@@ -7238,48 +7238,4 @@ body {
     cursor: pointer;
     font-size: 20px;
     color: #0066ff;
-}
-
-.subcategories-bar {
-    padding: 10px 0;
-    background: #f8f9fb;
-    border-bottom: 1px solid #eee;
-}
-
-.subcategories-bar__grid {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    scrollbar-width: none;
-}
-
-.subcategories-bar__grid::-webkit-scrollbar { display: none; }
-
-.subcategory-btn {
-    padding: 8px 16px;
-    border-radius: 20px;
-    border: 2px solid #e0e0e0;
-    background: #fff;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    white-space: nowrap;
-    transition: 0.2s;
-    color: #333;
-}
-
-.subcategory-btn:hover,
-.subcategory-btn.active {
-    border-color: #0066ff;
-    background: #0066ff;
-    color: #fff;
-}
-
-.categories-bar h3{
-    font-size: 24px;
-    font-weight: 800;
-    color: var(--dark);
-    letter-spacing: -0.5px;
-    position: relative;
-    left: 9%;
 }
