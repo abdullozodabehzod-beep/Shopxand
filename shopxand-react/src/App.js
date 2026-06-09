@@ -10,10 +10,16 @@ import Orders from './components/Orders';
 import Auth from './components/Auth';
 import BottomNav from './components/BottomNav';
 import Favorites from './components/Favorites';
+import CategoriesBar from './components/CategoriesBar';
+import { sendOrderToTelegram } from './components/TelegramOrder';
+import PhotoSearch from './components/PhotoSearch';
 
 const API_URL = 'http://localhost:3000/api';
 
 function App() {
+   console.log('Render App, filteredProducts:', filteredProducts.length);
+  const [showPhotoSearch, setShowPhotoSearch] = useState(false);
+  const [activeCategory, setActiveCategory] = useState(null);
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [cart, setCart] = useState([]);
@@ -26,7 +32,14 @@ function App() {
   const [showOrders, setShowOrders] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
+  const handleSelectCategory = (cat) => {
+    setActiveCategory(cat);
+    setFilteredProducts(
+      products.filter(p => p.cat === cat)
+    );
+  };          
   // Вот сюда — после addToCart и removeFromCart:
   const toggleFavorite = (product) => {
     setFavorites(prev => {
@@ -37,12 +50,21 @@ function App() {
   }
 
   useEffect(() => {
+  if ('Notification' in window && Notification.permission === 'default') {
+    setTimeout(() => {
+      Notification.requestPermission();
+    }, 5000);
+  }
+}, []);
+
+  useEffect(() => {
     fetch(API_URL + '/products')
       .then(r => r.json())
       .then(data => {
         setProducts(data.products || []);
         setFilteredProducts(data.products || []);
       });
+
     
     const token = localStorage.getItem('shopxand_token');
     if (token) {
@@ -66,7 +88,13 @@ function App() {
 
   const removeFromCart = (id) => setCart(prev => prev.filter(i => i._id !== id));
 
-  const placeOrder = (orderData) => {
+    const sendPush = (title, body) => {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, { body, icon: '/img/icons/icon-192x192.png' });
+  }
+};
+
+   const placeOrder = (orderData) => {
     const order = {
       id: 'SX-' + Date.now().toString().slice(-8),
       customer: orderData,
@@ -75,13 +103,18 @@ function App() {
       status: 'processing',
       date: new Date().toISOString()
     };
-    
+
     fetch(API_URL + '/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(order)
     });
+
+    sendOrderToTelegram(order);
     
+    // ← ВОТ СЮДА
+    sendPush('📦 Заказ принят!', `Заказ ${order.id} на сумму ${order.total.toLocaleString()} с.`);
+
     setOrders(prev => [order, ...prev]);
     setCart([]);
     setShowCheckout(false);
@@ -99,6 +132,24 @@ function App() {
     setFilteredProducts(filtered);
   };
 
+  useEffect(() => {
+    console.log('Загружаю товары с:', API_URL + '/products');
+    fetch(API_URL + '/products')
+      .then(r => {
+        console.log('Ответ сервера:', r.status);
+        return r.json();
+      })
+      .then(data => {
+        console.log('Данные:', data);
+        console.log('Товаров:', data.products?.length);
+        if (data.products) {
+          setProducts(data.products);
+          setFilteredProducts(data.products);
+        }
+      })
+      .catch(err => console.log('Ошибка:', err));
+  }, []);
+
   return (
     <LanguageProvider>
       <div className="App">
@@ -109,9 +160,12 @@ function App() {
           onSearch={handleSearch}
           products={products}
           onProductSelect={setSelectedProduct}
+          onOpenFavorites={() => setShowFavorites(true)}
+          onOpenOrders={() => setShowOrders(true)}
+          setShowPhotoSearch={setShowPhotoSearch}
         />
         <Hero />
-        
+        <CategoriesBar onSelectCategory={handleSelectCategory} />
         <section className="products">
           <div className="container">
             <div className="products__header">
@@ -180,8 +234,16 @@ function App() {
           <Auth onLogin={setUser} onClose={() => setShowAuth(false)} />
         )}
         {showOrders && (
-          <Orders orders={orders} />
+           <Orders orders={orders} onClose={() => setShowOrders(false)} />
         )}
+
+              {showPhotoSearch && (
+        <PhotoSearch 
+          products={products} 
+          onProductSelect={(p) => setSelectedProduct(p)}
+          onClose={() => setShowPhotoSearch(false)} 
+        />
+      )}
 
         <BottomNav 
           onOpenCart={() => setShowCart(true)} 

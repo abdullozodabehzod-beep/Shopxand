@@ -5,7 +5,7 @@ import CityModal from './CityModal';
 import Search from './Search';
 import MobileMenu from './MobileMenu';
 
-function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSelect }) {
+function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSelect, onOpenFavorites, onOpenOrders, setShowPhotoSearch}) {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   <Search products={products} onProductSelect={onProductSelect} />
   const { lang, t } = useLanguage();
@@ -13,6 +13,7 @@ function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSel
   const [showCityModal, setShowCityModal] = useState(false);
   const [showCatalog, setShowCatalog] = useState(false);
   const [currentCity, setCurrentCity] = useState(localStorage.getItem('shopxand_city') || 'Душанбе');
+  
 
   const langCodes = { ru: 'RU', tg: 'TJ', en: 'EN' };
 
@@ -69,7 +70,12 @@ function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSel
 
               <div className="header__search">
                 <input type="text" className="header__search-input" placeholder={t('search')} />
-                <button className="header__search-btn"><i className="fas fa-search"></i></button>
+                <button className="header__search-by-photo" onClick={() => setShowPhotoSearch(true)} title="Поиск по фото">
+                  <i className="fas fa-camera"></i>
+                </button>
+                <button className="header__search-btn">
+                  <i className="fas fa-search"></i>
+                </button>
               </div>
 
               <div className="header__actions">
@@ -77,14 +83,15 @@ function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSel
                   <i className="fas fa-user"></i>
                   <span>{user ? user.name : t('login')}</span>
                 </a>
-                <a href="#" className="header__action">
+               <a href="#" className="header__action" onClick={(e) => { e.preventDefault(); onOpenOrders(); }}>
                   <i className="fas fa-box"></i>
                   <span>{t('orders')}</span>
                 </a>
-                <a href="#" className="header__action">
-                  <i className="fas fa-heart"></i>
-                  <span>{t('favorites')}</span>
-                </a>
+
+                <a href="#" className="header__action" onClick={(e) => { e.preventDefault(); onOpenFavorites(); }}>
+                <i className="fas fa-heart"></i>
+                <span>{t('favorites')}</span>
+              </a>
                 <a href="#" className="header__action header__action--cart" onClick={(e) => { e.preventDefault(); onOpenCart(); }}>
                   <i className="fas fa-shopping-cart"></i>
                   <span>{t('cart')}</span>
@@ -166,10 +173,10 @@ function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSel
         {showMobileMenu && (
         <MobileMenu 
           onClose={() => setShowMobileMenu(false)}
-          onOpenAuth={() => setShowAuth(true)}
-          onOpenCart={() => setShowCart(true)}
-          onOpenFavorites={() => setShowFavorites(true)}
-          onOpenOrders={() => setShowOrders(true)}
+          onOpenAuth={onOpenAuth}
+          onOpenCart={onOpenCart}
+          onOpenFavorites={onOpenFavorites}
+          onOpenOrders={onOpenOrders}
           user={user}
         />
       )}

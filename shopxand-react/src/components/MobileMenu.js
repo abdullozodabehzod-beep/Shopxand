@@ -99,3 +99,5 @@ function MobileMenu({ onClose, onOpenAuth, onOpenCart, onOpenFavorites, onOpenOr
     </div>
   );
 }
+
+export default MobileMenu;

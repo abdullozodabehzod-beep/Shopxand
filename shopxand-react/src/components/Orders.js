@@ -1,15 +1,18 @@
 import React from 'react';
 
-function Orders({ orders }) {
+function Orders({ orders, onClose }) {
   return (
     <div className="orders-panel active">
-      <div className="orders-panel__overlay"></div>
+      <div className="orders-panel__overlay" onClick={onClose}></div>
       <div className="orders-panel__content">
         <div className="orders-panel__header">
           <h3 className="orders-panel__title">
             <i className="fas fa-box"></i> Мои заказы
             <span className="orders-panel__count">{orders.length} заказов</span>
           </h3>
+          <button className="orders-panel__close" onClick={onClose}>
+            <i className="fas fa-times"></i>
+          </button>
         </div>
         <div className="orders-panel__body">
           {orders.length === 0 ? (
