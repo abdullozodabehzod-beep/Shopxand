@@ -51,25 +51,21 @@ function App() {
     });
   };
 
-  useEffect(() => {
+ useEffect(() => {
     fetch(API_URL + '/products')
       .then(r => r.json())
       .then(data => {
         if (data.products) {
-          setProducts(data.products);
-          setFilteredProducts(data.products);
+          // Исправляем пути к картинкам
+          const fixed = data.products.map(p => ({
+            ...p,
+            img: p.img && !p.img.startsWith('http') && !p.img.startsWith('/') ? '/' + p.img : p.img
+          }));
+          setProducts(fixed);
+          setFilteredProducts(fixed);
         }
       })
-      .catch(err => console.log('Ошибка загрузки товаров:', err));
-
-    const token = localStorage.getItem('shopxand_token');
-    if (token) {
-      fetch(API_URL + '/auth/me', {
-        headers: { 'Authorization': 'Bearer ' + token }
-      })
-      .then(r => r.json())
-      .then(data => data.user && setUser(data.user));
-    }
+      .catch(err => console.log('Ошибка:', err));
   }, []);
 
   useEffect(() => {
