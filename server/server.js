@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const https = require('https');
+const mongoose = require('mongoose');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,41 +10,13 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// ============================================
-// AUTOPING — чтобы сервер не засыпал
-// ============================================
-const SITE_URL = 'shopxand-3.onrender.com';
+// MongoDB
+const MONGO_URI = 'mongodb+srv://abdullozodabehzod_db_user:shopxand2024@cluster0.kbl37oo.mongodb.net/shopxand?retryWrites=true&w=majority&appName=Cluster0';
+mongoose.connect(MONGO_URI)
+    .then(() => console.log('✅ MongoDB подключена'))
+    .catch(err => console.error('❌ Ошибка MongoDB:', err.message));
 
-function keepAlive() {
-    https.get('https://' + SITE_URL + '/ping', (res) => {
-        console.log('✅ Autoping:', res.statusCode);
-    }).on('error', (err) => {
-        console.log('❌ Ping error:', err.message);
-    });
-}
-
-// Пингуем каждые 14 минут (Render засыпает после 15 мин)
-setInterval(keepAlive, 14 * 60 * 1000);
-
-// Эндпоинт для пинга
-app.get('/ping', (req, res) => {
-    res.json({ status: 'alive', time: new Date().toISOString() });
-});
-
-// robots.txt
-app.get('/robots.txt', (req, res) => {
-    res.type('text/plain');
-    res.send(`User-agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /cart/
-
-Sitemap: https://shopxand-3.onrender.com/sitemap.xml`);
-});
-
-app.use(express.static(path.join(__dirname, '..')));
-
-// API routes
+// API routes (ДОЛЖНЫ БЫТЬ ПЕРЕД static)
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/products', require('./routes/products'));
 app.use('/api/orders', require('./routes/orders'));
@@ -51,6 +24,14 @@ app.use('/api/reviews', require('./routes/reviews'));
 app.use('/api/user', require('./routes/userdata'));
 app.use('/api/email', require('./routes/email'));
 app.use('/api/telegram', require('./routes/telegram'));
+
+// Статические файлы (ПОСЛЕ API)
+app.use(express.static(path.join(__dirname, '..')));
+
+app.get('/robots.txt', (req, res) => {
+    res.type('text/plain');
+    res.send(`User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /cart/\n\nSitemap: https://shopxand-3.onrender.com/sitemap.xml`);
+});
 
 app.get('/sitemap.xml', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'sitemap.xml'));
@@ -60,15 +41,14 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
-app.listen(PORT, () => {
-    console.log('🛒 ShopXand сервер на порту ' + PORT);
-    // Первый пинг через 1 минуту после старта
-    setTimeout(keepAlive, 60 * 1000);
+// React build
+app.use(express.static(path.join(__dirname, '..', 'shopxand-react', 'build')));
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'shopxand-react', 'build', 'index.html'));
 });
 
-const mongoose = require('mongoose');
-const MONGO_URI = 'mongodb+srv://abdullozodabehzod_db_user:shopxand2024@cluster0.kbl37oo.mongodb.net/shopxand?retryWrites=true&w=majority&appName=Cluster0';
+app.listen(PORT, () => {
+    console.log('🛒 ShopXand сервер на порту ' + PORT);
+});
 
-mongoose.connect(MONGO_URI)
-    .then(() => console.log('✅ MongoDB подключена'))
-    .catch(err => console.error('❌ Ошибка MongoDB:', err.message));

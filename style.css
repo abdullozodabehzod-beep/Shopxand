@@ -7012,7 +7012,7 @@ body {
    ======================================== */
 
 .categories-bar {
-    display: block;
+    display: none;
     padding: 16px 0;
     background: #fff;
     border-bottom: 1px solid #f0f0f0;
