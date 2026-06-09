@@ -16,10 +16,6 @@ const productSchema = new mongoose.Schema({
     thumbs: [String],
     inStock: { type: Boolean, default: true },
     brightness: { type: Number, default: 128 },
-    // Новые поля для мульти-продавцов
-    sellerId: { type: String, required: true },
-    sellerName: String,
-    commission: { type: Number, default: 10 }, // % комиссии
 });
 
 module.exports = mongoose.model('Product', productSchema);
