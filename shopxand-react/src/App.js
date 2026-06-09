@@ -180,6 +180,7 @@ function App() {
                     <button className="product-card__cart-btn" onClick={(e) => { e.stopPropagation(); addToCart(product); }}>
                       <i className="fas fa-shopping-cart"></i> В корзину
                     </button>
+                    
                   </div>
                 </div>
               ))}

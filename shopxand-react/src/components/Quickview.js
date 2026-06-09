@@ -177,7 +177,7 @@ function Quickview({ product, onClose, onAddToCart }) {
               </div>
             </div>
 
-            {/* Кнопки */}
+                        {/* Кнопки */}
             <div className="quickview__actions">
               <button className="quickview__cart-btn" onClick={() => { onAddToCart(product); onClose(); }}>
                 <i className="fas fa-shopping-cart"></i> В корзину
@@ -185,6 +185,13 @@ function Quickview({ product, onClose, onAddToCart }) {
               <button className="quickview__fav-btn">
                 <i className="far fa-heart"></i>
               </button>
+              {navigator.share && (
+                <button className="quickview__share-btn" onClick={() => {
+                  navigator.share({ title: product.name, text: product.price + ' сомони', url: window.location.href });
+                }}>
+                  <i className="fas fa-share-alt"></i>
+                </button>
+              )}
             </div>
 
             {/* Доставка */}
