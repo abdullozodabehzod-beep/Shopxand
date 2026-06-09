@@ -3397,21 +3397,6 @@ sizeBlock.style.display = 'none';
             });
         }
 
-            // Кнопка Поделиться
-    if (navigator.share) {
-        var shareBtn = document.createElement('button');
-        shareBtn.className = 'quickview__share-btn';
-        shareBtn.innerHTML = '<i class="fas fa-share-alt"></i>';
-        shareBtn.onclick = function() {
-            navigator.share({
-                title: product.name,
-                text: product.name + ' — ' + product.price + ' сомони',
-                url: window.location.href
-            });
-        };
-        document.querySelector('.quickview__actions').appendChild(shareBtn);
-    }
-
     }
     
     window.openQuickview = openQuickview;
