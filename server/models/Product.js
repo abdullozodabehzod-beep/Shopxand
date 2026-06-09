@@ -11,9 +11,15 @@ const productSchema = new mongoose.Schema({
     desc: String,
     sizes: [String],
     shoeSizes: [String],
+    colors: [String],
     specs: [[String]],
     thumbs: [String],
-    inStock: { type: Boolean, default: true }
+    inStock: { type: Boolean, default: true },
+    brightness: { type: Number, default: 128 },
+    // Новые поля для мульти-продавцов
+    sellerId: { type: String, required: true },
+    sellerName: String,
+    commission: { type: Number, default: 10 }, // % комиссии
 });
 
 module.exports = mongoose.model('Product', productSchema);
