@@ -10,6 +10,29 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+
+// ============================================
+// AUTOPING — чтобы сервер не засыпал
+// ============================================
+const SITE_URL = 'shopxand-3.onrender.com';
+
+function keepAlive() {
+    https.get('https://' + SITE_URL + '/ping', (res) => {
+        console.log('✅ Autoping:', res.statusCode);
+    }).on('error', (err) => {
+        console.log('❌ Ping error:', err.message);
+    });
+}
+
+// Пингуем каждые 14 минут
+setInterval(keepAlive, 14 * 60 * 1000);
+
+// Эндпоинт для пинга
+app.get('/ping', (req, res) => {
+    res.json({ status: 'alive', time: new Date().toISOString() });
+});
+
+
 // MongoDB
 const MONGO_URI = 'mongodb+srv://abdullozodabehzod_db_user:shopxand2024@cluster0.kbl37oo.mongodb.net/shopxand?retryWrites=true&w=majority&appName=Cluster0';
 mongoose.connect(MONGO_URI)
@@ -50,5 +73,6 @@ app.get('*', (req, res) => {
 
 app.listen(PORT, () => {
     console.log('🛒 ShopXand сервер на порту ' + PORT);
+    setTimeout(keepAlive, 60 * 1000);
 });
 

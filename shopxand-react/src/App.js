@@ -17,7 +17,6 @@ import PhotoSearch from './components/PhotoSearch';
 const API_URL = 'http://localhost:3000/api';
 
 function App() {
-   console.log('Render App, filteredProducts:', filteredProducts.length);
   const [showPhotoSearch, setShowPhotoSearch] = useState(false);
   const [activeCategory, setActiveCategory] = useState(null);
   const [products, setProducts] = useState([]);
@@ -34,38 +33,35 @@ function App() {
   const [showFavorites, setShowFavorites] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
+  const handleViewAll = () => {
+    setActiveCategory(null);
+    setFilteredProducts(products);
+  };
+
   const handleSelectCategory = (cat) => {
     setActiveCategory(cat);
-    setFilteredProducts(
-      products.filter(p => p.cat === cat)
-    );
-  };          
-  // Вот сюда — после addToCart и removeFromCart:
+    setFilteredProducts(products.filter(p => p.cat === cat));
+  };
+
   const toggleFavorite = (product) => {
     setFavorites(prev => {
       const exists = prev.find(i => i._id === product._id);
       if (exists) return prev.filter(i => i._id !== product._id);
       return [...prev, product];
-    })
-  }
-
-  useEffect(() => {
-  if ('Notification' in window && Notification.permission === 'default') {
-    setTimeout(() => {
-      Notification.requestPermission();
-    }, 5000);
-  }
-}, []);
+    });
+  };
 
   useEffect(() => {
     fetch(API_URL + '/products')
       .then(r => r.json())
       .then(data => {
-        setProducts(data.products || []);
-        setFilteredProducts(data.products || []);
-      });
+        if (data.products) {
+          setProducts(data.products);
+          setFilteredProducts(data.products);
+        }
+      })
+      .catch(err => console.log('Ошибка загрузки товаров:', err));
 
-    
     const token = localStorage.getItem('shopxand_token');
     if (token) {
       fetch(API_URL + '/auth/me', {
@@ -73,6 +69,12 @@ function App() {
       })
       .then(r => r.json())
       .then(data => data.user && setUser(data.user));
+    }
+  }, []);
+
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      setTimeout(() => { Notification.requestPermission(); }, 5000);
     }
   }, []);
 
@@ -88,13 +90,13 @@ function App() {
 
   const removeFromCart = (id) => setCart(prev => prev.filter(i => i._id !== id));
 
-    const sendPush = (title, body) => {
-  if ('Notification' in window && Notification.permission === 'granted') {
-    new Notification(title, { body, icon: '/img/icons/icon-192x192.png' });
-  }
-};
+  const sendPush = (title, body) => {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, { body, icon: '/img/icons/icon-192x192.png' });
+    }
+  };
 
-   const placeOrder = (orderData) => {
+  const placeOrder = (orderData) => {
     const order = {
       id: 'SX-' + Date.now().toString().slice(-8),
       customer: orderData,
@@ -111,8 +113,6 @@ function App() {
     });
 
     sendOrderToTelegram(order);
-    
-    // ← ВОТ СЮДА
     sendPush('📦 Заказ принят!', `Заказ ${order.id} на сумму ${order.total.toLocaleString()} с.`);
 
     setOrders(prev => [order, ...prev]);
@@ -125,30 +125,11 @@ function App() {
       setFilteredProducts(products);
       return;
     }
-    const filtered = products.filter(p => 
+    setFilteredProducts(products.filter(p => 
       (p.name || '').toLowerCase().includes(query.toLowerCase()) ||
       (p.cat || '').toLowerCase().includes(query.toLowerCase())
-    );
-    setFilteredProducts(filtered);
+    ));
   };
-
-  useEffect(() => {
-    console.log('Загружаю товары с:', API_URL + '/products');
-    fetch(API_URL + '/products')
-      .then(r => {
-        console.log('Ответ сервера:', r.status);
-        return r.json();
-      })
-      .then(data => {
-        console.log('Данные:', data);
-        console.log('Товаров:', data.products?.length);
-        if (data.products) {
-          setProducts(data.products);
-          setFilteredProducts(data.products);
-        }
-      })
-      .catch(err => console.log('Ошибка:', err));
-  }, []);
 
   return (
     <LanguageProvider>
@@ -163,13 +144,18 @@ function App() {
           onOpenFavorites={() => setShowFavorites(true)}
           onOpenOrders={() => setShowOrders(true)}
           setShowPhotoSearch={setShowPhotoSearch}
+          onSelectCategory={handleSelectCategory}
         />
         <Hero />
         <CategoriesBar onSelectCategory={handleSelectCategory} />
+        
         <section className="products">
           <div className="container">
             <div className="products__header">
               <h2 className="products__title">Популярные товары</h2>
+              <a href="#" className="products__all" onClick={(e) => { e.preventDefault(); handleViewAll(); }}>
+                Смотреть все <i className="fas fa-arrow-right"></i>
+              </a>
             </div>
             <div className="products__grid">
               {filteredProducts.map(product => (
@@ -180,9 +166,7 @@ function App() {
                       <i className="far fa-heart"></i>
                     </button>
                     {product.oldPrice && (
-                      <span className="product-card__badge">
-                        -{Math.round((1 - product.price / product.oldPrice) * 100)}%
-                      </span>
+                      <span className="product-card__badge">-{Math.round((1 - product.price / product.oldPrice) * 100)}%</span>
                     )}
                   </div>
                   <div className="product-card__body">
@@ -207,43 +191,13 @@ function App() {
           </div>
         </section>
 
-        {selectedProduct && (
-          <Quickview 
-            product={selectedProduct} 
-            onClose={() => setSelectedProduct(null)} 
-            onAddToCart={addToCart} 
-          />
-        )}
-
-        {showFavorites && (
-          <Favorites 
-           favorites={favorites}
-           onRemove={(id) => setFavorites(prev => prev.filter(i => i._id !== id))}
-           onAddToCart={addToCart}
-           onClose={() => setShowFavorites(false)}
-           />
-        )}
-
-        {showCart && (
-          <Cart cart={cart} onRemove={removeFromCart} onCheckout={() => { setShowCart(false); setShowCheckout(true); }} onClose={() => setShowCart(false)} />
-        )}
-        {showCheckout && (
-          <Checkout cart={cart} user={user} onPlaceOrder={placeOrder} onClose={() => setShowCheckout(false)} />
-        )}
-        {showAuth && (
-          <Auth onLogin={setUser} onClose={() => setShowAuth(false)} />
-        )}
-        {showOrders && (
-           <Orders orders={orders} onClose={() => setShowOrders(false)} />
-        )}
-
-              {showPhotoSearch && (
-        <PhotoSearch 
-          products={products} 
-          onProductSelect={(p) => setSelectedProduct(p)}
-          onClose={() => setShowPhotoSearch(false)} 
-        />
-      )}
+        {selectedProduct && <Quickview product={selectedProduct} onClose={() => setSelectedProduct(null)} onAddToCart={addToCart} />}
+        {showFavorites && <Favorites favorites={favorites} onRemove={(id) => setFavorites(prev => prev.filter(i => i._id !== id))} onAddToCart={addToCart} onClose={() => setShowFavorites(false)} />}
+        {showCart && <Cart cart={cart} onRemove={removeFromCart} onCheckout={() => { setShowCart(false); setShowCheckout(true); }} onClose={() => setShowCart(false)} />}
+        {showCheckout && <Checkout cart={cart} user={user} onPlaceOrder={placeOrder} onClose={() => setShowCheckout(false)} />}
+        {showAuth && <Auth onLogin={setUser} onClose={() => setShowAuth(false)} />}
+        {showOrders && <Orders orders={orders} onClose={() => setShowOrders(false)} />}
+        {showPhotoSearch && <PhotoSearch products={products} onProductSelect={(p) => setSelectedProduct(p)} onClose={() => setShowPhotoSearch(false)} />}
 
         <BottomNav 
           onOpenCart={() => setShowCart(true)} 

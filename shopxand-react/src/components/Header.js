@@ -5,7 +5,7 @@ import CityModal from './CityModal';
 import Search from './Search';
 import MobileMenu from './MobileMenu';
 
-function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSelect, onOpenFavorites, onOpenOrders, setShowPhotoSearch}) {
+function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSelect, onOpenFavorites, onOpenOrders, setShowPhotoSearch, onSelectCategory}) {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   <Search products={products} onProductSelect={onProductSelect} />
   const { lang, t } = useLanguage();
@@ -103,17 +103,17 @@ function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSel
 
         {/* Navigation */}
         <nav className="header__nav">
-          <div className="container">
-            <ul className="header__nav-list">
-              <li><a href="#" className="header__nav-link">{t('clothing')}</a></li>
-              <li><a href="#" className="header__nav-link">{t('electronics')}</a></li>
-              <li><a href="#" className="header__nav-link">{t('home')}</a></li>
-              <li><a href="#" className="header__nav-link">{t('computers')}</a></li>
-              <li><a href="#" className="header__nav-link">{t('cosmetics')}</a></li>
-              <li><a href="#" className="header__nav-link">{t('sales')}</a></li>
-            </ul>
-          </div>
-        </nav>
+  <div className="container">
+    <ul className="header__nav-list">
+      <li><a href="#" className="header__nav-link" onClick={(e) => { e.preventDefault(); onSelectCategory('Одежда'); }}>{t('clothing')}</a></li>
+      <li><a href="#" className="header__nav-link" onClick={(e) => { e.preventDefault(); onSelectCategory('Электроника'); }}>{t('electronics')}</a></li>
+      <li><a href="#" className="header__nav-link" onClick={(e) => { e.preventDefault(); onSelectCategory('Дом и сад'); }}>{t('home')}</a></li>
+      <li><a href="#" className="header__nav-link" onClick={(e) => { e.preventDefault(); onSelectCategory('Компьютеры'); }}>{t('computers')}</a></li>
+      <li><a href="#" className="header__nav-link" onClick={(e) => { e.preventDefault(); onSelectCategory('Косметика'); }}>{t('cosmetics')}</a></li>
+      <li><a href="#" className="header__nav-link" onClick={(e) => { e.preventDefault(); onSelectCategory('Акции'); }}>{t('sales')}</a></li>
+    </ul>
+  </div>
+</nav>
 
         {/* Выпадающий каталог */}
         <div className={`catalog-dropdown ${showCatalog ? 'active' : ''}`}>
