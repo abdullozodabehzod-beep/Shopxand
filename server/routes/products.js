@@ -49,7 +49,17 @@ router.put('/:id/rating', async (req, res) => {
 // Удалить товар
 router.delete('/:id', async (req, res) => {
     try {
-        await Product.findByIdAndDelete(req.params.id);
+        const mongoose = require('mongoose');
+        const id = req.params.id;
+        
+        // Проверяем валидный ли ObjectId
+        if (mongoose.Types.ObjectId.isValid(id)) {
+            await Product.findByIdAndDelete(id);
+        } else {
+            // Если это старый id (строка) — ищем по полю id
+            await Product.findOneAndDelete({ id: id });
+        }
+        
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: err.message });

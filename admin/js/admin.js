@@ -77,15 +77,14 @@ async function loadProductsAdmin() {
    var tbody = document.getElementById('productsTable');
    tbody.innerHTML = data.products.map(function(p) {
   return '<tr>' +
- '<td>' + p.id + '</td>' +
- '<td>' + p.name + '</td>' +
- '<td>' + p.cat + '</td>' +
- '<td>' + p.price + ' с.</td>' +
- '<td>' +
-'<button class="btn-sm btn-sm--red" onclick="deleteProduct(\'' + p.id + '\')">🗑️</button>' +
- '</td>' +
+    '<td>' + (p._id || p.id || '—') + '</td>' +
+    '<td><img src="' + (p.img || '') + '" style="width:50px;height:50px;object-fit:contain;" onerror="this.style.display=\'none\'"></td>' +
+    '<td>' + p.name + '</td>' +
+    '<td>' + p.cat + '</td>' +
+    '<td>' + p.price + ' с.</td>' +
+    '<td><button class="btn-sm btn-sm--red" onclick="deleteProduct(\'' + (p._id || p.id) + '\')">🗑️</button></td>' +
   '</tr>';
-   }).join('');
+}).join('');
     } catch (err) {
    console.log('Ошибка загрузки товаров');
     }
