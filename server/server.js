@@ -60,9 +60,9 @@ app.get('/sitemap.xml', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'sitemap.xml'));
 });
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'index.html'));
-});
+// app.get('/', (req, res) => {
+//     res.sendFile(path.join(__dirname, '..', 'index.html'));
+// });
 
 app.use('/api/sellers', require('./routes/sellers'));
 
@@ -72,6 +72,16 @@ app.use(express.static(path.join(__dirname, '..', 'shopxand-react', 'build')));
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'shopxand-react', 'build', 'index.html'));
 });
+
+// В server.js добавь ПЕРЕД app.listen:
+const { execSync } = require('child_process');
+try {
+    console.log('Собираю React...');
+    execSync('cd shopxand-react && npm install && npm run build', { stdio: 'inherit' });
+    console.log('React собран!');
+} catch (e) {
+    console.log('Ошибка сборки React:', e.message);
+}
 
 app.listen(PORT, () => {
     console.log('🛒 ShopXand сервер на порту ' + PORT);

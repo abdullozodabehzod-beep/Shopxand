@@ -1,6 +1,8 @@
 {
-  "dependencies": {
-    "cors": "^2.8.6",
-    "react-router-dom": "^6.30.4"
+  "name": "shopxand",
+  "scripts": {
+    "build": "cd shopxand-react && npm install && npm run build",
+    "start": "node server/server.js"
   }
 }
+
