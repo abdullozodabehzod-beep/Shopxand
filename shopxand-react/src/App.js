@@ -14,7 +14,7 @@ import CategoriesBar from './components/CategoriesBar';
 import { sendOrderToTelegram } from './components/TelegramOrder';
 import PhotoSearch from './components/PhotoSearch';
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'https://shopxand-3.onrender.com/';
 
 function App() {
   const [showPhotoSearch, setShowPhotoSearch] = useState(false);
