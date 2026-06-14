@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-function Cart({ cart, onRemove, onCheckout, onClose }) {
+function Cart({ cart, onRemove, onCheckout, onClose, onUpdateQuantity }) {
   const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-
+  const [addedItem, setAddedItem] = useState(null);
+  useEffect(() => {
+  if (addedItem) {
+    setTimeout(() => setAddedItem(null), 1500);
+  }
+}, [addedItem]);
   return (
     <div className="cart-panel active">
       <div className="cart-panel__overlay" onClick={onClose}></div>
@@ -18,6 +23,7 @@ function Cart({ cart, onRemove, onCheckout, onClose }) {
         </div>
 
         <div className="cart-panel__items">
+          {addedItem && <div className="cart-added-popup">✅ {addedItem} добавлен!</div>}
           {cart.length === 0 ? (
             <div className="cart-panel__empty">
               <span className="cart-panel__empty-icon">🛒</span>
@@ -26,16 +32,21 @@ function Cart({ cart, onRemove, onCheckout, onClose }) {
           ) : (
             cart.map(item => (
               <div key={item._id} className="cart-item">
-                <div className="cart-item__img"><span>{item.img || '📦'}</span></div>
-                <div className="cart-item__info">
+                  <div className="cart-item__img">
+                    {item.img && item.img !== '📦' ? 
+                      <img src={item.img} alt="" style={{width:'100%',height:'100%',objectFit:'contain',borderRadius:10}} /> : 
+                      <span>📦</span>
+                    }
+                  </div>                
+                  <div className="cart-item__info">
                   <h4 className="cart-item__name">{item.name}</h4>
                   <span className="cart-item__price">{item.price} с.</span>
                 </div>
                 <div className="cart-item__quantity">
-                  <button className="cart-item__qty-btn">−</button>
-                  <span className="cart-item__qty-num">{item.quantity}</span>
-                  <button className="cart-item__qty-btn">+</button>
-                </div>
+              <button className="cart-item__qty-btn" onClick={() => onUpdateQuantity(item._id, item.quantity - 1)}>−</button>
+              <span className="cart-item__qty-num">{item.quantity}</span>
+              <button className="cart-item__qty-btn" onClick={() => onUpdateQuantity(item._id, item.quantity + 1)}>+</button>
+            </div>
                 <button className="cart-item__remove" onClick={() => onRemove(item._id)}>
                   <i className="fas fa-trash-alt"></i>
                 </button>

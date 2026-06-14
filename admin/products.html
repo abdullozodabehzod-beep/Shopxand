@@ -22,68 +22,40 @@
   <button onclick="logoutAdmin()">Выйти</button>
    </div>
    
-   <!-- Форма добавления товара -->
-   <div style="background:#fff;padding:20px;border-radius:12px;margin-bottom:20px;">
-  <h3 id="formTitle">Добавить товар</h3>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
- <div class="form-group">
-<label>Название</label>
-<input type="text" id="prodName" placeholder="Название товара">
- </div>
- <div class="form-group">
-<label>Категория</label>
-<select id="prodCat">
-    <option value="Одежда">Одежда</option>
-    <option value="Электроника">Электроника</option>
-    <option value="Дом и сад">Дом и сад</option>
-    <option value="Компьютеры">Компьютеры</option>
-    <option value="Косметика">Косметика</option>
-    <option value="Аксессуары">Аксессуары</option>
-</select>
- </div>
- <div class="form-group">
-<label>Цена (сомони)</label>
-<input type="number" id="prodPrice" placeholder="120">
- </div>
- <div class="form-group">
-<label>Старая цена</label>
-<input type="number" id="prodOldPrice" placeholder="180">
- </div>
-    <div class="form-group">
-    <label>Основная картинка</label>
-    <input type="text" id="prodImg" placeholder="/img/товар.jpeg">
+    <!-- Форма добавления товара -->
+<div style="background:#fff;padding:20px;border-radius:12px;margin-bottom:20px;">
+    <h3>Добавить товар</h3>
+    
+    <div class="form-group"><label>Название</label><input type="text" id="prodName" placeholder="Название"></div>
+    <div class="form-group"><label>Категория</label>
+        <select id="prodCat">
+            <option>Одежда</option><option>Электроника</option><option>Дом и сад</option><option>Компьютеры</option><option>Косметика</option><option>Аксессуары</option>
+        </select>
+    </div>
+    <div style="display:flex;gap:10px;">
+        <div class="form-group" style="flex:1;"><label>Цена (с.)</label><input type="number" id="prodPrice" placeholder="120"></div>
+        <div class="form-group" style="flex:1;"><label>Старая цена</label><input type="number" id="prodOldPrice" placeholder="180"></div>
+    </div>
+    <div class="form-group"><label>Картинка</label><input type="text" id="prodImg" placeholder="/img/товар.jpeg"></div>
+    <div class="form-group"><label>Описание</label><input type="text" id="prodDesc" placeholder="Описание"></div>
+    
+    <div class="form-group"><label>Материал</label><input type="text" id="prodMaterial" placeholder="Хлопок, Кожа..."></div>
+    <div style="display:flex;gap:10px;">
+        <div class="form-group" style="flex:1;"><label>Сезон</label>
+            <select id="prodSeason"><option>Все сезоны</option><option>Весна</option><option>Лето</option><option>Осень</option><option>Зима</option></select>
+        </div>
+        <div class="form-group" style="flex:1;"><label>Стиль</label><input type="text" id="prodStyle" placeholder="Повседневный..."></div>
+    </div>
+    
+    <div class="form-group"><label>Размеры (через запятую)</label><input type="text" id="prodSizes" placeholder="X, XL, 2XL, 3XL"></div>
+    <div class="form-group"><label>Размеры обуви (через запятую)</label><input type="text" id="prodShoeSizes" placeholder="38, 39, 40, 41"></div>
+    
+    <div class="form-group"><label>Цвета (через запятую)</label><input type="text" id="prodColors" placeholder="Красный, Синий"></div>
+    <div class="form-group"><label>Доп. картинки (через запятую)</label><input type="text" id="prodThumbs" placeholder="/img/красный.jpeg, /img/синий.jpeg"></div>
+    <div class="form-group"><label>Цены доп. картинок (через запятую)</label><input type="text" id="prodThumbPrices" placeholder="120, 130"></div>
+    
+    <button onclick="saveProduct()" style="width:100%;padding:14px;background:#0066ff;color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:15px;font-weight:700;">Сохранить товар</button>
 </div>
-<div class="form-group">
-    <label>Дополнительные картинки (через запятую)</label>
-    <input type="text" id="prodThumbs" placeholder="/img/красный.jpeg, /img/синий.jpeg, /img/чёрный.jpeg">
-</div>
-<div class="form-group">
-    <label>Цвета/Варианты (через запятую)</label>
-    <input type="text" id="prodColors" placeholder="Красный, Синий, Чёрный">
-</div>
- <div class="form-group">
-<label>Описание</label>
-<input type="text" id="prodDesc" placeholder="Краткое описание">
- </div>
-       <div class="form-group">
-         <label>Рейтинг (0-5)</label>
-            <input type="number" id="prodRating" value="0" min="0" max="5" step="0.1">
-          </div>
-         <div class="form-group">
-             <label>Количество отзывов</label>
-             <input type="number" id="prodReviews" value="0" min="0">
-          </div>
-  <div class="form-group">
-<label>Размеры (через запятую, для одежды)</label>
-<input type="text" id="prodSizes" placeholder="X, XL, 2XL, 3XL">
- </div>
- <div class="form-group">
-<label>Размеры обуви (через запятую)</label>
-<input type="text" id="prodShoeSizes" placeholder="38, 39, 40, 41, 42, 43, 44">
- </div>
-  </div>
-  <button onclick="saveProduct()" style="margin-top:12px;padding:12px 24px;background:#0066ff;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;">Сохранить товар</button>
-   </div>
    
    <!-- Список товаров -->
    <table class="admin-table">

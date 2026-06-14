@@ -5,7 +5,7 @@ import CityModal from './CityModal';
 import Search from './Search';
 import MobileMenu from './MobileMenu';
 
-function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSelect, onOpenFavorites, onOpenOrders, setShowPhotoSearch, onSelectCategory}) {
+function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSelect, onOpenFavorites, onOpenOrders, setShowPhotoSearch, onSelectCategory, setShowLogout}) {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   <Search products={products} onProductSelect={onProductSelect} />
   const { lang, t } = useLanguage();
@@ -79,10 +79,13 @@ function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSel
               </div>
 
               <div className="header__actions">
-                <a href="#" className="header__action" onClick={(e) => { e.preventDefault(); onOpenAuth(); }}>
-                  <i className="fas fa-user"></i>
-                  <span>{user ? user.name : t('login')}</span>
-                </a>
+               <a href="#" className="header__action" onClick={(e) => { 
+                e.preventDefault(); 
+                user ? setShowLogout(true) : onOpenAuth(); 
+              }}>
+                <i className={`fas ${user ? 'fa-user-check' : 'fa-user'}`}></i>
+                <span>{user ? user.name : t('login')}</span>
+              </a>
                <a href="#" className="header__action" onClick={(e) => { e.preventDefault(); onOpenOrders(); }}>
                   <i className="fas fa-box"></i>
                   <span>{t('orders')}</span>

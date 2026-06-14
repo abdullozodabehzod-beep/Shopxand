@@ -6,32 +6,34 @@ function Auth({ onLogin, onClose }) {
   const [isLogin, setIsLogin] = useState(true);
   const [form, setForm] = useState({ name: '', phone: '', email: '', password: '', passwordConfirm: '' });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const url = isLogin ? '/auth/login' : '/auth/register';
-    const body = isLogin 
-      ? { phone: form.phone, password: form.password }
-      : { name: form.name, phone: form.phone, email: form.email, password: form.password };
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  const cleanPhone = form.phone.replace(/[\+\s\-\(\)]/g, '');
+  const url = isLogin ? '/auth/login' : '/auth/register';
+  const body = isLogin 
+    ? { phone: cleanPhone, password: form.password }
+    : { name: form.name, phone: form.phone, email: form.email, password: form.password };
 
-    try {
-      const res = await fetch(API_URL + url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      if (data.token) {
-        localStorage.setItem('shopxand_token', data.token);
-        onLogin(data.user);
-        onClose();
-      } else {
-        alert(data.error);
-      }
-    } catch (err) {
-      alert('Ошибка сервера');
+  try {
+    const res = await fetch(API_URL + url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    
+    if (data.token) {
+      localStorage.setItem('shopxand_token', data.token);
+      localStorage.setItem('shopxand_user', JSON.stringify(data.user));
+      onLogin(data.user);
+      onClose();
+    } else {
+      alert(data.error || 'Ошибка');
     }
-  };
-
+  } catch (err) {
+    alert('Ошибка сервера');
+  }
+};
   return (
     <div className="auth-modal active">
       <div className="auth-modal__overlay" onClick={onClose}></div>

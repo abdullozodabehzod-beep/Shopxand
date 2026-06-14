@@ -7239,3 +7239,13 @@ body {
     font-size: 20px;
     color: #0066ff;
 }
+
+@keyframes slideInRight {
+  from { right: -400px; opacity: 0; }
+  to { right: 20px; opacity: 1; }
+}
+
+@keyframes slideOutRight {
+  from { right: 20px; opacity: 1; }
+  to { right: -400px; opacity: 0; }
+}

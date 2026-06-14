@@ -2,7 +2,7 @@
 
 const ADMIN_USER = 'admin';
 const ADMIN_PASS = 'shopxand2024';
-const API_URL = 'https://shopxand-3.onrender.com/api';
+const API_URL = 'http://localhost:3000/api';
 // Вход
 document.getElementById('adminLoginForm')?.addEventListener('submit', function(e) {
     e.preventDefault();
@@ -81,6 +81,7 @@ async function loadProductsAdmin() {
     '<td><img src="' + (p.img || '') + '" style="width:50px;height:50px;object-fit:contain;" onerror="this.style.display=\'none\'"></td>' +
     '<td>' + p.name + '</td>' +
     '<td>' + p.cat + '</td>' +
+    '<td>' + (p.thumbPrices ? p.thumbPrices.join(', ') + ' с.' : '—') + '</td>' +
     '<td>' + p.price + ' с.</td>' +
     '<td><button class="btn-sm btn-sm--red" onclick="deleteProduct(\'' + (p._id || p.id) + '\')">🗑️</button></td>' +
   '</tr>';
@@ -92,22 +93,29 @@ async function loadProductsAdmin() {
 
 // Сохранение товара
 async function saveProduct() {
-    var thumbsStr = document.getElementById('prodThumbs')?.value || '';
-    var colorsStr = document.getElementById('prodColors')?.value || '';
+     var materialStr = document.getElementById('prodMaterial')?.value || '';
+    var seasonStr = document.getElementById('prodSeason')?.value || '';
+    var styleStr = document.getElementById('prodStyle')?.value || '';
+    var thumbPricesStr = document.getElementById('prodThumbPrices')?.value || '';
     var sizesStr = document.getElementById('prodSizes')?.value || '';
     var shoeSizesStr = document.getElementById('prodShoeSizes')?.value || '';
-    
-    var product = {
+    var colorsStr = document.getElementById('prodColors')?.value || '';
+    var thumbsStr = document.getElementById('prodThumbs')?.value || '';
+        var product = {
         name: document.getElementById('prodName').value,
         cat: document.getElementById('prodCat').value,
         price: parseInt(document.getElementById('prodPrice').value) || 0,
         oldPrice: document.getElementById('prodOldPrice').value ? parseInt(document.getElementById('prodOldPrice').value) : null,
         img: document.getElementById('prodImg').value || '',
-        thumbs: thumbsStr ? thumbsStr.split(',').map(t => t.trim()) : [],
-        colors: colorsStr ? colorsStr.split(',').map(c => c.trim()) : [],
         desc: document.getElementById('prodDesc').value || '',
+        material: materialStr,
+        season: seasonStr,
+        style: styleStr,
         sizes: sizesStr ? sizesStr.split(',').map(s => s.trim()) : [],
         shoeSizes: shoeSizesStr ? shoeSizesStr.split(',').map(s => s.trim()) : [],
+        colors: colorsStr ? colorsStr.split(',').map(c => c.trim()) : [],
+        thumbs: thumbsStr ? thumbsStr.split(',').map(t => t.trim()) : [],
+        thumbPrices: thumbPricesStr ? thumbPricesStr.split(',').map(p => parseInt(p.trim()) || 0) : [],
         rating: parseFloat(document.getElementById('prodRating')?.value) || 0,
         reviews: parseInt(document.getElementById('prodReviews')?.value) || 0,
         specs: [],
@@ -152,87 +160,83 @@ var currentReviewFilter = 'pending';
 async function loadReviews(filter) {
     currentReviewFilter = filter;
     try {
-   var url = API_URL + '/reviews/admin';
-   var res = await fetch(url);
-   var data = await res.json();
-   
-   var reviews = data.reviews;
-   if (filter !== 'all') {
-  reviews = reviews.filter(function(r) { return r.status === filter; });
-   }
-   
-   // Статистика
-   var allReviews = data.reviews;
-   document.getElementById('pendingCount').textContent = allReviews.filter(function(r) { return r.status === 'pending'; }).length;
-   document.getElementById('approvedCount').textContent = allReviews.filter(function(r) { return r.status === 'approved'; }).length;
-   document.getElementById('rejectedCount').textContent = allReviews.filter(function(r) { return r.status === 'rejected'; }).length;
-   
-   var list = document.getElementById('reviewsList');
-   
-   if (reviews.length === 0) {
-  list.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">Нет отзывов</div>';
-  return;
-   }
-   
-   list.innerHTML = reviews.map(function(r) {
-  var stars = '';
-  for (var i = 1; i <= 5; i++) stars += i <= r.rating ? '⭐' : '☆';
-  var statusBadge = '';
-  if (r.status === 'pending') statusBadge = '<span class="badge badge--orange">Ожидает</span>';
-  if (r.status === 'approved') statusBadge = '<span class="badge badge--green">Одобрен</span>';
-  if (r.status === 'rejected') statusBadge = '<span class="badge badge--red">Отклонён</span>';
-  
-  var actions = '';
-  if (r.status === 'pending') {
- actions = '<button class="btn-sm btn-sm--green" onclick="approveReview(\'' + r.date + '\')">✅ Одобрить</button> ' +
- '<button class="btn-sm btn-sm--red" onclick="rejectReview(\'' + r.date + '\')">❌ Отклонить</button>';
-  }
-  actions += ' <button class="btn-sm" onclick="deleteReview(\'' + r.date + '\')">🗑️</button>';
-  
-  return '<div style="background:#fff;padding:16px;border-radius:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:start;">' +
- '<div>' +
-'<div style="font-weight:700;">' + r.name + ' ' + statusBadge + '</div>' +
-'<div style="font-size:12px;color:#999;">' + new Date(r.date).toLocaleString('ru-RU') + ' | Товар: ' + r.productId + '</div>' +
-'<div style="margin:6px 0;">' + stars + ' <strong>' + r.rating + '/5</strong></div>' +
-'<div>' + r.text + '</div>' +
- '</div>' +
- '<div style="display:flex;gap:6px;flex-shrink:0;">' + actions + '</div>' +
-  '</div>';
-   }).join('');
-   
+        var res = await fetch(API_URL + '/reviews/admin');
+        var data = await res.json();
+        var reviews = data.reviews;
+        if (filter !== 'all') reviews = reviews.filter(r => r.status === filter);
+
+        var list = document.getElementById('reviewsList');
+        if (reviews.length === 0) {
+            list.innerHTML = '<div style="text-align:center;padding:40px;">Нет отзывов</div>';
+            return;
+        }
+
+        list.innerHTML = reviews.map(function(r) {
+            var stars = '';
+            for (var i = 1; i <= 5; i++) stars += i <= r.rating ? '⭐' : '☆';
+            return '<div style="background:#fff;padding:14px;border-radius:10px;margin-bottom:8px;">' +
+                '<strong>' + (r.name || 'Гость') + '</strong> ' + stars + ' ' + r.rating + '/5' +
+                '<p>' + r.text + '</p>' +
+                '<small>' + new Date(r.date).toLocaleString('ru-RU') + '</small>' +
+                '<br><button class="btn-sm" onclick="deleteReviewById(\'' + r.id + '\')">🗑️ Удалить</button>' +
+            '</div>';
+        }).join('');
     } catch (err) {
-   console.log('Ошибка загрузки отзывов');
+        console.log('Ошибка:', err);
     }
+}
+
+async function deleteReviewById(id) {
+    if (!confirm('Удалить отзыв?')) return;
+    await fetch(API_URL + '/reviews/' + id, { method: 'DELETE' });
+    loadReviews(currentReviewFilter);
+}
+
+async function deleteReviewById(id) {
+    if (!confirm('Удалить отзыв?')) return;
+    await fetch(API_URL + '/reviews/' + id, { method: 'DELETE' });
+    loadReviews(currentReviewFilter);
+}
+
+async function deleteReviewById(id) {
+    if (!confirm('Удалить отзыв?')) return;
+    await fetch(API_URL + '/reviews/' + id, { method: 'DELETE' });
+    loadReviews(currentReviewFilter);
 }
 
 // Одобрить
-async function approveReview(id) {
-    try {
-   await fetch(API_URL + '/reviews/' + id + '/approve', { method: 'PUT' });
-   loadReviews(currentReviewFilter);
-    } catch (err) {
-   alert('Ошибка');
-    }
-}
+router.put('/:id/approve', (req, res) => {
+    const reviews = getReviews();
+    const review = reviews.find(r => r.id === req.params.id);
+    if (review) review.status = 'approved';
+    saveReviews(reviews);
+    res.json({ success: true });
+});
 
-// Отклонить
-async function rejectReview(id) {
-    try {
-   await fetch(API_URL + '/reviews/' + id + '/reject', { method: 'PUT' });
-   loadReviews(currentReviewFilter);
-    } catch (err) {
-   alert('Ошибка');
-    }
-}
+router.put('/:id/reject', (req, res) => {
+    const reviews = getReviews();
+    const review = reviews.find(r => r.id === req.params.id);
+    if (review) review.status = 'rejected';
+    saveReviews(reviews);
+    res.json({ success: true });
+});
 
-// Удалить
 async function deleteReview(id) {
     if (!confirm('Удалить отзыв навсегда?')) return;
     try {
-   await fetch(API_URL + '/reviews/' + id, { method: 'DELETE' });
-   loadReviews(currentReviewFilter);
+        // Используем индекс вместо ID
+        const res = await fetch(API_URL + '/reviews');
+        const data = await res.json();
+        const allReviews = data.reviews;
+        
+        // Находим отзыв по дате
+        const reviewToDelete = allReviews.find(r => r.date === id);
+        if (reviewToDelete) {
+            await fetch(API_URL + '/reviews/' + encodeURIComponent(id), { method: 'DELETE' });
+        }
+        loadReviews(currentReviewFilter);
     } catch (err) {
-   alert('Ошибка');
+        alert('Ошибка');
     }
 }
 
