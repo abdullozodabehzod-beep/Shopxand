@@ -13,18 +13,20 @@ function Quickview({ product, onClose, onAddToCart }) {
   const [reviewRating, setReviewRating] = useState(0);
   const [reviews, setReviews] = useState([]);
 
- useEffect(() => {
+useEffect(() => {
   if (!product?._id) return;
   
   fetch('http://localhost:3000/api/reviews')
     .then(r => r.json())
     .then(data => {
-      console.log('Все отзывы:', data.reviews);
       const productReviews = data.reviews?.[product._id] || [];
-      console.log('Отзывы для товара ' + product._id + ':', productReviews.length);
       setReviews(productReviews);
-    })
-    .catch(err => console.log('Ошибка:', err));
+      // Обновляем счётчик
+      const reviewsCountEl = document.querySelector('.quickview__reviews');
+      if (reviewsCountEl) {
+        reviewsCountEl.textContent = productReviews.length + ' отзывов';
+      }
+    });
 }, [product?._id]);
 
   if (!product) return null;
@@ -113,6 +115,10 @@ function Quickview({ product, onClose, onAddToCart }) {
   .then(data => {
     if (data.success) {
       setReviews(prev => [data.review, ...prev]);
+      const countE1 = document.querySelector('.quickview__reviews')
+      if (countE1) {
+        const num = (parseInt(countE1.textContent) || 0) + 1
+      }
       setShowReviewForm(false);
       setReviewText('');
       setReviewRating(0);
