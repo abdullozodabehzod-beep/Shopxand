@@ -36,6 +36,22 @@ function App() {
   const [toast, setToast] = useState(null);
   const [showLogout, setShowLogout] = useState(false);
 
+  const deleteOrder = (orderId) => {
+    if (!window.confirm('Удалить заказ?')) return;
+    fetch(API_URL + '/orders/' + orderId, { method: 'DELETE' })
+        .then(() => setOrders(prev => prev.filter(o => o.id !== orderId)));
+};
+
+const cancelOrder = (orderId) => {
+    if (!window.confirm('Отменить заказ?')) return;
+    fetch(API_URL + '/orders/' + orderId, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'cancelled' })
+    })
+    .then(() => setOrders(prev => prev.map(o => o.id === orderId ? {...o, status: 'cancelled'} : o)));
+};
+
   const updateCartQuantity = (id, newQty) => {
   if (newQty <= 0) {
     setCart(prev => prev.filter(i => i._id !== id));
@@ -236,7 +252,7 @@ function App() {
           setUser(user); 
           showToast('✅ Добро пожаловать, ' + user.name + '!'); 
         }} onClose={() => setShowAuth(false)} />}  
-      {showOrders && <Orders orders={orders} onClose={() => setShowOrders(false)} />}
+      {showOrders && <Orders orders={orders} onClose={() => setShowOrders(false)} onDelete={deleteOrder} onCancel={cancelOrder} />}
         {showPhotoSearch && <PhotoSearch products={products} onProductSelect={(p) => setSelectedProduct(p)} onClose={() => setShowPhotoSearch(false)} />}
 
           <BottomNav 

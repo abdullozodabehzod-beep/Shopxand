@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Orders({ orders, onClose }) {
+function Orders({ orders, onClose, onDelete, onCancel }) {
   return (
     <div className="orders-panel active">
       <div className="orders-panel__overlay" onClick={onClose}></div>
@@ -29,8 +29,26 @@ function Orders({ orders, onClose }) {
                     {order.status}
                   </span>
                 </div>
-                <div className="order-card__total">{order.total.toLocaleString()} с.</div>
+                <div className="order-card__total">{order.total?.toLocaleString()} с.</div>
                 <div className="order-card__date">{new Date(order.date).toLocaleDateString('ru-RU')}</div>
+                <div className="order-card__items">
+                  {order.items?.map((item, i) => (
+                    <div key={i} className="order-card__item">
+                      <span className="order-card__item-name">{item.name}</span>
+                      <span className="order-card__item-qty">×{item.quantity}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="order-card__footer">
+                  {order.status !== 'cancelled' && order.status !== 'completed' && (
+                    <button className="order-card__cancel-btn" onClick={() => onCancel(order.id)}>
+                      <i className="fas fa-times"></i> Отменить
+                    </button>
+                  )}
+                  <button className="order-card__delete-btn" onClick={() => onDelete(order.id)}>
+                    <i className="fas fa-trash-alt"></i> Удалить
+                  </button>
+                </div>
               </div>
             ))
           )}
