@@ -221,6 +221,21 @@ const cancelOrder = (orderId) => {
     document.querySelector('.products')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleUpdateProduct = (productId, reviewsCount, avgRating) => {
+  setFilteredProducts(prev => prev.map(p => {
+    if (p._id === productId) {
+      return { ...p, reviews: reviewsCount, rating: avgRating };
+    }
+    return p;
+  }));
+  setProducts(prev => prev.map(p => {
+    if (p._id === productId) {
+      return { ...p, reviews: reviewsCount, rating: avgRating };
+    }
+    return p;
+  }));
+};
+
   return (
     <LanguageProvider>
       <div className="App">
@@ -295,7 +310,7 @@ const cancelOrder = (orderId) => {
     </div>
   </section>
 
-        {selectedProduct && <Quickview product={selectedProduct} onClose={() => setSelectedProduct(null)} onAddToCart={addToCart} />}
+        {selectedProduct && <Quickview product={selectedProduct} onClose={() => setSelectedProduct(null)} onAddToCart={addToCart} onUpdateProduct={handleUpdateProduct} />}
         {showFavorites && <Favorites favorites={favorites} onRemove={(id) => setFavorites(prev => prev.filter(i => i._id !== id))} onAddToCart={addToCart} onClose={() => setShowFavorites(false)} />}
         {showCart && <Cart cart={cart} onRemove={removeFromCart} onCheckout={() => { setShowCart(false); setShowCheckout(true); }} onClose={() => setShowCart(false)} onUpdateQuantity={updateCartQuantity} />}        {showCheckout && <Checkout cart={cart} user={user} onPlaceOrder={placeOrder} onClose={() => setShowCheckout(false)} />}
         {showAuth && <Auth onLogin={(user) => { 
