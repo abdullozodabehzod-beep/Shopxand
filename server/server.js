@@ -13,7 +13,7 @@ app.use(express.json());
 // ============================================
 // AUTOPING — чтобы сервер не засыпал
 // ============================================
-const SITE_URL = 'shopxand-3.onrender.com';
+const SITE_URL = '/api';
 
 function keepAlive() {
     https.get('https://' + SITE_URL + '/ping', (res) => {
