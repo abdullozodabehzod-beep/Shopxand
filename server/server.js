@@ -49,17 +49,17 @@ app.use('/api/email', require('./routes/email'));
 app.use('/api/telegram', require('./routes/telegram'));
 
 // ============================================
-// Старая статика (админка, картинки, старый сайт)
-// ============================================
-app.use(express.static(path.join(__dirname, '..')));
-
-// ============================================
-// React build
+// React build (ПЕРВЫМ!)
 // ============================================
 app.use(express.static(path.join(__dirname, '..', 'shopxand-react', 'build')));
 
 // ============================================
-// Остальные роуты
+// Старая статика — админка, картинки (ВТОРЫМ)
+// ============================================
+app.use(express.static(path.join(__dirname, '..')));
+
+// ============================================
+// robots.txt и sitemap
 // ============================================
 app.get('/robots.txt', (req, res) => {
     res.type('text/plain');
@@ -70,7 +70,9 @@ app.get('/sitemap.xml', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'sitemap.xml'));
 });
 
-// Все остальные запросы → React index.html
+// ============================================
+// Все остальные запросы → React
+// ============================================
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'shopxand-react', 'build', 'index.html'));
 });
