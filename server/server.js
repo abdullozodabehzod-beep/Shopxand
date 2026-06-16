@@ -13,7 +13,7 @@ app.use(express.json());
 // ============================================
 // AUTOPING — чтобы сервер не засыпал
 // ============================================
-const SITE_URL = '/api';
+const SITE_URL = 'http://localhost:3001/api';
 
 function keepAlive() {
     https.get('https://' + SITE_URL + '/ping', (res) => {
