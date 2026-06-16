@@ -5,14 +5,15 @@ import CityModal from './CityModal';
 import Search from './Search';
 import MobileMenu from './MobileMenu';
 
-function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSelect, onOpenFavorites, onOpenOrders, setShowPhotoSearch, onSelectCategory, setShowLogout}) {
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
-  <Search products={products} onProductSelect={onProductSelect} />
+function Header({ user, onOpenAuth, onOpenCart,onSearchSelect, onSearch, products, onProductSelect, onOpenFavorites, onOpenOrders, setShowPhotoSearch, onSelectCategory, setShowLogout, onOpenMobileMenu}) {
+  <Search products={products} onProductSelect={onProductSelect} onSearch={onSearch} />
   const { lang, t } = useLanguage();
   const [showLangModal, setShowLangModal] = useState(false);
   const [showCityModal, setShowCityModal] = useState(false);
   const [showCatalog, setShowCatalog] = useState(false);
   const [currentCity, setCurrentCity] = useState(localStorage.getItem('shopxand_city') || 'Душанбе');
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
   
 
   const langCodes = { ru: 'RU', tg: 'TJ', en: 'EN' };
@@ -20,15 +21,6 @@ function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSel
   return (
     <>
       <header className="header">
-        <div className="header__main">
-          <div className="container">
-            <div className="header__main-inner">
-              <button className="header__burger" onClick={() => setShowMobileMenu(true)}>
-                <span></span><span></span><span></span>
-              </button>
-              </div>
-          </div>
-        </div>
         {/* Top Bar */}
         <div className="header__top">
           <div className="container">
@@ -50,9 +42,10 @@ function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSel
         <div className="header__main">
           <div className="container">
             <div className="header__main-inner">
-              <button className="header__burger"><span></span><span></span><span></span></button>
-
-              <a href="/" className="header__logo">
+               <button className="header__burger" onClick={() => setShowMobileMenu(true)}>
+            <span></span><span></span><span></span>
+          </button>
+                  <a href="/" className="header__logo">
                 <span className="header__logo-icon">
                   <svg viewBox="0 0 500 500" width="45" height="45">
                     <defs><clipPath id="xclip2"><rect x="320" y="0" width="250" height="500"/></clipPath></defs>
@@ -68,15 +61,13 @@ function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSel
                 <span>{t('catalog')}</span>
               </button>
 
-              <div className="header__search">
-                <input type="text" className="header__search-input" placeholder={t('search')} />
-                <button className="header__search-by-photo" onClick={() => setShowPhotoSearch(true)} title="Поиск по фото">
-                  <i className="fas fa-camera"></i>
-                </button>
-                <button className="header__search-btn">
-                  <i className="fas fa-search"></i>
-                </button>
-              </div>
+                <div className={`header__search ${showMobileSearch ? 'active' : ''}`}>
+              <Search 
+                products={products} 
+                onSearchSelect={onSearchSelect}
+                onSearch={onSearch}
+              />
+            </div>
 
               <div className="header__actions">
                <a href="#" className="header__action" onClick={(e) => { 
@@ -91,7 +82,11 @@ function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSel
                   <span>{t('orders')}</span>
                 </a>
 
-                <a href="#" className="header__action" onClick={(e) => { e.preventDefault(); onOpenFavorites(); }}>
+                <a href="#" className="header__action" onClick={(e) => { 
+                e.preventDefault(); 
+                if (!user) { onOpenAuth(); return; }
+                onOpenFavorites(); 
+              }}>
                 <i className="fas fa-heart"></i>
                 <span>{t('favorites')}</span>
               </a>
@@ -99,6 +94,11 @@ function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSel
                   <i className="fas fa-shopping-cart"></i>
                   <span>{t('cart')}</span>
                 </a>
+
+                              {/* Mobile Search Toggle */}
+              <button className="header__search-toggle" aria-label="Поиск" onClick={() => setShowMobileSearch(!showMobileSearch)}>
+                <i className="fas fa-search"></i>
+              </button>
               </div>
             </div>
           </div>
@@ -172,17 +172,18 @@ function Header({ user, onOpenAuth, onOpenCart, onSearch, products, onProductSel
           onSelectCity={(city) => { setCurrentCity(city); localStorage.setItem('shopxand_city', city); }}
         />   
       )}
-
-        {showMobileMenu && (
-        <MobileMenu 
-          onClose={() => setShowMobileMenu(false)}
-          onOpenAuth={onOpenAuth}
-          onOpenCart={onOpenCart}
-          onOpenFavorites={onOpenFavorites}
-          onOpenOrders={onOpenOrders}
-          user={user}
-        />
-      )}
+      {showMobileMenu && (
+  <MobileMenu 
+    onClose={() => setShowMobileMenu(false)}
+    onOpenAuth={onOpenAuth}
+    onOpenCart={onOpenCart}
+    onOpenFavorites={onOpenFavorites}
+    onOpenOrders={onOpenOrders}
+    user={user}
+    onOpenCityModal={() => setShowCityModal(true)}
+  onOpenLangModal={() => setShowLangModal(true)}
+  />
+)}
 
     </>
   );

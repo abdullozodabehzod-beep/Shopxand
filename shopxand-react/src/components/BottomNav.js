@@ -13,7 +13,7 @@ function BottomNav({ onOpenCart, onOpenFavorites, onOpenOrders, onOpenMenu, cart
       <i className="fas fa-heart"></i>
       <span>Избранное</span>
     </button>
-      <button className="bottom-nav__item" onClick={onOpenCart}>
+    <button className="bottom-nav__item" onClick={onOpenCart}>
         <i className="fas fa-shopping-cart"></i>
         {cartCount > 0 && <span className="bottom-nav__badge">{cartCount}</span>}
         <span>Корзина</span>
@@ -22,10 +22,7 @@ function BottomNav({ onOpenCart, onOpenFavorites, onOpenOrders, onOpenMenu, cart
         <i className="fas fa-box"></i>
         <span>Заказы</span>
       </button>
-      <button className="bottom-nav__item" onClick={onOpenMenu}>
-        <i className="fas fa-bars"></i>
-        <span>Меню</span>
-      </button>
+       
     </nav>
   );
 }

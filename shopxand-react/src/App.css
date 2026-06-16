@@ -49,6 +49,7 @@ body {
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 16px;
+    overflow: visible !important;
 }
 
 /* ========================================
@@ -7012,19 +7013,24 @@ body {
    ======================================== */
 
 .categories-bar {
-    display: none;
     padding: 16px 0;
     background: #fff;
     border-bottom: 1px solid #f0f0f0;
+    overflow: visible !important;
+}
+
+
+.categories-bar .container {
+    overflow: visible !important;
 }
 
 .categories-bar__grid {
-    display: flex;
+   display: flex;
     gap: 8px;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding: 4px 0;
+    overflow-y: visible !important;
+    padding: 4px 0 200px 0;
+    margin-bottom: -180px;
 }
 
 .categories-bar__grid::-webkit-scrollbar {
@@ -7065,7 +7071,7 @@ body {
     white-space: nowrap;
 }
 
-@media (max-width: 768px) {
+@media (min-width: 769px) {
     .category-btn {
         min-width: 64px;
         padding: 10px 12px;
@@ -7075,8 +7081,40 @@ body {
         font-size: 20px;
     }
      .categories-bar {
-        display: block; /* Показываем только на телефоне */
+        display: none; /* Показываем только на телефоне */
     }
+}
+
+.category-btn {
+    position: relative;
+}
+
+.category-btn-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    padding: 8px;
+    z-index: 999;
+    min-width: 150px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.category-btn-dropdown a {
+    display: block;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #333;
+    text-decoration: none;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.category-btn-dropdown a:hover {
+    background: #f0f0f0;
 }
 
 .categories-bar h3{
@@ -7248,4 +7286,33 @@ body {
 @keyframes slideOutRight {
   from { right: 20px; opacity: 1; }
   to { right: -400px; opacity: 0; }
+}
+
+
+
+.order-detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+}
+.order-detail-row span:first-child { color: #999; }
+.order-detail-row span:last-child { font-weight: 600; }
+
+.order-track__days {
+    font-size: 10px;
+    color: #999;
+    margin-top: 2px;
+}
+
+.order-card__details-btn {
+    padding: 6px 14px;
+    background: #0066ff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
 }

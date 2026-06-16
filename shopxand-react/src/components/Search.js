@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-function Search({ products, onProductSelect }) {
+function Search({ products, onProductSelect, onSearchSelect }) {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -51,10 +51,13 @@ function Search({ products, onProductSelect }) {
     }
   };
 
-  const handleSelect = (product) => {
-    setQuery('');
+    const handleSelect = (product) => {
+    setQuery(product.name);
     setShowSuggestions(false);
-    if (onProductSelect) onProductSelect(product);
+    // Вместо открытия Quickview — фильтруем товары
+    if (onSearchSelect) {
+      onSearchSelect(product.name);
+    }
   };
 
   const handleSearch = () => {

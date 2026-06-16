@@ -228,9 +228,18 @@ useEffect(() => {
 {/* Кнопки */}
 <div className="quickview__actions">
   <button className="quickview__cart-btn" onClick={() => { 
-    onAddToCart({...product, img: selectedThumb || product.img, price: currentPrice}); 
-    onClose(); 
-  }}>
+  onAddToCart({
+    ...product,
+    img: selectedThumb || mainImg || product.img,
+    price: currentPrice,
+    selectedSize,
+    selectedColor,
+    material: product.material,
+    season: product.season,
+    style: product.style
+  }); 
+  onClose(); 
+}}>
     <i className="fas fa-shopping-cart"></i> В корзину
   </button>
   <button className="quickview__fav-btn"><i className="far fa-heart"></i></button>

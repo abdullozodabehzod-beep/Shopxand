@@ -9,21 +9,28 @@ function Checkout({ cart, user, onPlaceOrder, onClose }) {
     address: ''
   });
   const [delivery, setDelivery] = useState('courier');
-  const [payment, setPayment] = useState('cash');
+  const [payment, setPayment] = useState('dc');
   const [orderId, setOrderId] = useState('');
 
   const total = cart.reduce((s, i) => s + i.price * i.quantity, 0) + (delivery === 'courier' ? 30 : 0);
 
   const handleSubmit = () => {
-    if (!form.name || !form.phone || !form.address) {
-      alert('Заполните все поля');
-      return;
-    }
-    const newOrderId = 'SX-' + Date.now().toString().slice(-8);
-    setOrderId(newOrderId);
-    onPlaceOrder(form);
-    setStep(3);
-  };
+  if (!form.name || !form.phone || !form.address) {
+    alert('Заполните все поля');
+    return;
+  }
+  const newOrderId = 'SX-' + Date.now().toString().slice(-8);
+  setOrderId(newOrderId);
+  onPlaceOrder(form);
+  setStep(3);
+  
+  // Окно в правом верхнем углу
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#1a1a2e;color:#fff;padding:16px 24px;border-radius:14px;z-index:99999;font-size:15px;font-weight:600;box-shadow:0 10px 40px rgba(0,0,0,0.3);animation:slideInRight 0.4s ease forwards,slideOutRight 0.4s ease 2s forwards;';
+  toast.textContent = '✅ Заказ ' + newOrderId + ' подтверждён!';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+};
 
   return (
     <div className="checkout-modal active">
@@ -89,7 +96,12 @@ function Checkout({ cart, user, onPlaceOrder, onClose }) {
               <div className="checkout-order__items">
                 {cart.map(item => (
                   <div key={item._id} className="checkout-order__item">
-                    <span>{item.img || '📦'}</span>
+                    <img 
+                      src={item.img} 
+                      alt={item.name} 
+                      style={{width:40,height:40,objectFit:'contain',borderRadius:6}}
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
                     <span className="checkout-order__item-name">{item.name}</span>
                     <span className="checkout-order__item-qty">×{item.quantity}</span>
                     <span className="checkout-order__item-price">{(item.price * item.quantity).toLocaleString()} с.</span>
@@ -111,9 +123,18 @@ function Checkout({ cart, user, onPlaceOrder, onClose }) {
                 </div>
               </div>
 
-              <h3 className="checkout-section__title">Способ оплаты</h3>
+                            <h3 className="checkout-section__title">Способ оплаты</h3>
               <div className="checkout-payment__options">
-                <label className="checkout-payment__option active">
+                <label className={`checkout-payment__option ${payment === 'dc' ? 'active' : ''}`}>
+                  <input type="radio" name="payment" checked={payment === 'dc'} onChange={() => setPayment('dc')} />
+                  <div className="checkout-payment__info">
+                    <span className="checkout-payment__name">
+                      <i className="fas fa-mobile-alt"></i> D/C (Душанбе Сити)
+                    </span>
+                    <span className="checkout-payment__desc">Оплата через D/C</span>
+                  </div>
+                </label>
+                <label className={`checkout-payment__option ${payment === 'cash' ? 'active' : ''}`}>
                   <input type="radio" name="payment" checked={payment === 'cash'} onChange={() => setPayment('cash')} />
                   <div className="checkout-payment__info">
                     <span className="checkout-payment__name">
@@ -122,7 +143,7 @@ function Checkout({ cart, user, onPlaceOrder, onClose }) {
                     <span className="checkout-payment__desc">Оплата при получении</span>
                   </div>
                 </label>
-                <label className="checkout-payment__option">
+                <label className={`checkout-payment__option ${payment === 'card' ? 'active' : ''}`}>
                   <input type="radio" name="payment" checked={payment === 'card'} onChange={() => setPayment('card')} />
                   <div className="checkout-payment__info">
                     <span className="checkout-payment__name">
@@ -132,6 +153,19 @@ function Checkout({ cart, user, onPlaceOrder, onClose }) {
                   </div>
                 </label>
               </div>
+
+              {payment === 'dc' && (
+                <div className="checkout-dc-block" style={{marginBottom:16}}>
+                  <div className="checkout-dc-number">
+                    <span>Номер D/C:</span>
+                    <strong>+992300003230</strong>
+                    <button onClick={() => { navigator.clipboard.writeText('+992300003230'); alert('Номер скопирован!'); }}>
+                      <i className="fas fa-copy"></i>
+                    </button>
+                  </div>
+                  <p style={{fontSize:12,color:'#999',margin:'8px 0'}}>Переведите сумму на этот номер и нажмите "Подтвердить заказ"</p>
+                </div>
+              )}
 
               <div style={{display: 'flex', gap: 10}}>
                 <button className="checkout-btn checkout-btn--outline" onClick={() => setStep(1)}>

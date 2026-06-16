@@ -14,7 +14,8 @@ import CategoriesBar from './components/CategoriesBar';
 import { sendOrderToTelegram } from './components/TelegramOrder';
 import PhotoSearch from './components/PhotoSearch';
 
-const API_URL = 'https://shopxand-3.onrender.com/';
+
+const API_URL = 'http://localhost:3000/api';
 
 function App() {
   const [showPhotoSearch, setShowPhotoSearch] = useState(false);
@@ -36,20 +37,37 @@ function App() {
   const [toast, setToast] = useState(null);
   const [showLogout, setShowLogout] = useState(false);
 
-  const deleteOrder = (orderId) => {
-    if (!window.confirm('Удалить заказ?')) return;
+ const deleteOrder = (orderId) => {
     fetch(API_URL + '/orders/' + orderId, { method: 'DELETE' })
         .then(() => setOrders(prev => prev.filter(o => o.id !== orderId)));
 };
 
+ 
+
 const cancelOrder = (orderId) => {
-    if (!window.confirm('Отменить заказ?')) return;
+    const order = orders.find(o => o.id === orderId);
+    
     fetch(API_URL + '/orders/' + orderId, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'cancelled' })
     })
-    .then(() => setOrders(prev => prev.map(o => o.id === orderId ? {...o, status: 'cancelled'} : o)));
+    .then(() => {
+        setOrders(prev => prev.map(o => o.id === orderId ? {...o, status: 'cancelled'} : o));
+        
+        // Отправляем уведомление в Telegram
+        if (order) {
+            const BOT_TOKEN = '8265957442:AAFWnqXyl8TJJzZXsv3vxXRCuWwWd_aY9mE';
+            const CHAT_ID = '5282056467';
+            const msg = `❌ КЛИЕНТ ОТМЕНИЛ ЗАКАЗ\n\n📦 Заказ: ${order.id}\n👤 Клиент: ${order.customer?.name}\n📞 Телефон: ${order.customer?.phone}\n💰 Сумма: ${order.total?.toLocaleString()} с.`;
+            
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
+            });
+        }
+    });
 };
 
   const updateCartQuantity = (id, newQty) => {
@@ -89,10 +107,14 @@ const cancelOrder = (orderId) => {
       .then(r => r.json())
       .then(data => {
         if (data.products) {
-          // Исправляем пути к картинкам
           const fixed = data.products.map(p => ({
             ...p,
-            img: p.img && !p.img.startsWith('http') && !p.img.startsWith('/') ? '/' + p.img : p.img
+            img: p.img && !p.img.startsWith('http') && !p.img.startsWith('/') ? '/' + p.img : p.img,
+            material: p.material || '',
+            season: p.season || '',
+            style: p.style || '',
+            thumbPrices: p.thumbPrices || [],
+            thumbs: p.thumbs || []
           }));
           setProducts(fixed);
           setFilteredProducts(fixed);
@@ -122,17 +144,27 @@ const cancelOrder = (orderId) => {
   }, []);
 
 
-    const addToCart = (product) => {
-    if (!user) { setShowAuth(true); return; }
-    setCart(prev => {
-      const existing = prev.find(i => i._id === product._id);
-      if (existing) {
-        return prev.map(i => i._id === product._id ? {...i, quantity: i.quantity + 1} : i);
-      }
-      return [...prev, {...product, quantity: 1, img: product.img || product.selectedThumb || product.img}];
-    });
-    showToast('✅ ' + product.name + ' добавлен!');
-  };
+
+   const addToCart = (product) => {
+  if (!user) { setShowAuth(true); return; }
+  setCart(prev => {
+    const existing = prev.find(i => i._id === product._id);
+    if (existing) {
+      return prev.map(i => i._id === product._id ? {...i, quantity: i.quantity + 1} : i);
+    }
+    return [...prev, {
+      ...product,
+      quantity: 1,
+      img: product.img,
+      selectedSize: product.selectedSize,
+      selectedColor: product.selectedColor,
+      material: product.material,
+      season: product.season,
+      style: product.style
+    }];
+  });
+  showToast('✅ ' + product.name + ' добавлен!');
+};
 
   const removeFromCart = (id) => setCart(prev => prev.filter(i => i._id !== id));
 
@@ -177,9 +209,22 @@ const cancelOrder = (orderId) => {
     ));
   };
 
+   const handleSearchSelect = (query) => {
+    // Ищем товары с похожим названием
+    const similar = products.filter(p => 
+      (p.name || '').toLowerCase().includes(query.toLowerCase()) ||
+      (p.cat || '').toLowerCase().includes(query.toLowerCase())
+    );
+    setFilteredProducts(similar.length > 0 ? similar : products);
+    
+    // Прокрутка к товарам
+    document.querySelector('.products')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <LanguageProvider>
       <div className="App">
+
         <Header 
           user={user} 
           onOpenAuth={() => setShowAuth(true)} 
@@ -191,10 +236,15 @@ const cancelOrder = (orderId) => {
           products={products}
           onProductSelect={setSelectedProduct}
           onOpenFavorites={() => setShowFavorites(true)}
-          onOpenOrders={() => setShowOrders(true)}
-          setShowPhotoSearch={setShowPhotoSearch}
+         onOpenOrders={() => {
+        if (!user) { setShowAuth(true); return; }
+        setShowOrders(true);
+      }} 
+           setShowPhotoSearch={setShowPhotoSearch}
           onSelectCategory={handleSelectCategory}
           setShowLogout={setShowLogout}
+          onOpenMobileMenu={() => setShowMobileMenu(true)}
+           onSearchSelect={handleSearchSelect}
         />
         <Hero />
         <CategoriesBar onSelectCategory={handleSelectCategory} />
@@ -261,7 +311,10 @@ const cancelOrder = (orderId) => {
             setShowCart(true);
           }}
           onOpenFavorites={() => setShowFavorites(true)}
-          onOpenOrders={() => setShowOrders(true)}
+          onOpenOrders={() => {
+          if (!user) { setShowAuth(true); return; }
+          setShowOrders(true);
+        }}
           cartCount={cart.reduce((s, i) => s + i.quantity, 0)} 
           onOpenMenu={() => setShowMobileMenu(true)}
           user={user}

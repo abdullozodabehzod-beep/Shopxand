@@ -2,8 +2,8 @@ import React from "react";
 
 import { useLanguage } from "../context/LanguageContext";
 
-function MobileMenu({ onClose, onOpenAuth, onOpenCart, onOpenFavorites, onOpenOrders, user }) {
-  const { t } = useLanguage();
+function MobileMenu({ onClose, onOpenAuth, onOpenCart, onOpenFavorites, onOpenOrders, user, onOpenCityModal, onOpenLangModal  }) {
+  const { lang, t } = useLanguage();
 
   return (
     <div className="mobile-menu active">
@@ -72,29 +72,22 @@ function MobileMenu({ onClose, onOpenAuth, onOpenCart, onOpenFavorites, onOpenOr
           </ul>
         </div>
 
-        {/* Действия */}
-        <div className="mobile-menu__secondary">
-          <ul className="mobile-menu__secondary-list">
-            <li>
-              <a href="#" onClick={(e) => { e.preventDefault(); onOpenOrders(); onClose(); }}>
-                <i className="fas fa-box"></i>
-                <span>{t('myOrders')}</span>
-              </a>
-            </li>
-            <li>
-              <a href="#" onClick={(e) => { e.preventDefault(); onOpenFavorites(); onClose(); }}>
-                <i className="fas fa-heart"></i>
-                <span>{t('myFavorites')}</span>
-              </a>
-            </li>
-            <li>
-              <a href="#" onClick={(e) => { e.preventDefault(); onOpenCart(); onClose(); }}>
-                <i className="fas fa-shopping-cart"></i>
-                <span>{t('myCart')}</span>
-              </a>
-            </li>
-          </ul>
-        </div>
+       <div className="mobile-menu__secondary">
+  <ul className="mobile-menu__secondary-list">
+    <li>
+  <a href="#" onClick={(e) => { e.preventDefault(); onOpenCityModal(); onClose(); }}>
+    <i className="fas fa-map-marker-alt"></i>
+    <span>Душанбе</span>
+  </a>
+</li>
+<li>
+  <a href="#" onClick={(e) => { e.preventDefault(); onOpenLangModal(); onClose(); }}>
+    <i className="fas fa-globe"></i>
+    <span>{lang === 'ru' ? 'Русский (RU)' : lang === 'tg' ? 'Тоҷикӣ (TJ)' : 'English (EN)'}</span>
+  </a>
+</li>
+  </ul>
+</div>
       </div>
     </div>
   );
