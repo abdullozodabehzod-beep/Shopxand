@@ -16,7 +16,7 @@ app.use(express.json());
 const SITE_URL = 'https://shopxand-3.onrender.com';
 
 function keepAlive() {
-    https.get('https://' + SITE_URL + '/ping', (res) => {
+    https.get('https://shopxand-3.onrender.com/ping', (res) => {
         console.log('✅ Autoping:', res.statusCode);
     }).on('error', (err) => {
         console.log('❌ Ping error:', err.message);

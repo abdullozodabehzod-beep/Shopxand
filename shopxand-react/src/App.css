@@ -2191,14 +2191,18 @@ body {
    grid-template-columns: repeat(2, 1fr);
    gap: 10px;
     }
+    .product-card {
+        width: 100%;
+    }
     
     .product-card__img {
    height: 160px;
     }
     
     .product-card__img img {
-   width: 75%;
-   height: 75%;
+    width: 100%;
+        height: 100%;
+        object-fit: contain;
     }
     
     .product-card__img span {
