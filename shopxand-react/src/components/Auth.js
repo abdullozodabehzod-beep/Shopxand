@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = '/api';
 
 function Auth({ onLogin, onClose }) {
   const [isLogin, setIsLogin] = useState(true);
