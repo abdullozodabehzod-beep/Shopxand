@@ -15,7 +15,7 @@ import { sendOrderToTelegram } from './components/TelegramOrder';
 import PhotoSearch from './components/PhotoSearch';
 
 
-const API_URL = 'http://localhost:3001/api';
+const API_URL = 'http://localhost:3000/api';
 
 function App() {
   const [showPhotoSearch, setShowPhotoSearch] = useState(false);

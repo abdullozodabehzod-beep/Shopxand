@@ -13,7 +13,7 @@ app.use(express.json());
 // ============================================
 // AUTOPING — чтобы сервер не засыпал
 // ============================================
-const SITE_URL = 'http://localhost:3001/api';
+const SITE_URL = 'shopxand-3.onrender.com';
 
 function keepAlive() {
     https.get('https://' + SITE_URL + '/ping', (res) => {
@@ -49,6 +49,81 @@ app.use('/api/email', require('./routes/email'));
 app.use('/api/telegram', require('./routes/telegram'));
 
 // ============================================
+// SEO — Server-Side Rendering
+// ============================================
+const { renderProductPage, renderHomePage } = require('./seo');
+
+// SEO: страница товара
+app.get('/product/:id', async (req, res) => {
+    try {
+        const Product = require('./models/Product');
+        const product = await Product.findById(req.params.id);
+        const products = await Product.find().limit(20);
+        
+        if (!product) {
+            return res.redirect('/');
+        }
+        
+        const userAgent = req.get('User-Agent') || '';
+        const isBot = /bot|google|yandex|baidu|bing|slurp|duckduck|facebook|twitter/i.test(userAgent);
+        
+        if (isBot) {
+            res.send(renderProductPage(product, products));
+        } else {
+            res.sendFile(path.join(__dirname, '..', 'shopxand-react', 'build', 'index.html'));
+        }
+    } catch (err) {
+        res.redirect('/');
+    }
+});
+
+// SEO: категории
+app.get('/category/:cat', async (req, res) => {
+    try {
+        const Product = require('./models/Product');
+        const products = await Product.find({ cat: req.params.cat }).limit(20);
+        const userAgent = req.get('User-Agent') || '';
+        const isBot = /bot|google|yandex|baidu|bing|slurp|duckduck|facebook|twitter/i.test(userAgent);
+        
+        if (isBot) {
+            res.send(renderHomePage(products));
+        } else {
+            res.sendFile(path.join(__dirname, '..', 'shopxand-react', 'build', 'index.html'));
+        }
+    } catch (err) {
+        res.redirect('/');
+    }
+});
+
+// ============================================
+// Sitemap — динамический
+// ============================================
+app.get('/sitemap.xml', async (req, res) => {
+    try {
+        const Product = require('./models/Product');
+        const products = await Product.find();
+        
+        let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+        xml += '<url><loc>https://shopxand-3.onrender.com/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>\n';
+        
+        products.forEach(p => {
+            xml += '<url>\n';
+            xml += `  <loc>https://shopxand-3.onrender.com/product/${p._id}</loc>\n`;
+            xml += '  <changefreq>weekly</changefreq>\n';
+            xml += '  <priority>0.8</priority>\n';
+            xml += '</url>\n';
+        });
+        
+        xml += '</urlset>';
+        res.type('application/xml');
+        res.send(xml);
+    } catch (err) {
+        res.sendFile(path.join(__dirname, '..', 'sitemap.xml'));
+    }
+});
+
+// ============================================
 // React build (ПЕРВЫМ!)
 // ============================================
 app.use(express.static(path.join(__dirname, '..', 'shopxand-react', 'build')));
@@ -59,15 +134,11 @@ app.use(express.static(path.join(__dirname, '..', 'shopxand-react', 'build')));
 app.use(express.static(path.join(__dirname, '..')));
 
 // ============================================
-// robots.txt и sitemap
+// robots.txt
 // ============================================
 app.get('/robots.txt', (req, res) => {
     res.type('text/plain');
     res.send('User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /cart/\n\nSitemap: https://shopxand-3.onrender.com/sitemap.xml');
-});
-
-app.get('/sitemap.xml', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'sitemap.xml'));
 });
 
 // ============================================
