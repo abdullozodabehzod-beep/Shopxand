@@ -20,6 +20,7 @@ import Contact from './pages/Contact';
 import Footer from './components/Footer';
 import ChatWidget from './components/ChatWidget';
 import TelegramButton from './components/TelegramButton';
+import PwaInstall from './components/PwaInstall';
 
 
 const API_URL = '/api';
@@ -343,7 +344,12 @@ const cancelOrder = (orderId) => {
     </div>
   </section>
 
-        {selectedProduct && <Quickview product={selectedProduct} onClose={() => setSelectedProduct(null)} onAddToCart={addToCart} onUpdateProduct={handleUpdateProduct} />}
+       {selectedProduct && <Quickview 
+  product={selectedProduct} 
+  products={products}
+  onClose={() => setSelectedProduct(null)} 
+  onAddToCart={addToCart} 
+/>}
         {showFavorites && <Favorites favorites={favorites} onRemove={(id) => setFavorites(prev => prev.filter(i => i._id !== id))} onAddToCart={addToCart} onClose={() => setShowFavorites(false)} />}
         {showCart && <Cart cart={cart} onRemove={removeFromCart} onCheckout={() => { setShowCart(false); setShowCheckout(true); }} onClose={() => setShowCart(false)} onUpdateQuantity={updateCartQuantity} />}        {showCheckout && <Checkout cart={cart} user={user} onPlaceOrder={placeOrder} onClose={() => setShowCheckout(false)} />}
         {showAuth && <Auth onLogin={(user) => { 
@@ -352,6 +358,7 @@ const cancelOrder = (orderId) => {
         }} onClose={() => setShowAuth(false)} />}  
       {showOrders && <Orders orders={orders} onClose={() => setShowOrders(false)} onDelete={deleteOrder} onCancel={cancelOrder} />}
         {showPhotoSearch && <PhotoSearch products={products} onProductSelect={(p) => setSelectedProduct(p)} onClose={() => setShowPhotoSearch(false)} />}
+          <PwaInstall />
            <ChatWidget />
       <TelegramButton />
          <Footer />

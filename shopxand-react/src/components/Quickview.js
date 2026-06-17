@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Reviews from './Reviews';
 
-function Quickview({ product, onClose, onAddToCart, onUpdateProduct }) {
-  const [quantity, setQuantity] = useState(1);
+function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products }) {  const [quantity, setQuantity] = useState(1);
   const [mainImg, setMainImg] = useState(product.img);
   const [selectedThumb, setSelectedThumb] = useState(product.img);
   const [currentPrice, setCurrentPrice] = useState(product.price);
@@ -18,7 +17,7 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct }) {
   useEffect(() => {
     if (!product?._id) return;
     
-    fetch('http://localhost:3000/api/reviews')
+    fetch('/api/reviews')
       .then(r => r.json())
       .then(data => {
         const productReviews = data.reviews?.[product._id] || [];
@@ -37,7 +36,7 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct }) {
     if (reviewRating === 0) { alert('Поставьте оценку'); return; }
     if (!reviewText.trim()) { alert('Напишите отзыв'); return; }
 
-    fetch('http://localhost:3000/api/reviews', {
+    fetch('/api/reviews', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -252,6 +251,26 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct }) {
                 <i className="fab fa-whatsapp"></i>
                 <span>Написать в WhatsApp</span>
               </a>
+
+               {/* Похожие товары */}
+      <div className="quickview__related">
+        <h3 className="quickview__related-title">Похожие товары</h3>
+        <div className="quickview__related-grid">
+          {products && products
+            .filter(p => p.cat === product.cat && p._id !== product._id)
+            .slice(0, 4)
+            .map(p => (
+              <div key={p._id} className="related-card" onClick={() => window.location.reload()}>
+                <div className="related-card__img">
+                  <img src={p.img} alt={p.name} />
+                </div>
+                <div className="related-card__name">{p.name}</div>
+                <div className="related-card__price">{p.price} с.</div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
           </div>
         </div>
       </div>
