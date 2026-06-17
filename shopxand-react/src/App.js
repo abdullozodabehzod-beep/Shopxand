@@ -18,6 +18,8 @@ import Delivery from './pages/Delivery';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Footer from './components/Footer';
+import ChatWidget from './components/ChatWidget';
+import TelegramButton from './components/TelegramButton';
 
 
 const API_URL = 'http://localhost:3000/api';
@@ -350,7 +352,8 @@ const cancelOrder = (orderId) => {
         }} onClose={() => setShowAuth(false)} />}  
       {showOrders && <Orders orders={orders} onClose={() => setShowOrders(false)} onDelete={deleteOrder} onCancel={cancelOrder} />}
         {showPhotoSearch && <PhotoSearch products={products} onProductSelect={(p) => setSelectedProduct(p)} onClose={() => setShowPhotoSearch(false)} />}
-
+           <ChatWidget />
+      <TelegramButton />
          <Footer />
           <BottomNav 
           onOpenCart={() => {
