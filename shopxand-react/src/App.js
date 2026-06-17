@@ -14,6 +14,10 @@ import CategoriesBar from './components/CategoriesBar';
 import { sendOrderToTelegram } from './components/TelegramOrder';
 import PhotoSearch from './components/PhotoSearch';
 import { initGA, initYM } from './utils/analytics';
+import Delivery from './pages/Delivery';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import Footer from './components/Footer';
 
 
 const API_URL = 'http://localhost:3000/api';
@@ -37,17 +41,11 @@ function App() {
   const [addedItem, setAddedItem] = useState(null);
   const [toast, setToast] = useState(null);
   const [showLogout, setShowLogout] = useState(false);
-  const [toast, setToast] = useState(null);
 
    useEffect(() => {
     initGA();
     initYM();
   }, []);
-
-  const handleViewAll = () => {
-    setActiveCategory(null);
-    setFilteredProducts(products);
-  };
 
  const deleteOrder = (orderId) => {
     fetch(API_URL + '/orders/' + orderId, { method: 'DELETE' })
@@ -263,6 +261,12 @@ const cancelOrder = (orderId) => {
   }));
 };
 
+ const path = window.location.pathname;
+
+  if (path === '/delivery') return <Delivery />;
+  if (path === '/about') return <About />;
+  if (path === '/contact') return <Contact />;
+
   return (
     <LanguageProvider>
       <div className="App">
@@ -347,6 +351,7 @@ const cancelOrder = (orderId) => {
       {showOrders && <Orders orders={orders} onClose={() => setShowOrders(false)} onDelete={deleteOrder} onCancel={cancelOrder} />}
         {showPhotoSearch && <PhotoSearch products={products} onProductSelect={(p) => setSelectedProduct(p)} onClose={() => setShowPhotoSearch(false)} />}
 
+         <Footer />
           <BottomNav 
           onOpenCart={() => {
             if (!user) { setShowAuth(true); return; }

@@ -46,6 +46,30 @@ function renderProductPage(product, products) {
         .breadcrumbs { margin-bottom: 15px; color: #666; }
         .breadcrumbs a { color: #0066ff; text-decoration: none; }
     </style>
+
+        <!-- Schema.org Product -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "${product.name}",
+        "description": "${product.desc || product.name}",
+        "image": "${product.img}",
+        "sku": "${product._id || product.id}",
+        "offers": {
+            "@type": "Offer",
+            "price": "${product.price}",
+            "priceCurrency": "TJS",
+            "availability": "${product.inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'}",
+            "url": "https://shopxand-3.onrender.com/product/${product._id || product.id}"
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "${product.rating || '4.5'}",
+            "reviewCount": "${product.reviews || '1'}"
+        }
+    }
+    </script>
 </head>
 <body>
     <div class="breadcrumbs">
@@ -130,6 +154,16 @@ function renderHomePage(products) {
         if (!window.location.search.includes('_escaped_fragment_')) {
             window.location.href = '/';
         }
+    </script>
+
+        <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "ShopXand",
+        "url": "https://shopxand-3.onrender.com",
+        "description": "Интернет-магазин товаров в Таджикистане"
+    }
     </script>
 </body>
 </html>`;
