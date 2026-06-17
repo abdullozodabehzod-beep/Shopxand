@@ -7316,3 +7316,25 @@ body {
     font-weight: 600;
     cursor: pointer;
 }
+.quickview__whatsapp-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: #25D366;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 8px;
+    transition: 0.2s;
+}
+
+.quickview__whatsapp-btn:hover {
+    background: #1ebe5b;
+}
+
+.quickview__whatsapp-btn i {
+    font-size: 20px;
+}

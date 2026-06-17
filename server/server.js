@@ -38,6 +38,11 @@ mongoose.connect(MONGO_URI)
     .catch(err => console.error('❌ Ошибка MongoDB:', err.message));
 
 // ============================================
+// React build (САМЫЙ ПЕРВЫЙ — для JS/CSS файлов)
+// ============================================
+app.use(express.static(path.join(__dirname, '..', 'shopxand-react', 'build')));
+
+// ============================================
 // API routes
 // ============================================
 app.use('/api/auth', require('./routes/auth'));
@@ -58,7 +63,6 @@ app.get('/product/:id', async (req, res) => {
     try {
         const Product = require('./models/Product');
         const product = await Product.findById(req.params.id);
-        const products = await Product.find().limit(20);
         
         if (!product) {
             return res.redirect('/');
@@ -68,6 +72,7 @@ app.get('/product/:id', async (req, res) => {
         const isBot = /bot|google|yandex|baidu|bing|slurp|duckduck|facebook|twitter/i.test(userAgent);
         
         if (isBot) {
+            const products = await Product.find().limit(20);
             res.send(renderProductPage(product, products));
         } else {
             res.sendFile(path.join(__dirname, '..', 'shopxand-react', 'build', 'index.html'));
@@ -124,12 +129,7 @@ app.get('/sitemap.xml', async (req, res) => {
 });
 
 // ============================================
-// React build (ПЕРВЫМ!)
-// ============================================
-app.use(express.static(path.join(__dirname, '..', 'shopxand-react', 'build')));
-
-// ============================================
-// Старая статика — админка, картинки (ВТОРЫМ)
+// Старая статика — админка, картинки
 // ============================================
 app.use(express.static(path.join(__dirname, '..')));
 

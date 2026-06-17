@@ -243,6 +243,15 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct }) {
               <div className="quickview__delivery-item"><i className="fas fa-truck"></i><div><strong>Курьерская доставка</strong><span>от 1 до 3 дней, 30 сомони</span></div></div>
               <div className="quickview__delivery-item"><i className="fas fa-store"></i><div><strong>Самовывоз</strong><span>сегодня, бесплатно</span></div></div>
             </div>
+             <a 
+                href={`https://wa.me/992300003230?text=Здравствуйте! Интересует товар: ${product.name} — ${product.price} сомони`}
+                target="_blank"
+                className="quickview__whatsapp-btn"
+                rel="noopener noreferrer"
+              >
+                <i className="fab fa-whatsapp"></i>
+                <span>Написать в WhatsApp</span>
+              </a>
           </div>
         </div>
       </div>

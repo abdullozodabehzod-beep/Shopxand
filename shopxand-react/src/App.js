@@ -13,6 +13,7 @@ import Favorites from './components/Favorites';
 import CategoriesBar from './components/CategoriesBar';
 import { sendOrderToTelegram } from './components/TelegramOrder';
 import PhotoSearch from './components/PhotoSearch';
+import { initGA, initYM } from './utils/analytics';
 
 
 const API_URL = 'http://localhost:3000/api';
@@ -36,6 +37,17 @@ function App() {
   const [addedItem, setAddedItem] = useState(null);
   const [toast, setToast] = useState(null);
   const [showLogout, setShowLogout] = useState(false);
+  const [toast, setToast] = useState(null);
+
+   useEffect(() => {
+    initGA();
+    initYM();
+  }, []);
+
+  const handleViewAll = () => {
+    setActiveCategory(null);
+    setFilteredProducts(products);
+  };
 
  const deleteOrder = (orderId) => {
     fetch(API_URL + '/orders/' + orderId, { method: 'DELETE' })
@@ -78,9 +90,12 @@ const cancelOrder = (orderId) => {
   setCart(prev => prev.map(i => i._id === id ? {...i, quantity: newQty} : i));
 };
 
-   const showToast = (message) => {
-    setToast(message);
-    setTimeout(() => setToast(null), 2000);
+     const showToast = (message) => {
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:12px 24px;border-radius:30px;z-index:9999;font-weight:600;';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
   };
 
   const handleViewAll = () => {
@@ -145,26 +160,37 @@ const cancelOrder = (orderId) => {
 
 
 
-   const addToCart = (product) => {
-  if (!user) { setShowAuth(true); return; }
-  setCart(prev => {
-    const existing = prev.find(i => i._id === product._id);
-    if (existing) {
-      return prev.map(i => i._id === product._id ? {...i, quantity: i.quantity + 1} : i);
-    }
-    return [...prev, {
-      ...product,
-      quantity: 1,
-      img: product.img,
-      selectedSize: product.selectedSize,
-      selectedColor: product.selectedColor,
-      material: product.material,
-      season: product.season,
-      style: product.style
-    }];
-  });
-  showToast('✅ ' + product.name + ' добавлен!');
-};
+     const addToCart = (product) => {
+    if (!user) { setShowAuth(true); return; }
+    setCart(prev => {
+      const existing = prev.find(i => i._id === product._id);
+      if (existing) {
+        return prev.map(i => i._id === product._id ? {...i, quantity: i.quantity + 1} : i);
+      }
+      return [...prev, {
+        ...product,
+        quantity: 1,
+        img: product.selectedThumb || product.img,
+        selectedSize: product.selectedSize,
+        selectedColor: product.selectedColor,
+        material: product.material,
+        season: product.season,
+        style: product.style
+      }];
+    });
+    
+    showToast('✅ ' + product.name + ' добавлен!');
+    
+    // Запускаем таймер брошенной корзины (30 минут)
+    if (window._cartTimer) clearTimeout(window._cartTimer);
+    window._cartTimer = setTimeout(() => {
+      if (cart.length > 0 && !showCheckout) {
+        sendPush('🛒 Вы забыли товары в корзине!', 
+          `У вас ${cart.length} товаров на сумму ${cart.reduce((s, i) => s + i.price * i.quantity, 0).toLocaleString()} с. Завершите заказ!`
+        );
+      }
+    }, 30 * 60 * 1000);
+  };
 
   const removeFromCart = (id) => setCart(prev => prev.filter(i => i._id !== id));
 
@@ -175,6 +201,7 @@ const cancelOrder = (orderId) => {
   };
 
   const placeOrder = (orderData) => {
+      if (window._cartTimer) clearTimeout(window._cartTimer);
     const order = {
       id: 'SX-' + Date.now().toString().slice(-8),
       customer: orderData,
