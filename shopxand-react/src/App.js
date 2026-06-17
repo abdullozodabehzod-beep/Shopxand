@@ -22,7 +22,7 @@ import ChatWidget from './components/ChatWidget';
 import TelegramButton from './components/TelegramButton';
 
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = '/api';
 
 function App() {
   const [showPhotoSearch, setShowPhotoSearch] = useState(false);
