@@ -231,9 +231,19 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products })
                 onAddToCart({...product, img: selectedThumb || mainImg || product.img, price: currentPrice, selectedSize, selectedColor, material: product.material, season: product.season, style: product.style}); 
                 onClose(); 
               }}><i className="fas fa-shopping-cart"></i> В корзину</button>
-              <button className="quickview__fav-btn" onClick={() => toggleFavorite(product)}>
-              <i className={`${isFavorited ? 'fas' : 'far'} fa-heart`}></i>
-            </button>
+              <button className="quickview__fav-btn" onClick={() => {
+                const favs = JSON.parse(localStorage.getItem('shopxand_favorites') || '[]');
+                const exists = favs.find(f => f._id === product._id);
+                if (exists) {
+                  localStorage.setItem('shopxand_favorites', JSON.stringify(favs.filter(f => f._id !== product._id)));
+                } else {
+                  favs.push(product);
+                  localStorage.setItem('shopxand_favorites', JSON.stringify(favs));
+                }
+                alert(exists ? 'Удалено из избранного' : 'Добавлено в избранное');
+              }}>
+                <i className="far fa-heart"></i>
+              </button>
               <button className="quickview__share-btn" onClick={() => {
                 if (navigator.share) navigator.share({ title: product.name, text: product.price + ' сомони', url: window.location.href });
               }}><i className="fas fa-share-alt"></i></button>
