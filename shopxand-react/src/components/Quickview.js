@@ -240,7 +240,11 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products })
                   favs.push(product);
                   localStorage.setItem('shopxand_favorites', JSON.stringify(favs));
                 }
-                alert(exists ? 'Удалено из избранного' : 'Добавлено в избранное');
+                const toast = document.createElement('div');
+                  toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:12px 24px;border-radius:10px;z-index:9999;font-weight:600;animation:fadeInOut 3s forwards;';
+                  toast.textContent = exists ? 'Удалено из избранного' : 'Добавлено в избранное';
+                  document.body.appendChild(toast);
+                  setTimeout(() => toast.remove(), 3000);
               }}>
                 <i className="far fa-heart"></i>
               </button>

@@ -91,8 +91,8 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
               </button>
 
               {/* Только корзина на мобильном */}
-              <a href="#" className="header__action header__action--cart header__cart--mobile" onClick={(e) => { e.preventDefault(); onOpenCart(); }}>
-                <i className="fas fa-shopping-cart"></i>
+              <a href="#" className="header__action header__login--mobile" onClick={(e) => { e.preventDefault(); onOpenAuth(); }}>
+                <i className="fas fa-user"></i>
               </a>
             </div>
           </div>

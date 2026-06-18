@@ -2002,18 +2002,17 @@ body {
 
 /* Бейдж */
 .product-card__badge {
-     position: absolute;
-    top: 8px;
-    left: 8px;
-    background: #ff4757;
+    position: absolute;
+    top: -10px;
+    left: 10px;
     color: white;
-    padding: 2px 7px;
-    border-radius: 4px;
-    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
     font-weight: 700;
     z-index: 2;
-    line-height: 1.3;
-    letter-spacing: 0.2px;
+    line-height: 1.4;
+    letter-spacing: 0.3px;
 }
 
 /* Тело карточки */
@@ -2198,10 +2197,10 @@ body {
     }
     
     .product-card__badge {
-   font-size: 7px;
-   padding: 2px 6px;
-   top: 6px;
-   left: 6px;
+   font-size: 10px;
+   padding: 3px 8px;
+   top: 8px;
+   left: 8px;
     }
 }
 
@@ -7642,3 +7641,36 @@ body {
     background: none;
 }
 
+@media (max-width: 768px) {
+    .auth-modal__container,
+    .checkout-modal__container,
+    .logout-modal__content,
+    .cart-panel__content,
+    .fav-panel__content,
+    .orders-panel__content {
+        width: 100%;
+        max-width: 100vw;
+        border-radius: 16px 16px 0 0;
+        max-height: 85vh;
+    }
+    
+    .auth-form {
+        padding: 20px 16px;
+    }
+}
+
+.header__login--mobile { display: none; }
+@media (max-width: 768px) {
+    .header__login--mobile { display: flex; }
+}
+
+@keyframes slideInRight {
+    from { right: -400px; opacity: 0; }
+    to { right: 20px; opacity: 1; }
+}
+
+@media (max-width: 768px) {
+    .checkout-modal__container {
+        max-height: 90vh;
+    }
+}

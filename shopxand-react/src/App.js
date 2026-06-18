@@ -201,8 +201,9 @@ const cancelOrder = (orderId) => {
     }
   };
 
-  const placeOrder = (orderData) => {
-      if (window._cartTimer) clearTimeout(window._cartTimer);
+   const placeOrder = (orderData) => {
+    if (window._cartTimer) clearTimeout(window._cartTimer);
+    
     const order = {
       id: 'SX-' + Date.now().toString().slice(-8),
       customer: orderData,
