@@ -7027,6 +7027,40 @@ body {
     color: #fff;
 }
 
+
+/* Действия на ПК видны, на мобильном скрыты */
+.header__actions--desktop {
+    display: flex;
+}
+
+/* Корзина на мобильном */
+.header__cart--mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .header__actions--desktop {
+        display: none;
+    }
+    
+    .header__cart--mobile {
+        display: flex;
+    }
+    
+    .header__search-toggle {
+        display: flex;
+    }
+    
+    .header__search--mobile {
+        padding: 10px 0;
+        background: #fff;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .header__search--mobile .header__search {
+        max-width: 100%;
+    }
+}
 /* ========================================
    SPLASH SCREEN
    ======================================== */

@@ -5,7 +5,7 @@ import CityModal from './CityModal';
 import Search from './Search';
 import MobileMenu from './MobileMenu';
 
-function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, products, onProductSelect, onOpenFavorites, onOpenOrders, setShowPhotoSearch, onSelectCategory, setShowLogout }) {
+function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, products, onOpenFavorites, onOpenOrders, setShowPhotoSearch, onSelectCategory, setShowLogout }) {
   const { lang, t } = useLanguage();
   const [showLangModal, setShowLangModal] = useState(false);
   const [showCityModal, setShowCityModal] = useState(false);
@@ -46,7 +46,7 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
 
               <a href="/" className="header__logo">
                 <span className="header__logo-icon">
-                  <svg viewBox="0 0 500 500" width="45" height="45">
+                  <svg viewBox="0 0 500 500" width="40" height="40">
                     <defs><clipPath id="xclip2"><rect x="320" y="0" width="250" height="500"/></clipPath></defs>
                     <text x="320" y="410" fontFamily="Arial Black" fontWeight="900" fontSize="400" fill="#1a6df0" textAnchor="middle" clipPath="url(#xclip2)">X</text>
                     <text x="170" y="410" fontFamily="Arial Black" fontWeight="900" fontSize="400" fill="#111" textAnchor="middle">S</text>
@@ -62,23 +62,12 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
 
               {/* Поиск (ПК) */}
               <div className="header__search header__search--desktop">
-                <Search 
-                  products={products} 
-                  onSearchSelect={onSearchSelect}
-                  onSearch={onSearch}
-                />
+                <Search products={products} onSearchSelect={onSearchSelect} onSearch={onSearch} />
               </div>
 
-              {/* Кнопка поиска (мобильная) */}
-              <button className="header__search-toggle" onClick={() => setShowMobileSearch(!showMobileSearch)}>
-                <i className="fas fa-search"></i>
-              </button>
-
-              <div className="header__actions">
-                <a href="#" className="header__action" onClick={(e) => { 
-                  e.preventDefault(); 
-                  user ? setShowLogout(true) : onOpenAuth(); 
-                }}>
+              {/* Действия (ПК) */}
+              <div className="header__actions header__actions--desktop">
+                <a href="#" className="header__action" onClick={(e) => { e.preventDefault(); user ? setShowLogout(true) : onOpenAuth(); }}>
                   <i className={`fas ${user ? 'fa-user-check' : 'fa-user'}`}></i>
                   <span>{user ? user.name : t('login')}</span>
                 </a>
@@ -86,11 +75,7 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
                   <i className="fas fa-box"></i>
                   <span>{t('orders')}</span>
                 </a>
-                <a href="#" className="header__action" onClick={(e) => { 
-                  e.preventDefault(); 
-                  if (!user) { onOpenAuth(); return; }
-                  onOpenFavorites(); 
-                }}>
+                <a href="#" className="header__action" onClick={(e) => { e.preventDefault(); if (!user) { onOpenAuth(); return; } onOpenFavorites(); }}>
                   <i className="fas fa-heart"></i>
                   <span>{t('favorites')}</span>
                 </a>
@@ -99,6 +84,16 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
                   <span>{t('cart')}</span>
                 </a>
               </div>
+
+              {/* Кнопка поиска (мобильная) */}
+              <button className="header__search-toggle" onClick={() => setShowMobileSearch(!showMobileSearch)}>
+                <i className="fas fa-search"></i>
+              </button>
+
+              {/* Только корзина на мобильном */}
+              <a href="#" className="header__action header__action--cart header__cart--mobile" onClick={(e) => { e.preventDefault(); onOpenCart(); }}>
+                <i className="fas fa-shopping-cart"></i>
+              </a>
             </div>
           </div>
         </div>
@@ -107,11 +102,7 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
         {showMobileSearch && (
           <div className="header__search--mobile active">
             <div className="container">
-              <Search 
-                products={products} 
-                onSearchSelect={onSearchSelect}
-                onSearch={onSearch}
-              />
+              <Search products={products} onSearchSelect={onSearchSelect} onSearch={onSearch} />
             </div>
           </div>
         )}
@@ -130,32 +121,29 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
           </div>
         </nav>
 
-        {/* Выпадающий каталог */}
+        {/* Каталог */}
         <div className={`catalog-dropdown ${showCatalog ? 'active' : ''}`}>
           <div className="container">
             <div className="catalog-dropdown__grid">
               <div className="catalog-dropdown__col">
                 <a href="#" className="catalog-dropdown__category"><i className="fas fa-tshirt"></i><span>Одежда</span></a>
                 <ul className="catalog-dropdown__sub">
-                  <li><a href="#" onClick={() => { onSearch && onSearch('Рубашка'); setShowCatalog(false); }}>Рубашки</a></li>
-                  <li><a href="#" onClick={() => { onSearch && onSearch('Крассовка'); setShowCatalog(false); }}>Крассовки</a></li>
-                  <li><a href="#" onClick={() => { onSearch && onSearch('Брюки'); setShowCatalog(false); }}>Брюки</a></li>
+                  <li><a href="#" onClick={() => { onSearch('Рубашка'); setShowCatalog(false); }}>Рубашки</a></li>
+                  <li><a href="#" onClick={() => { onSearch('Крассовка'); setShowCatalog(false); }}>Крассовки</a></li>
+                  <li><a href="#" onClick={() => { onSearch('Брюки'); setShowCatalog(false); }}>Брюки</a></li>
                 </ul>
               </div>
               <div className="catalog-dropdown__col">
                 <a href="#" className="catalog-dropdown__category"><i className="fas fa-laptop"></i><span>Электроника</span></a>
                 <ul className="catalog-dropdown__sub">
-                  <li><a href="#" onClick={() => { onSearch && onSearch('наушник'); setShowCatalog(false); }}>Наушники</a></li>
-                  <li><a href="#" onClick={() => { onSearch && onSearch('часы'); setShowCatalog(false); }}>Часы</a></li>
-                  <li><a href="#" onClick={() => { onSearch && onSearch('аксессуар'); setShowCatalog(false); }}>Аксессуары</a></li>
+                  <li><a href="#" onClick={() => { onSearch('наушник'); setShowCatalog(false); }}>Наушники</a></li>
+                  <li><a href="#" onClick={() => { onSearch('часы'); setShowCatalog(false); }}>Часы</a></li>
+                  <li><a href="#" onClick={() => { onSearch('аксессуар'); setShowCatalog(false); }}>Аксессуары</a></li>
                 </ul>
               </div>
               <div className="catalog-dropdown__col">
                 <a href="#" className="catalog-dropdown__category"><i className="fas fa-home"></i><span>Дом и сад</span></a>
-                <ul className="catalog-dropdown__sub">
-                  <li><a href="#">Мебель</a></li>
-                  <li><a href="#">Декор</a></li>
-                </ul>
+                <ul className="catalog-dropdown__sub"><li><a href="#">Мебель</a></li><li><a href="#">Декор</a></li></ul>
               </div>
             </div>
           </div>
@@ -164,25 +152,8 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
       </header>
 
       {showLangModal && <LanguageModal onClose={() => setShowLangModal(false)} />}
-      {showCityModal && (
-        <CityModal 
-          onClose={() => setShowCityModal(false)} 
-          currentCity={currentCity}
-          onSelectCity={(city) => { setCurrentCity(city); localStorage.setItem('shopxand_city', city); }}
-        />
-      )}
-      {showMobileMenu && (
-        <MobileMenu 
-          onClose={() => setShowMobileMenu(false)}
-          onOpenAuth={onOpenAuth}
-          onOpenCart={onOpenCart}
-          onOpenFavorites={onOpenFavorites}
-          onOpenOrders={onOpenOrders}
-          user={user}
-          onOpenCityModal={() => setShowCityModal(true)}
-          onOpenLangModal={() => setShowLangModal(true)}
-        />
-      )}
+      {showCityModal && <CityModal onClose={() => setShowCityModal(false)} currentCity={currentCity} onSelectCity={(city) => { setCurrentCity(city); localStorage.setItem('shopxand_city', city); }} />}
+      {showMobileMenu && <MobileMenu onClose={() => setShowMobileMenu(false)} onOpenAuth={onOpenAuth} onOpenCart={onOpenCart} onOpenFavorites={onOpenFavorites} onOpenOrders={onOpenOrders} user={user} onOpenCityModal={() => setShowCityModal(true)} onOpenLangModal={() => setShowLangModal(true)} />}
     </>
   );
 }
