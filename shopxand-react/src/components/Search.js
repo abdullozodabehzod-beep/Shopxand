@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-function Search({ products, onProductSelect, onSearchSelect }) {
+function Search({ products, onSearchSelect, onSearch }) {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -22,6 +22,7 @@ function Search({ products, onProductSelect, onSearchSelect }) {
       setShowSuggestions(false);
       return;
     }
+
     const fixedQuery = fixTypos(query.toLowerCase());
     const results = products
       .filter(p => {
@@ -32,10 +33,26 @@ function Search({ products, onProductSelect, onSearchSelect }) {
                cat.includes(query.toLowerCase());
       })
       .slice(0, 8);
+
     setSuggestions(results);
     setShowSuggestions(results.length > 0);
     setSelectedIndex(-1);
   }, [query, products]);
+
+  // Закрытие при клике вне
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, []);
 
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowDown') {
@@ -51,10 +68,9 @@ function Search({ products, onProductSelect, onSearchSelect }) {
     }
   };
 
-    const handleSelect = (product) => {
+  const handleSelect = (product) => {
     setQuery(product.name);
     setShowSuggestions(false);
-    // Вместо открытия Quickview — фильтруем товары
     if (onSearchSelect) {
       onSearchSelect(product.name);
     }
@@ -62,19 +78,15 @@ function Search({ products, onProductSelect, onSearchSelect }) {
 
   const handleSearch = () => {
     if (query.trim()) {
-      const fixedQuery = fixTypos(query.toLowerCase());
-      const results = products.filter(p => 
-        (p.name || '').toLowerCase().includes(fixedQuery) || 
-        (p.cat || '').toLowerCase().includes(fixedQuery)
-      );
-      setSuggestions(results);
-      setShowSuggestions(true);
+      if (onSearch) onSearch(query.trim());
+      setShowSuggestions(false);
     }
   };
 
-  const highlightMatch = (text, q) => {
-    if (!q) return text;
-    const regex = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  const highlightMatch = (text, query) => {
+    if (!query) return text;
+    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escaped})`, 'gi');
     return text.replace(regex, '<span>$1</span>');
   };
 
@@ -87,8 +99,9 @@ function Search({ products, onProductSelect, onSearchSelect }) {
         value={query}
         onChange={e => setQuery(e.target.value)}
         onKeyDown={handleKeyDown}
-        onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+        onFocus={() => {
+          if (suggestions.length > 0) setShowSuggestions(true);
+        }}
       />
       <button className="header__search-by-photo" title="Поиск по фото">
         <i className="fas fa-camera"></i>
@@ -97,33 +110,34 @@ function Search({ products, onProductSelect, onSearchSelect }) {
         <i className="fas fa-search"></i>
       </button>
 
-      {showSuggestions && (
+      {showSuggestions && suggestions.length > 0 && (
         <div className="search-suggestions active">
-          {suggestions.length > 0 && (
-            <div className="search-suggestions__group">
-              <div className="search-suggestions__group-title">Товары</div>
-              {suggestions.map((product, i) => (
-                <div 
-                  key={product._id || i}
-                  className={`search-suggestions__item ${i === selectedIndex ? 'search-suggestions__item--active' : ''}`}
-                  onClick={() => handleSelect(product)}
-                  onMouseEnter={() => setSelectedIndex(i)}
-                >
-                  <div className="search-suggestions__item-img">
-                    {product.img ? <img src={product.img} alt="" /> : '📦'}
-                  </div>
-                  <div className="search-suggestions__item-info">
-                    <div 
-                      className="search-suggestions__item-name"
-                      dangerouslySetInnerHTML={{ __html: highlightMatch(product.name, query) }}
-                    />
-                    <div className="search-suggestions__item-cat">{product.cat}</div>
-                  </div>
-                  <div className="search-suggestions__item-price">{product.price} с.</div>
+          <div className="search-suggestions__group">
+            <div className="search-suggestions__group-title">Товары</div>
+            {suggestions.map((product, i) => (
+              <div 
+                key={product._id || i}
+                className={`search-suggestions__item ${i === selectedIndex ? 'search-suggestions__item--active' : ''}`}
+                onClick={() => handleSelect(product)}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  handleSelect(product);
+                }}
+              >
+                <div className="search-suggestions__item-img">
+                  {product.img ? <img src={product.img} alt="" /> : <span>📦</span>}
                 </div>
-              ))}
-            </div>
-          )}
+                <div className="search-suggestions__item-info">
+                  <div 
+                    className="search-suggestions__item-name"
+                    dangerouslySetInnerHTML={{ __html: highlightMatch(product.name, query) }}
+                  />
+                  <div className="search-suggestions__item-cat">{product.cat}</div>
+                </div>
+                <div className="search-suggestions__item-price">{product.price} с.</div>
+              </div>
+            ))}
+          </div>
           <div className="search-suggestions__footer">
             <button onClick={handleSearch}>Показать все результаты</button>
           </div>
