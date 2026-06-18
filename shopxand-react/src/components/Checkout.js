@@ -14,9 +14,8 @@ function Checkout({ cart, user, onPlaceOrder, onClose }) {
 
   const total = cart.reduce((s, i) => s + i.price * i.quantity, 0) + (delivery === 'courier' ? 30 : 0);
 
-   const handleSubmit = () => {
+     const handleSubmit = () => {
     if (!form.name || !form.phone || !form.address) {
-      // Toast ошибки вместо alert
       const toast = document.createElement('div');
       toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#ff4757;color:#fff;padding:14px 22px;border-radius:12px;z-index:99999;font-size:14px;font-weight:600;box-shadow:0 10px 40px rgba(0,0,0,0.3);animation:slideInRight 0.4s ease forwards;';
       toast.textContent = '❌ Заполните все поля';
@@ -28,15 +27,16 @@ function Checkout({ cart, user, onPlaceOrder, onClose }) {
     const newOrderId = 'SX-' + Date.now().toString().slice(-8);
     setOrderId(newOrderId);
     onPlaceOrder(form);
-    setStep(3);
-    onClose(); // ← ЗАКРЫВАЕМ ОКНО
+    setStep(1);
+    onClose();
     
-    // Toast успеха
-    const toast = document.createElement('div');
-    toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#1a1a2e;color:#fff;padding:14px 22px;border-radius:12px;z-index:99999;font-size:14px;font-weight:600;box-shadow:0 10px 40px rgba(0,0,0,0.3);animation:slideInRight 0.4s ease forwards;';
-    toast.textContent = '✅ Заказ ' + newOrderId + ' оформлен!';
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2500);
+    setTimeout(() => {
+      const toast = document.createElement('div');
+      toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#1a1a2e;color:#fff;padding:14px 22px;border-radius:12px;z-index:99999;font-size:14px;font-weight:600;box-shadow:0 10px 40px rgba(0,0,0,0.3);animation:slideInRight 0.4s ease forwards;';
+      toast.textContent = '✅ Заказ ' + newOrderId + ' оформлен!';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2500);
+    }, 300);
   };
   return (
     <div className="checkout-modal active">
