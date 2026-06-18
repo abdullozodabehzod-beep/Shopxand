@@ -87,7 +87,7 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products })
           {/* Галерея */}
           <div className="quickview__gallery">
             <div className="quickview__main-img">
-              <img src={mainImg || product.img} alt={product.name} />
+             <img src={mainImg || product.img} alt={product.name} onError={(e) => { e.target.src = '/img/placeholder.png'; }} />
             </div>
             <div className="quickview__thumbs">
               {[product.img, ...(product.thumbs || [])].map((thumb, i) => (
@@ -231,7 +231,9 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products })
                 onAddToCart({...product, img: selectedThumb || mainImg || product.img, price: currentPrice, selectedSize, selectedColor, material: product.material, season: product.season, style: product.style}); 
                 onClose(); 
               }}><i className="fas fa-shopping-cart"></i> В корзину</button>
-              <button className="quickview__fav-btn"><i className="far fa-heart"></i></button>
+              <button className="quickview__fav-btn" onClick={() => toggleFavorite(product)}>
+              <i className={`${isFavorited ? 'fas' : 'far'} fa-heart`}></i>
+            </button>
               <button className="quickview__share-btn" onClick={() => {
                 if (navigator.share) navigator.share({ title: product.name, text: product.price + ' сомони', url: window.location.href });
               }}><i className="fas fa-share-alt"></i></button>
