@@ -1,1 +1,15 @@
-{} 
+{
+  "6a245dc524db667fc4eed809": {
+    "cart": [
+      {
+        "id": "6a30fdb1ca2494a8d62b56b0",
+        "name": "Часы: PIN-TIME",
+        "price": 100,
+        "img": "/img/Часы Royal-4.jpeg",
+        "cat": "Электроника",
+        "quantity": 1
+      }
+    ],
+    "favorites": []
+  }
+}

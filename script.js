@@ -5,8 +5,13 @@
 // ============================================
 // API CONFIG
 // ============================================
-var API_URL = 'https://shopxand-3.onrender.com/api';
-var API_TOKEN = localStorage.getItem('shopxand_token') || '';
+var BOT_ORDER = '8265957442:AAFWnqXyl8TJJzZXsv3vxXRCuWwWd_aY9mE';
+var CHAT_ID = '5282056467';
+var CHANNEL_ID = '-1002854630161';
+
+
+const API_URL = '/api';
+const API_TOKEN = localStorage.getItem('shopxand_token') || '';
 
 function apiHeaders() {
     var token = localStorage.getItem('shopxand_token');
@@ -73,6 +78,7 @@ function showToast(title, message, type) {
     toast._timeout = setTimeout(function() { toast.classList.remove('show'); }, 3000);
 }
 var reviewsData = {};
+
 
 document.addEventListener('DOMContentLoaded', async function()  {
      await loadReviews();
@@ -680,11 +686,6 @@ cityModalContent.style.transform = '';
     };
 
 });
-
-
-    const BOT_TOKEN = '8265957442:AAFWnqXyl8TJJzZXsv3vxXRCuWwWd_aY9mE';
-    const CHAT_ID = '5282056467';
-    const CHANNEL_ID = '-1002854630161';
 
 
 
@@ -2539,22 +2540,27 @@ body: JSON.stringify({
     // ============================================
     // ЗАГРУЗКА И СОХРАНЕНИЕ
     // ============================================
-   async function loadOrders() {
-   if (!isLoggedIn || !API_TOKEN) {
-  var saved = localStorage.getItem('shopxand_orders');
-  if (saved) orders = JSON.parse(saved);
-  return;
-   }
-   
-   try {
-  var data = await apiRequest('/orders');
-  orders = data.orders;
-  console.log('📦 Заказы загружены с сервера:', orders.length);
-   } catch (err) {
-  console.log('Загружаем локально');
-  var saved = localStorage.getItem('shopxand_orders');
-  if (saved) orders = JSON.parse(saved);
-   }
+    async function loadOrders() {
+        // ВСЕГДА сначала загружаем из localStorage
+        var saved = localStorage.getItem('shopxand_orders');
+        if (saved) orders = JSON.parse(saved);
+        
+        // Потом пытаемся с сервера (только если залогинен)
+        if (isLoggedIn && API_TOKEN) {
+            try {
+                var data = await apiRequest('/orders');
+                if (data.orders && data.orders.length > 0) {
+                    // Обновляем localStorage серверными данными
+                    orders = data.orders;
+                    localStorage.setItem('shopxand_orders', JSON.stringify(orders));
+                }
+                console.log('📦 Заказы с сервера:', orders.length);
+            } catch (err) {
+                console.log('Сервер недоступен, используем локальные');
+            }
+        }
+        
+        renderOrders();
     }
     
    async function saveOrder(order) {
@@ -4754,7 +4760,7 @@ self.style.background = '';
         if (selectedRating === 0) { showToast('Ошибка', 'Поставьте оценку', 'error'); return; }
         if (!text) { showToast('Ошибка', 'Напишите отзыв', 'error'); return; }
         
-        var productId = currentQvProduct.id;
+        var productId = currentQvProduct.id || currentQvProduct._id;
         var review = {
             name: currentUser ? currentUser.name : 'Гость',
             rating: selectedRating,
@@ -5475,7 +5481,7 @@ self.style.background = '';
     var subcategories = {
         'Компьютеры': ['Ноутбуки', 'ПК', 'Мониторы', 'Мыши', 'Клавиатуры', 'Аксессуары'],
         'Электроника': ['Смартфоны', 'Наушники', 'Часы', 'Планшеты', 'Аксессуары'],
-        'Одежда': ['Рубашки', 'Крассовки', 'Брюки', 'Тапочки', 'Жилеты'],
+        'Одежда': ['Обувь','Рубашки', 'Крассовки', 'Брюки', 'Тапочки', 'Жилеты'],
         'Косметика': ['Уход за лицом', 'Макияж', 'Парфюмерия', 'Для мужчин'],
         'Дом и сад': ['Мебель', 'Декор', 'Кухня', 'Садоводство']
     };

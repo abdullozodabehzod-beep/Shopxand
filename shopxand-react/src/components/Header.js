@@ -19,7 +19,6 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
   return (
     <>
       <header className="header">
-        {/* Top Bar */}
         <div className="header__top">
           <div className="container">
             <div className="header__top-inner">
@@ -36,7 +35,6 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
           </div>
         </div>
 
-        {/* Main Header */}
         <div className="header__main">
           <div className="container">
             <div className="header__main-inner">
@@ -60,12 +58,10 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
                 <span>{t('catalog')}</span>
               </button>
 
-              {/* Поиск (ПК) */}
               <div className="header__search header__search--desktop">
                 <Search products={products} onSearchSelect={onSearchSelect} onSearch={onSearch} />
               </div>
 
-              {/* Действия (ПК) */}
               <div className="header__actions header__actions--desktop">
                 <a href="#" className="header__action" onClick={(e) => { e.preventDefault(); user ? setShowLogout(true) : onOpenAuth(); }}>
                   <i className={`fas ${user ? 'fa-user-check' : 'fa-user'}`}></i>
@@ -85,12 +81,10 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
                 </a>
               </div>
 
-              {/* Кнопка поиска (мобильная) */}
               <button className="header__search-toggle" onClick={() => setShowMobileSearch(!showMobileSearch)}>
                 <i className="fas fa-search"></i>
               </button>
 
-              {/* Только корзина на мобильном */}
               <a href="#" className="header__action header__login--mobile" onClick={(e) => { e.preventDefault(); onOpenAuth(); }}>
                 <i className="fas fa-user"></i>
               </a>
@@ -98,7 +92,6 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
           </div>
         </div>
 
-        {/* Мобильный поиск */}
         {showMobileSearch && (
           <div className="header__search--mobile active">
             <div className="container">
@@ -107,7 +100,6 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
           </div>
         )}
 
-        {/* Navigation */}
         <nav className="header__nav">
           <div className="container">
             <ul className="header__nav-list">
@@ -116,35 +108,49 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
               <li><a href="#" className="header__nav-link" onClick={(e) => { e.preventDefault(); onSelectCategory('Дом и сад'); }}>{t('home')}</a></li>
               <li><a href="#" className="header__nav-link" onClick={(e) => { e.preventDefault(); onSelectCategory('Компьютеры'); }}>{t('computers')}</a></li>
               <li><a href="#" className="header__nav-link" onClick={(e) => { e.preventDefault(); onSelectCategory('Косметика'); }}>{t('cosmetics')}</a></li>
+              <li><a href="#" className="header__nav-link" onClick={(e) => { e.preventDefault(); onSelectCategory('Обувь'); }}>Обувь</a></li>
               <li><a href="#" className="header__nav-link" onClick={(e) => { e.preventDefault(); onSelectCategory('Акции'); }}>{t('sales')}</a></li>
             </ul>
           </div>
         </nav>
 
-        {/* Каталог */}
         <div className={`catalog-dropdown ${showCatalog ? 'active' : ''}`}>
           <div className="container">
             <div className="catalog-dropdown__grid">
+              
               <div className="catalog-dropdown__col">
-                <a href="#" className="catalog-dropdown__category"><i className="fas fa-tshirt"></i><span>Одежда</span></a>
+                <a href="#" className="catalog-dropdown__category" onClick={(e) => { e.preventDefault(); onSelectCategory('Одежда'); setShowCatalog(false); }}>
+                  <i className="fas fa-tshirt"></i><span>Одежда</span>
+                </a>
                 <ul className="catalog-dropdown__sub">
-                  <li><a href="#" onClick={() => { onSearch('Рубашка'); setShowCatalog(false); }}>Рубашки</a></li>
-                  <li><a href="#" onClick={() => { onSearch('Крассовка'); setShowCatalog(false); }}>Крассовки</a></li>
-                  <li><a href="#" onClick={() => { onSearch('Брюки'); setShowCatalog(false); }}>Брюки</a></li>
+                  <li><a href="#" onClick={(e) => { e.preventDefault(); onSearch('обувь'); setShowCatalog(false); }}>Обувь</a></li>
+                  <li><a href="#" onClick={(e) => { e.preventDefault(); onSearch('рубашка'); setShowCatalog(false); }}>Рубашки</a></li>
+                  <li><a href="#" onClick={(e) => { e.preventDefault(); onSearch('кроссовка'); setShowCatalog(false); }}>Крассовки</a></li>
+                  <li><a href="#" onClick={(e) => { e.preventDefault(); onSearch('брюки'); setShowCatalog(false); }}>Брюки</a></li>
                 </ul>
               </div>
+              
               <div className="catalog-dropdown__col">
-                <a href="#" className="catalog-dropdown__category"><i className="fas fa-laptop"></i><span>Электроника</span></a>
+                <a href="#" className="catalog-dropdown__category" onClick={(e) => { e.preventDefault(); onSelectCategory('Электроника'); setShowCatalog(false); }}>
+                  <i className="fas fa-laptop"></i><span>Электроника</span>
+                </a>
                 <ul className="catalog-dropdown__sub">
-                  <li><a href="#" onClick={() => { onSearch('наушник'); setShowCatalog(false); }}>Наушники</a></li>
-                  <li><a href="#" onClick={() => { onSearch('часы'); setShowCatalog(false); }}>Часы</a></li>
-                  <li><a href="#" onClick={() => { onSearch('аксессуар'); setShowCatalog(false); }}>Аксессуары</a></li>
+                  <li><a href="#" onClick={(e) => { e.preventDefault(); onSearch('наушник'); setShowCatalog(false); }}>Наушники</a></li>
+                  <li><a href="#" onClick={(e) => { e.preventDefault(); onSearch('часы'); setShowCatalog(false); }}>Часы</a></li>
+                  <li><a href="#" onClick={(e) => { e.preventDefault(); onSearch('аксессуар'); setShowCatalog(false); }}>Аксессуары</a></li>
                 </ul>
               </div>
+              
               <div className="catalog-dropdown__col">
-                <a href="#" className="catalog-dropdown__category"><i className="fas fa-home"></i><span>Дом и сад</span></a>
-                <ul className="catalog-dropdown__sub"><li><a href="#">Мебель</a></li><li><a href="#">Декор</a></li></ul>
+                <a href="#" className="catalog-dropdown__category" onClick={(e) => { e.preventDefault(); onSelectCategory('Дом и сад'); setShowCatalog(false); }}>
+                  <i className="fas fa-home"></i><span>Дом и сад</span>
+                </a>
+                <ul className="catalog-dropdown__sub">
+                  <li><a href="#" onClick={(e) => { e.preventDefault(); onSearch('мебель'); setShowCatalog(false); }}>Мебель</a></li>
+                  <li><a href="#" onClick={(e) => { e.preventDefault(); onSearch('декор'); setShowCatalog(false); }}>Декор</a></li>
+                </ul>
               </div>
+
             </div>
           </div>
         </div>

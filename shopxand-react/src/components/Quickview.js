@@ -81,8 +81,9 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products })
     <div className="quickview active">
       <div className="quickview__overlay" onClick={onClose}></div>
       <div className="quickview__modal">
-        <button className="quickview__close" onClick={onClose}><i className="fas fa-times"></i></button>
-
+        <button className="quickview__back" onClick={onClose}>
+        <i className="fas fa-arrow-left"></i>
+      </button>
         <div className="quickview__content">
           {/* Галерея */}
           <div className="quickview__gallery">

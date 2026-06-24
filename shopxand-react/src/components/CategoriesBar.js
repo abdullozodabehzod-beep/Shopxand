@@ -6,7 +6,7 @@ function CategoriesBar({ onSelectCategory }) {
   const categories = [
     { 
       name: 'Одежда', icon: '👗', cat: 'Одежда',
-      sub: ['Рубашки', 'Крассовки', 'Брюки', 'Тапочки']
+      sub: ['Обувь','Рубашки', 'Крассовки', 'Брюки', 'Тапочки']
     },
     { 
       name: 'Электроника', icon: '📱', cat: 'Электроника',

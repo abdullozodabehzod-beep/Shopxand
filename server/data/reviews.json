@@ -1,0 +1,25 @@
+[
+  {
+    "id": "1782325414025",
+    "name": "Pedro",
+    "rating": 4,
+    "text": "this good",
+    "date": "2026-06-24T18:23:34.027Z"
+  },
+  {
+    "id": "1782325801820",
+    "productId": "1",
+    "name": "Test",
+    "rating": 5,
+    "text": "Test",
+    "date": "2026-06-24T18:30:01.821Z"
+  },
+  {
+    "id": "1782325980563",
+    "productId": "6a350f9c281406f01b7b13b3",
+    "name": "Pedro",
+    "rating": 4,
+    "text": "thanks",
+    "date": "2026-06-24T18:33:00.563Z"
+  }
+]
