@@ -28,6 +28,8 @@ import Recommendations from './components/Recommendations';
 import ChatBot from './components/ChatBot';
 import { ThemeProvider } from './context/ThemeContext';
 import Wishlist from './components/Wishlist';
+import QuickOrder from './components/QuickOrder';
+import Profile from './components/Profile';
 
 const API_URL = 'http://localhost:3000/api';
 
@@ -57,6 +59,10 @@ function AppContent() {
   const [showWishlist, setShowWishlist] = useState(false);
   const [savedAddress, setSavedAddress] = useState(null);
    const currencyContext = useCurrency();
+   const [quickOrderProduct, setQuickOrderProduct] = useState(null);
+const [showQuickOrder, setShowQuickOrder] = useState(false);
+const [visibleCount, setVisibleCount] = useState(10);
+const [showProfile, setShowProfile] = useState(false);
 
   const oneClickBuy = (product) => {
     if (!user) { setShowAuth(true); return; }
@@ -119,9 +125,21 @@ function AppContent() {
     setTimeout(() => toast.remove(), 3000);
   };
 
-  const handleViewAll = () => { setActiveCategory(null); setFilteredProducts(products); };
-  const handleSelectCategory = (cat) => { setActiveCategory(cat); setFilteredProducts(products.filter(p => p.cat === cat)); };
+  const handleViewAll = () => { setActiveCategory(null); setFilteredProducts(products); setVisibleCount(10);};
+  const handleSelectCategory = (cat) => { setActiveCategory(cat); setFilteredProducts(products.filter(p => p.cat === cat)); setVisibleCount(10);};
 
+  const showMore = () => {
+  setVisibleCount(prev => Math.min(prev + 10, filteredProducts.length));
+};
+
+const handleLogout = () => {
+  localStorage.removeItem('shopxand_token');
+  localStorage.removeItem('shopxand_user');
+  setUser(null);
+  setShowProfile(false);
+  setCart([]);
+  setOrders([]);
+};
   const toggleFavorite = (product) => {
     if (!user) { setShowAuth(true); return; }
     setFavorites(prev => {
@@ -208,6 +226,7 @@ function AppContent() {
   const handleSearch = (query) => {
     if (!query) { setFilteredProducts(products); return; }
     setFilteredProducts(products.filter(p => (p.name || '').toLowerCase().includes(query.toLowerCase()) || (p.cat || '').toLowerCase().includes(query.toLowerCase())));
+    setVisibleCount(10);
   };
 
   const handleSearchSelect = (query) => {
@@ -224,13 +243,35 @@ function AppContent() {
   return (
     <ThemeProvider>
       <div className="App">
-        <Header onOpenWishlist={() => setShowWishlist(true)} user={user} onOpenAuth={() => setShowAuth(true)} onOpenCart={() => { if (!user) { setShowAuth(true); return; } setShowCart(true); }} onSearch={handleSearch} products={products} onProductSelect={setSelectedProduct} onOpenFavorites={() => setShowFavorites(true)} onOpenOrders={() => { if (!user) { setShowAuth(true); return; } setShowOrders(true); }} setShowPhotoSearch={setShowPhotoSearch} onSelectCategory={handleSelectCategory} setShowLogout={setShowLogout} onOpenMobileMenu={() => setShowMobileMenu(true)} onSearchSelect={handleSearchSelect} />
+        <Header onOpenWishlist={() => setShowWishlist(true)} user={user} onOpenAuth={() => setShowAuth(true)} onOpenCart={() => { if (!user) { setShowAuth(true); return; } setShowCart(true); }} onSearch={handleSearch} products={products} onProductSelect={setSelectedProduct} onOpenFavorites={() => setShowFavorites(true)} onOpenOrders={() => { if (!user) { setShowAuth(true); return; } setShowOrders(true); }} setShowPhotoSearch={setShowPhotoSearch} onSelectCategory={handleSelectCategory} setShowLogout={setShowLogout} onOpenMobileMenu={() => setShowMobileMenu(true)} onSearchSelect={handleSearchSelect} onOpenProfile={() => setShowProfile(true)}/>
         <Hero />
         <CategoriesBar onSelectCategory={handleSelectCategory} />
-        <section className="products"><div className="container"><div className="products__header"><h2 className="products__title">Популярные товары</h2><a href="#" className="products__all" onClick={(e) => { e.preventDefault(); handleViewAll(); }}>Смотреть все <i className="fas fa-arrow-right"></i></a></div><div className="products__grid">{filteredProducts.map(product => (<div key={product._id || product.id} className="product-card" onClick={() => setSelectedProduct(product)}><div className="product-card__img"><img src={product.img} alt={product.name} /><button className="product-card__fav" onClick={(e) => { e.stopPropagation(); toggleFavorite(product); }}><i className={`${favorites.some(f => f._id === product._id) ? 'fas' : 'far'} fa-heart`}></i></button>{product.oldPrice && (<span className="product-card__badge">-{Math.round((1 - product.price / product.oldPrice) * 100)}%</span>)}</div><div className="product-card__body"><span className="product-card__cat">{product.cat}</span><h3 className="product-card__name">{product.name}</h3><div className="product-card__rating"><i className="fas fa-star"></i><span>{product.rating || '0'}</span><span className="product-card__reviews">({product.reviews || 0} отзывов)</span></div><div className="product-card__price">
+        <section className="products"><div className="container"><div className="products__header"><h2 className="products__title">Популярные товары</h2><a href="#" className="products__all" onClick={(e) => { e.preventDefault(); handleViewAll(); }}>Смотреть все <i className="fas fa-arrow-right"></i></a></div><div className="products__grid">{filteredProducts.slice(0, visibleCount).map(product => (<div key={product._id || product.id} className="product-card" onClick={() => setSelectedProduct(product)}><div className="product-card__img"><img src={product.img} alt={product.name} /><button className="product-card__fav" onClick={(e) => { e.stopPropagation(); toggleFavorite(product); }}><i className={`${favorites.some(f => f._id === product._id) ? 'fas' : 'far'} fa-heart`}></i></button>{product.oldPrice && (<span className="product-card__badge">-{Math.round((1 - product.price / product.oldPrice) * 100)}%</span>)}</div><div className="product-card__body"><span className="product-card__cat">{product.cat}</span><h3 className="product-card__name">{product.name}</h3><div className="product-card__rating"><i className="fas fa-star"></i><span>{product.rating || '0'}</span><span className="product-card__reviews">({product.reviews || 0} отзывов)</span></div><div className="product-card__price">
           {product.oldPrice && <span className="product-card__price-old">{formatPrice(product.oldPrice)}</span>}
           <span className="product-card__price-current">{formatPrice(product.price)}</span>
-        </div><button className="product-card__cart-btn" onClick={(e) => { e.stopPropagation(); addToCart(product); }}><i className="fas fa-shopping-cart"></i> В корзину</button><button className="product-card__oneclick-btn" onClick={(e) => { e.stopPropagation(); oneClickBuy(product); }}>⚡ Купить в 1 клик</button><button className="product-card__compare-btn" onClick={(e) => { e.stopPropagation(); addToCompare(product); }}>📊 Сравнить</button></div></div>))}</div></div></section>
+        </div><button className="product-card__cart-btn" onClick={(e) => { e.stopPropagation(); addToCart(product); }}><i className="fas fa-shopping-cart"></i> В корзину</button><button className="product-card__quick-btn" onClick={(e) => { e.stopPropagation(); setQuickOrderProduct(product); setShowQuickOrder(true); }}>
+        📞 Быстрый заказ
+      </button>
+<button className="product-card__oneclick-btn" onClick={(e) => { e.stopPropagation(); oneClickBuy(product); }}>⚡ Купить в 1 клик</button><button className="product-card__compare-btn" onClick={(e) => { e.stopPropagation(); addToCompare(product); }}>📊 Сравнить</button></div></div>))}</div>
+  {visibleCount < filteredProducts.length && (
+              <div style={{textAlign:'center', marginTop:'20px'}}>
+                <button 
+                  onClick={showMore}
+                  style={{
+                    padding: '14px 40px',
+                    background: '#0066ff',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '10px',
+                    fontSize: '16px',
+                    fontWeight: '700',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Показать ещё ({filteredProducts.length - visibleCount} товаров)
+                </button>
+              </div>
+            )}</div></section>
         {filteredProducts.length > 0 && <Recommendations currentProduct={filteredProducts[0]} products={products} onAddToCart={addToCart} onSelect={setSelectedProduct} />}
         {selectedProduct && <Quickview product={selectedProduct} products={products} user={user} onClose={() => setSelectedProduct(null)} onAddToCart={addToCart} />}
         {showFavorites && <Favorites favorites={favorites} onRemove={(id) => setFavorites(prev => prev.filter(i => i._id !== id))} onAddToCart={addToCart} onClose={() => setShowFavorites(false)} />}
@@ -239,6 +280,8 @@ function AppContent() {
         {showAuth && <Auth onLogin={(user) => { setUser(user); showToast('✅ Добро пожаловать, ' + user.name + '!'); }} onClose={() => setShowAuth(false)} />}
         {showOrders && <Orders orders={orders} onClose={() => setShowOrders(false)} onDelete={deleteOrder} onCancel={cancelOrder} />}
         {showPhotoSearch && <PhotoSearch products={products} onProductSelect={(p) => setSelectedProduct(p)} onClose={() => setShowPhotoSearch(false)} />}
+        {showQuickOrder && <QuickOrder product={quickOrderProduct} onClose={() => setShowQuickOrder(false)} />}
+        {showProfile && <Profile user={user} onClose={() => setShowProfile(false)} onLogout={handleLogout} onUpdateUser={setUser} />}
         <PwaInstall /><ChatWidget /><TelegramButton /><ChatBot /><Footer />
         <BottomNav onOpenWishlist={() => setShowWishlist(true)} onOpenCart={() => { if (!user) { setShowAuth(true); return; } setShowCart(true); }} onOpenFavorites={() => setShowFavorites(true)} onOpenOrders={() => { if (!user) { setShowAuth(true); return; } setShowOrders(true); }} cartCount={cart.reduce((s, i) => s + i.quantity, 0)} onOpenMenu={() => setShowMobileMenu(true)} user={user} setShowAuth={setShowAuth} />
         {showLogout && (

@@ -10,7 +10,7 @@ import CurrencySwitcher from './CurrencySwitcher';
 import { useCurrency } from '../context/CurrencyContext';
 
 
-function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, products, onOpenFavorites, onOpenOrders, setShowPhotoSearch, onSelectCategory, setShowLogout, onOpenWishlist }) {
+function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, products, onOpenFavorites, onOpenOrders, setShowPhotoSearch, onSelectCategory, setShowLogout, onOpenWishlist, onOpenProfile }) {
   const { currency, changeCurrency, rates } = useCurrency();
   const { lang, t } = useLanguage();
   const [showLangModal, setShowLangModal] = useState(false);
@@ -28,13 +28,7 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
     <>
       <header className="header">
         <div className="header__top">
-            <div className="header__currency" onClick={() => {
-            const next = currency === 'TJS' ? 'RUB' : currency === 'RUB' ? 'USD' : 'TJS';
-            changeCurrency(next);
-          }}>
-            <span>{rates[currency].symbol}</span>
-            <i className="fas fa-chevron-down"></i>
-          </div>
+           
           <div className="container">
             <div className="header__top-inner">
               <div className="header__location" onClick={() => setShowCityModal(true)}>
@@ -85,10 +79,13 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
               </div>
 
               <div className="header__actions header__actions--desktop">
-                <a href="#" className="header__action" onClick={(e) => { e.preventDefault(); user ? setShowLogout(true) : onOpenAuth(); }}>
-                  <i className={`fas ${user ? 'fa-user-check' : 'fa-user'}`}></i>
-                  <span>{user ? user.name : t('login')}</span>
-                </a>
+                <a href="#" className="header__action" onClick={(e) => { 
+                e.preventDefault(); 
+                user ? onOpenProfile() : onOpenAuth(); 
+              }}>
+                <i className={`fas ${user ? 'fa-user-check' : 'fa-user'}`}></i>
+                <span>{user ? user.name : t('login')}</span>
+              </a>
                 <a href="#" className="header__action" onClick={(e) => { e.preventDefault(); onOpenOrders(); }}>
                   <i className="fas fa-box"></i>
                   <span>{t('orders')}</span>

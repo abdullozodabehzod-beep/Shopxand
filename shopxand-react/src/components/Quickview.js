@@ -5,6 +5,7 @@ import PriceAlert from './PriceAlert';
 import { useCurrency } from '../context/CurrencyContext';
 import Subscribe from './Subscribe';
 import StockNotify from './StockNotify';
+import QuickOrder from './QuickOrder';
 
 function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products, user }) {
   const [quantity, setQuantity] = useState(1);
@@ -24,7 +25,7 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products, u
   const { formatPrice } = useCurrency();
   const [showSubscribe, setShowSubscribe] = useState(false);
   const [showStockNotify, setShowStockNotify] = useState(false);
-  
+  const [showQuickOrder, setShowQuickOrder] = useState(false);
 
   const showToast = (msg) => {
     const t = document.createElement('div');
@@ -321,6 +322,7 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products, u
       </div>
        {showPriceAlert && <PriceAlert product={product} onClose={() => setShowPriceAlert(false)} />}
         {showSubscribe && <Subscribe product={product} onClose={() => setShowSubscribe(false)} />}
+          {showQuickOrder && <QuickOrder product={product} onClose={() => setShowQuickOrder(false)} />}
     </div>
 
   );

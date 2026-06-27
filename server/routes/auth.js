@@ -60,4 +60,28 @@ router.get('/me', async (req, res) => {
     }
 });
 
+router.put('/update', async (req, res) => {
+    try {
+        const token = req.headers['authorization']?.replace('Bearer ', '');
+        if (!token) return res.status(401).json({ error: 'Требуется авторизация' });
+        const decoded = jwt.verify(token, SECRET);
+        await User.findByIdAndUpdate(decoded.id, { name: req.body.name, email: req.body.email });
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+router.put('/change-password', async (req, res) => {
+    try {
+        const token = req.headers['authorization']?.replace('Bearer ', '');
+        if (!token) return res.status(401).json({ error: 'Требуется авторизация' });
+        const decoded = jwt.verify(token, SECRET);
+        const user = await User.findById(decoded.id);
+        const valid = await bcrypt.compare(req.body.current, user.password);
+        if (!valid) return res.status(400).json({ error: 'Неверный текущий пароль' });
+        user.password = await bcrypt.hash(req.body.new, 10);
+        await user.save();
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 module.exports = router;
