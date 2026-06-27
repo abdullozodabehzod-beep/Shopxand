@@ -105,6 +105,7 @@ async function saveProduct() {
     var product = {
         name: document.getElementById('prodName').value,
         cat: document.getElementById('prodCat').value,
+        inStock: document.getElementById('prodInStock')?.checked ?? true,
         price: parseInt(document.getElementById('prodPrice').value) || 0,
         oldPrice: document.getElementById('prodOldPrice').value ? parseInt(document.getElementById('prodOldPrice').value) : null,
         img: document.getElementById('prodImg').value || '',

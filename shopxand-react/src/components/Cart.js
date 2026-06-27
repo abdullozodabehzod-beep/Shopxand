@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useCurrency } from '../context/CurrencyContext';
 
 function Cart({ cart, onRemove, onCheckout, onClose, onUpdateQuantity }) {
   const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
   const [addedItem, setAddedItem] = useState(null);
+  const { formatPrice } = useCurrency();
   useEffect(() => {
   if (addedItem) {
     setTimeout(() => setAddedItem(null), 1500);
@@ -40,7 +42,7 @@ function Cart({ cart, onRemove, onCheckout, onClose, onUpdateQuantity }) {
                   </div>                
                   <div className="cart-item__info">
                   <h4 className="cart-item__name">{item.name}</h4>
-                  <span className="cart-item__price">{item.price} с.</span>
+                  <span className="cart-item__price">{formatPrice(item.price * item.quantity)}</span>
                 </div>
                 <div className="cart-item__quantity">
               <button className="cart-item__qty-btn" onClick={() => onUpdateQuantity(item._id, item.quantity - 1)}>−</button>

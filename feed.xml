@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
+<channel>
+  <title>ShopXand</title>
+  <link>https://shopxand-3.onrender.com</link>
+  <description>Интернет-магазин Таджикистана</description>
+  <item>
+    <g:id>1</g:id>
+    <g:title>Вельветовая рубашка</g:title>
+    <g:description>Стильная вельветовая рубашка. Размеры X-3XL.</g:description>
+    <g:link>https://shopxand-3.onrender.com/product/1</g:link>
+    <g:image_link>https://shopxand-3.onrender.com/img/Рубашка.jpeg</g:image_link>
+    <g:price>120 TJS</g:price>
+    <g:availability>in_stock</g:availability>
+    <g:condition>new</g:condition>
+  </item>
+</channel>
+</rss>

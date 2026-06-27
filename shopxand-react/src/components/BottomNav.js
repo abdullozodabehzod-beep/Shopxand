@@ -1,28 +1,31 @@
 import React from 'react';
 
-function BottomNav({ onOpenCart, onOpenFavorites, onOpenOrders, onOpenMenu, cartCount, user, setShowAuth }) {  return (
+function BottomNav({ onOpenCart, onOpenFavorites, onOpenOrders, cartCount, onOpenMenu, user, setShowAuth, onOpenWishlist }) {
+  return (
     <nav className="bottom-nav">
-      <button className="bottom-nav__item" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-        <i className="fas fa-home"></i>
-        <span>Главная</span>
-      </button>
-      <button className="bottom-nav__item" onClick={() => {
-      if (!user) { setShowAuth(true); return; }
-      onOpenFavorites(true);
-    }}>
-      <i className="fas fa-heart"></i>
-      <span>Избранное</span>
-    </button>
-    <button className="bottom-nav__item" onClick={onOpenCart}>
-        <i className="fas fa-shopping-cart"></i>
-        {cartCount > 0 && <span className="bottom-nav__badge">{cartCount}</span>}
-        <span>Корзина</span>
-      </button>
-      <button className="bottom-nav__item" onClick={onOpenOrders}>
-        <i className="fas fa-box"></i>
-        <span>Заказы</span>
-      </button>
-       
+      <div className="bottom-nav__scroll">
+        <button className="bottom-nav__item" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <div className="bottom-nav__icon">🏠</div>
+          <span>Главная</span>
+        </button>
+        <button className="bottom-nav__item" onClick={onOpenWishlist}>
+          <div className="bottom-nav__icon">🎁</div>
+          <span>Желания</span>
+        </button>
+        <button className="bottom-nav__item" onClick={onOpenCart}>
+          <div className="bottom-nav__icon">🛒</div>
+          {cartCount > 0 && <span className="bottom-nav__badge">{cartCount}</span>}
+          <span>Корзина</span>
+        </button>
+        <button className="bottom-nav__item" onClick={onOpenOrders}>
+          <div className="bottom-nav__icon">📦</div>
+          <span>Заказы</span>
+        </button>
+        <button className="bottom-nav__item" onClick={onOpenMenu}>
+          <div className="bottom-nav__icon">👤</div>
+          <span>{user ? 'Профиль' : 'Войти'}</span>
+        </button>
+      </div>
     </nav>
   );
 }

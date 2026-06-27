@@ -1,5 +1,4 @@
 import React, { createContext, useState, useContext } from 'react';
-
 const LanguageContext = createContext();
 
 const translations = {
@@ -58,16 +57,22 @@ const translations = {
 
 export function LanguageProvider({ children }) {
   const [lang, setLang] = useState(localStorage.getItem('shopxand_lang') || 'ru');
+  const [currency, setCurrency] = useState(localStorage.getItem('shopxand_currency') || 'TJS');
 
   const switchLanguage = (newLang) => {
     setLang(newLang);
     localStorage.setItem('shopxand_lang', newLang);
   };
 
+  const switchCurrency = (newCurrency) => {
+    setCurrency(newCurrency);
+    localStorage.setItem('shopxand_currency', newCurrency);
+  };
+
   const t = (key) => translations[lang]?.[key] || translations['ru'][key] || key;
 
   return (
-    <LanguageContext.Provider value={{ lang, switchLanguage, t }}>
+    <LanguageContext.Provider value={{ lang, switchLanguage, t, currency, switchCurrency }}>
       {children}
     </LanguageContext.Provider>
   );

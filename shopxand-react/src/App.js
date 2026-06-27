@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { LanguageProvider } from './context/LanguageContext';
+import { CurrencyProvider, useCurrency } from './context/CurrencyContext';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Quickview from './components/Quickview';
@@ -21,10 +22,19 @@ import Footer from './components/Footer';
 import ChatWidget from './components/ChatWidget';
 import TelegramButton from './components/TelegramButton';
 import PwaInstall from './components/PwaInstall';
+import { initPixel, trackEvent } from './utils/pixel';
+import Compare from './components/Compare';
+import Recommendations from './components/Recommendations';
+import ChatBot from './components/ChatBot';
+import { ThemeProvider } from './context/ThemeContext';
+import Wishlist from './components/Wishlist';
 
 const API_URL = 'http://localhost:3000/api';
 
-function App() {
+// Внутренний компонент (имеет доступ к контекстам)
+function AppContent() {
+  const { formatPrice } = useCurrency();
+  
   const [showPhotoSearch, setShowPhotoSearch] = useState(false);
   const [activeCategory, setActiveCategory] = useState(null);
   const [products, setProducts] = useState([]);
@@ -42,8 +52,36 @@ function App() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [toast, setToast] = useState(null);
   const [showLogout, setShowLogout] = useState(false);
+  const [compareList, setCompareList] = useState([]);
+  const [showCompare, setShowCompare] = useState(false);
+  const [showWishlist, setShowWishlist] = useState(false);
+  const [savedAddress, setSavedAddress] = useState(null);
+   const currencyContext = useCurrency();
+
+  const oneClickBuy = (product) => {
+    if (!user) { setShowAuth(true); return; }
+    const address = savedAddress || { name: user.name, phone: user.phone, city: 'Душанбе', address: 'Уточнить' };
+    const order = { id: 'SX-' + Date.now().toString().slice(-8), customer: address, items: [{...product, quantity: 1}], total: product.price + 30, status: 'processing', date: new Date().toISOString() };
+    fetch(API_URL + '/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(order) });
+    sendOrderToTelegram(order);
+    sendPush('📦 Заказ оформлен!', `One-Click заказ на ${order.total.toLocaleString()} с.`);
+    setOrders(prev => [order, ...prev]);
+    showToast('✅ Куплено в 1 клик! Заказ ' + order.id);
+  };
+
+  const addToCompare = (product) => {
+    if (compareList.find(p => p._id === product._id)) {
+      setCompareList(prev => prev.filter(p => p._id !== product._id));
+    } else if (compareList.length < 3) {
+      setCompareList(prev => [...prev, product]);
+    } else {
+      alert('Можно сравнить до 3 товаров');
+    }
+    setShowCompare(true);
+  };
 
   useEffect(() => { initGA(); initYM(); }, []);
+  useEffect(() => { initPixel(); }, []);
 
   const deleteOrder = (orderId) => {
     if (window.confirm('Удалить заказ?')) {
@@ -54,22 +92,18 @@ function App() {
 
   const cancelOrder = (orderId) => {
     const order = orders.find(o => o.id === orderId);
-    fetch(API_URL + '/orders/' + orderId, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'cancelled' })
-    }).then(() => {
-      setOrders(prev => prev.map(o => o.id === orderId ? {...o, status: 'cancelled'} : o));
-      if (order) {
-        const BOT_TOKEN = '8265957442:AAFWnqXyl8TJJzZXsv3vxXRCuWwWd_aY9mE';
-        const CHAT_ID = '5282056467';
-        const msg = `❌ КЛИЕНТ ОТМЕНИЛ ЗАКАЗ\n📦 ${order.id}\n👤 ${order.customer?.name}\n📞 ${order.customer?.phone}\n💰 ${order.total?.toLocaleString()} с.`;
-        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
-        });
-      }
-    });
+    fetch(API_URL + '/orders/' + orderId, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'cancelled' }) })
+      .then(() => {
+        setOrders(prev => prev.map(o => o.id === orderId ? {...o, status: 'cancelled'} : o));
+        if (order) {
+          const BOT_TOKEN = '8265957442:AAFWnqXyl8TJJzZXsv3vxXRCuWwWd_aY9mE';
+          const CHAT_ID = '5282056467';
+          fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: CHAT_ID, text: `❌ КЛИЕНТ ОТМЕНИЛ ЗАКАЗ\n📦 ${order.id}\n👤 ${order.customer?.name}\n📞 ${order.customer?.phone}\n💰 ${order.total?.toLocaleString()} с.` })
+          });
+        }
+      });
   };
 
   const updateCartQuantity = (id, newQty) => {
@@ -112,12 +146,33 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem('shopxand_token');
-    if (token) fetch(API_URL + '/auth/me', { headers: { 'Authorization': 'Bearer ' + token } }).then(r => r.json()).then(data => { if (data.user) setUser(data.user); }).catch(() => localStorage.removeItem('shopxand_token'));
+    if (token) {
+      fetch(API_URL + '/auth/me', { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(r => { if (!r.ok) { localStorage.removeItem('shopxand_token'); setUser(null); return; } return r.json(); })
+        .then(data => { if (data && data.user) setUser(data.user); })
+        .catch(() => { localStorage.removeItem('shopxand_token'); setUser(null); });
+    }
   }, []);
 
   useEffect(() => {
     if ('Notification' in window && Notification.permission === 'default') setTimeout(() => { Notification.requestPermission(); }, 5000);
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      const saved = localStorage.getItem('shopxand_address');
+      if (saved) setSavedAddress(JSON.parse(saved));
+    }
+  }, [user]);
+
+  useEffect(() => {
+    try {
+        const subs = JSON.parse(localStorage.getItem('shopxand_subscriptions') || '[]');
+        // Можно показать активные подписки
+    } catch (err) {
+        console.log('Подписки недоступны');
+    }
+}, []);
 
   const addToCart = (product) => {
     if (!user) { setShowAuth(true); return; }
@@ -126,6 +181,7 @@ function App() {
       if (existing) return prev.map(i => i._id === product._id ? {...i, quantity: i.quantity + 1} : i);
       return [...prev, { ...product, quantity: 1 }];
     });
+    trackEvent('AddToCart', { content_name: product.name, content_ids: [product._id], content_type: 'product', value: product.price, currency: 'TJS' });
     showToast('✅ ' + product.name + ' добавлен!');
     if (window._cartTimer) clearTimeout(window._cartTimer);
     window._cartTimer = setTimeout(() => {
@@ -145,6 +201,7 @@ function App() {
     fetch(API_URL + '/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(order) });
     sendOrderToTelegram(order);
     sendPush('📦 Заказ принят!', `Заказ ${order.id} на сумму ${order.total.toLocaleString()} с.`);
+    trackEvent('Purchase', { value: order.total, currency: 'TJS', content_ids: cart.map(i => i._id) });
     setOrders(prev => [order, ...prev]); setCart([]); setShowCheckout(false);
   };
 
@@ -165,23 +222,47 @@ function App() {
   if (path === '/contact') return <Contact />;
 
   return (
-    <LanguageProvider>
+    <ThemeProvider>
       <div className="App">
-        <Header user={user} onOpenAuth={() => setShowAuth(true)} onOpenCart={() => { if (!user) { setShowAuth(true); return; } setShowCart(true); }} onSearch={handleSearch} products={products} onProductSelect={setSelectedProduct} onOpenFavorites={() => setShowFavorites(true)} onOpenOrders={() => { if (!user) { setShowAuth(true); return; } setShowOrders(true); }} setShowPhotoSearch={setShowPhotoSearch} onSelectCategory={handleSelectCategory} setShowLogout={setShowLogout} onOpenMobileMenu={() => setShowMobileMenu(true)} onSearchSelect={handleSearchSelect} />
+        <Header onOpenWishlist={() => setShowWishlist(true)} user={user} onOpenAuth={() => setShowAuth(true)} onOpenCart={() => { if (!user) { setShowAuth(true); return; } setShowCart(true); }} onSearch={handleSearch} products={products} onProductSelect={setSelectedProduct} onOpenFavorites={() => setShowFavorites(true)} onOpenOrders={() => { if (!user) { setShowAuth(true); return; } setShowOrders(true); }} setShowPhotoSearch={setShowPhotoSearch} onSelectCategory={handleSelectCategory} setShowLogout={setShowLogout} onOpenMobileMenu={() => setShowMobileMenu(true)} onSearchSelect={handleSearchSelect} />
         <Hero />
         <CategoriesBar onSelectCategory={handleSelectCategory} />
-        <section className="products"><div className="container"><div className="products__header"><h2 className="products__title">Популярные товары</h2><a href="#" className="products__all" onClick={(e) => { e.preventDefault(); handleViewAll(); }}>Смотреть все <i className="fas fa-arrow-right"></i></a></div><div className="products__grid">{filteredProducts.map(product => (<div key={product._id || product.id} className="product-card" onClick={() => setSelectedProduct(product)}><div className="product-card__img"><img src={product.img} alt={product.name} /><button className="product-card__fav" onClick={(e) => { e.stopPropagation(); toggleFavorite(product); }}><i className={`${favorites.some(f => f._id === product._id) ? 'fas' : 'far'} fa-heart`}></i></button>{product.oldPrice && (<span className="product-card__badge">-{Math.round((1 - product.price / product.oldPrice) * 100)}%</span>)}</div><div className="product-card__body"><span className="product-card__cat">{product.cat}</span><h3 className="product-card__name">{product.name}</h3><div className="product-card__rating"><i className="fas fa-star"></i><span>{product.rating || '0'}</span><span className="product-card__reviews">({product.reviews || 0} отзывов)</span></div><div className="product-card__price">{product.oldPrice && <span className="product-card__price-old">{product.oldPrice} с.</span>}<span className="product-card__price-current">{product.price} с.</span></div><button className="product-card__cart-btn" onClick={(e) => { e.stopPropagation(); addToCart(product); }}><i className="fas fa-shopping-cart"></i> В корзину</button></div></div>))}</div></div></section>
-        {selectedProduct && <Quickview product={selectedProduct} products={products} onClose={() => setSelectedProduct(null)} onAddToCart={addToCart} />}
+        <section className="products"><div className="container"><div className="products__header"><h2 className="products__title">Популярные товары</h2><a href="#" className="products__all" onClick={(e) => { e.preventDefault(); handleViewAll(); }}>Смотреть все <i className="fas fa-arrow-right"></i></a></div><div className="products__grid">{filteredProducts.map(product => (<div key={product._id || product.id} className="product-card" onClick={() => setSelectedProduct(product)}><div className="product-card__img"><img src={product.img} alt={product.name} /><button className="product-card__fav" onClick={(e) => { e.stopPropagation(); toggleFavorite(product); }}><i className={`${favorites.some(f => f._id === product._id) ? 'fas' : 'far'} fa-heart`}></i></button>{product.oldPrice && (<span className="product-card__badge">-{Math.round((1 - product.price / product.oldPrice) * 100)}%</span>)}</div><div className="product-card__body"><span className="product-card__cat">{product.cat}</span><h3 className="product-card__name">{product.name}</h3><div className="product-card__rating"><i className="fas fa-star"></i><span>{product.rating || '0'}</span><span className="product-card__reviews">({product.reviews || 0} отзывов)</span></div><div className="product-card__price">
+          {product.oldPrice && <span className="product-card__price-old">{formatPrice(product.oldPrice)}</span>}
+          <span className="product-card__price-current">{formatPrice(product.price)}</span>
+        </div><button className="product-card__cart-btn" onClick={(e) => { e.stopPropagation(); addToCart(product); }}><i className="fas fa-shopping-cart"></i> В корзину</button><button className="product-card__oneclick-btn" onClick={(e) => { e.stopPropagation(); oneClickBuy(product); }}>⚡ Купить в 1 клик</button><button className="product-card__compare-btn" onClick={(e) => { e.stopPropagation(); addToCompare(product); }}>📊 Сравнить</button></div></div>))}</div></div></section>
+        {filteredProducts.length > 0 && <Recommendations currentProduct={filteredProducts[0]} products={products} onAddToCart={addToCart} onSelect={setSelectedProduct} />}
+        {selectedProduct && <Quickview product={selectedProduct} products={products} user={user} onClose={() => setSelectedProduct(null)} onAddToCart={addToCart} />}
         {showFavorites && <Favorites favorites={favorites} onRemove={(id) => setFavorites(prev => prev.filter(i => i._id !== id))} onAddToCart={addToCart} onClose={() => setShowFavorites(false)} />}
         {showCart && <Cart cart={cart} onRemove={removeFromCart} onCheckout={() => { setShowCart(false); setShowCheckout(true); }} onClose={() => setShowCart(false)} onUpdateQuantity={updateCartQuantity} />}
         {showCheckout && <Checkout cart={cart} user={user} onPlaceOrder={placeOrder} onClose={() => setShowCheckout(false)} />}
         {showAuth && <Auth onLogin={(user) => { setUser(user); showToast('✅ Добро пожаловать, ' + user.name + '!'); }} onClose={() => setShowAuth(false)} />}
         {showOrders && <Orders orders={orders} onClose={() => setShowOrders(false)} onDelete={deleteOrder} onCancel={cancelOrder} />}
         {showPhotoSearch && <PhotoSearch products={products} onProductSelect={(p) => setSelectedProduct(p)} onClose={() => setShowPhotoSearch(false)} />}
-        <PwaInstall /><ChatWidget /><TelegramButton /><Footer />
-        <BottomNav onOpenCart={() => { if (!user) { setShowAuth(true); return; } setShowCart(true); }} onOpenFavorites={() => setShowFavorites(true)} onOpenOrders={() => { if (!user) { setShowAuth(true); return; } setShowOrders(true); }} cartCount={cart.reduce((s, i) => s + i.quantity, 0)} onOpenMenu={() => setShowMobileMenu(true)} user={user} setShowAuth={setShowAuth} />
-        {showLogout && (<div className="logout-modal active"><div className="logout-modal__overlay" onClick={() => setShowLogout(false)}></div><div className="logout-modal__content"><div className="logout-modal__icon"><i className="fas fa-sign-out-alt"></i></div><h3>Вы точно хотите выйти?</h3><p>Ваши корзина и избранное сохранятся</p><div className="logout-modal__actions"><button className="logout-modal__btn logout-modal__btn--cancel" onClick={() => setShowLogout(false)}>Отмена</button><button className="logout-modal__btn logout-modal__btn--confirm" onClick={() => { localStorage.removeItem('shopxand_token'); localStorage.removeItem('shopxand_user'); setUser(null); setShowLogout(false); setToast('👋 Вы вышли из аккаунта'); setTimeout(() => setToast(null), 2000); }}><i className="fas fa-check"></i> Выйти</button></div></div></div>)}
+        <PwaInstall /><ChatWidget /><TelegramButton /><ChatBot /><Footer />
+        <BottomNav onOpenWishlist={() => setShowWishlist(true)} onOpenCart={() => { if (!user) { setShowAuth(true); return; } setShowCart(true); }} onOpenFavorites={() => setShowFavorites(true)} onOpenOrders={() => { if (!user) { setShowAuth(true); return; } setShowOrders(true); }} cartCount={cart.reduce((s, i) => s + i.quantity, 0)} onOpenMenu={() => setShowMobileMenu(true)} user={user} setShowAuth={setShowAuth} />
+        {showLogout && (
+          <div className="logout-modal active">
+            <div className="logout-modal__overlay" onClick={() => setShowLogout(false)}></div>
+            <div className="logout-modal__content"><div className="logout-modal__icon"><i className="fas fa-sign-out-alt"></i></div><h3>Вы точно хотите выйти?</h3><p>Ваши корзина и избранное сохранятся</p>
+              <div className="logout-modal__actions"><button className="logout-modal__btn logout-modal__btn--cancel" onClick={() => setShowLogout(false)}>Отмена</button><button className="logout-modal__btn logout-modal__btn--confirm" onClick={() => { localStorage.removeItem('shopxand_token'); localStorage.removeItem('shopxand_user'); setUser(null); setCart([]); setFavorites([]); setOrders([]); setShowLogout(false); setToast('👋 Вы вышли из аккаунта'); setTimeout(() => setToast(null), 2000); }}><i className="fas fa-check"></i> Выйти</button></div>
+            </div>
+          </div>
+        )}
+        {showCompare && <Compare compareList={compareList} onRemove={(id) => setCompareList(prev => prev.filter(p => p._id !== id))} onClear={() => { setCompareList([]); setShowCompare(false); }} />}
+        {showWishlist && <Wishlist onClose={() => setShowWishlist(false)} onAddToCart={addToCart} />}
       </div>
+    </ThemeProvider>
+  );
+}
+
+// Внешний компонент с провайдерами
+function App() {
+  return (
+    <LanguageProvider>
+      <CurrencyProvider>
+        <AppContent />
+      </CurrencyProvider>
     </LanguageProvider>
   );
 }

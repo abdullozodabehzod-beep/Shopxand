@@ -1,7 +1,6 @@
 import React from 'react';
 
 function Reviews({ productId, reviews = [] }) {
-  // Фильтруем undefined элементы
   const validReviews = Array.isArray(reviews) ? reviews.filter(r => r) : [];
 
   return (
@@ -26,6 +25,12 @@ function Reviews({ productId, reviews = [] }) {
               ))}
             </div>
             <p className="qv-review-item__text">{r.text || ''}</p>
+            {/* Фото отзыва */}
+            {r.photo && (
+              <div className="qv-review-item__photo">
+                <img src={r.photo} alt="Фото отзыва" />
+              </div>
+            )}
           </div>
         ))
       )}

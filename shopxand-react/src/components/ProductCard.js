@@ -24,8 +24,7 @@ function ProductCard({ product, onAddToCart }) {
         </div>
         <div className="product-card__price">
           {product.oldPrice && <span className="product-card__price-old">{product.oldPrice} с.</span>}
-          <span className="product-card__price-current">{product.price} с.</span>
-        </div>
+        <span className="product-card__price-current">{formatPrice(product.price, currency)}</span>        </div>
         <button className="product-card__cart-btn" onClick={() => onAddToCart(product)}>
           <i className="fas fa-shopping-cart"></i> В корзину
         </button>

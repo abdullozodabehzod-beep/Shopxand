@@ -4,8 +4,14 @@ import LanguageModal from './LanguageModal';
 import CityModal from './CityModal';
 import Search from './Search';
 import MobileMenu from './MobileMenu';
+import VoiceSearch from './VoiceSearch';
+import { useTheme } from '../context/ThemeContext';
+import CurrencySwitcher from './CurrencySwitcher';
+import { useCurrency } from '../context/CurrencyContext';
 
-function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, products, onOpenFavorites, onOpenOrders, setShowPhotoSearch, onSelectCategory, setShowLogout }) {
+
+function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, products, onOpenFavorites, onOpenOrders, setShowPhotoSearch, onSelectCategory, setShowLogout, onOpenWishlist }) {
+  const { currency, changeCurrency, rates } = useCurrency();
   const { lang, t } = useLanguage();
   const [showLangModal, setShowLangModal] = useState(false);
   const [showCityModal, setShowCityModal] = useState(false);
@@ -13,6 +19,8 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
   const [currentCity, setCurrentCity] = useState(localStorage.getItem('shopxand_city') || 'Душанбе');
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [showVoice, setShowVoice] = useState(false);
+  const { darkMode, toggleTheme } = useTheme();
 
   const langCodes = { ru: 'RU', tg: 'TJ', en: 'EN' };
 
@@ -20,6 +28,13 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
     <>
       <header className="header">
         <div className="header__top">
+            <div className="header__currency" onClick={() => {
+            const next = currency === 'TJS' ? 'RUB' : currency === 'RUB' ? 'USD' : 'TJS';
+            changeCurrency(next);
+          }}>
+            <span>{rates[currency].symbol}</span>
+            <i className="fas fa-chevron-down"></i>
+          </div>
           <div className="container">
             <div className="header__top-inner">
               <div className="header__location" onClick={() => setShowCityModal(true)}>
@@ -31,6 +46,10 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
                 <span className="header__lang-current">{langCodes[lang]}</span>
                 <i className="fas fa-chevron-down"></i>
               </div>
+              <CurrencySwitcher />
+               <button className="theme-toggle" onClick={toggleTheme}>
+              {darkMode ? '☀️' : '🌙'}
+            </button>
             </div>
           </div>
         </div>
@@ -60,6 +79,9 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
 
               <div className="header__search header__search--desktop">
                 <Search products={products} onSearchSelect={onSearchSelect} onSearch={onSearch} />
+                <button className="header__voice-btn" onClick={() => setShowVoice(true)}>
+                <i className="fas fa-microphone"></i>
+              </button>
               </div>
 
               <div className="header__actions header__actions--desktop">
@@ -79,15 +101,23 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
                   <i className="fas fa-shopping-cart"></i>
                   <span>{t('cart')}</span>
                 </a>
+                <a href="#" className="header__action" onClick={(e) => { e.preventDefault(); onOpenWishlist(); }}>
+                <i className="fas fa-gift"></i>
+                <span>Желания</span>
+              </a>
               </div>
 
               <button className="header__search-toggle" onClick={() => setShowMobileSearch(!showMobileSearch)}>
                 <i className="fas fa-search"></i>
               </button>
 
-              <a href="#" className="header__action header__login--mobile" onClick={(e) => { e.preventDefault(); onOpenAuth(); }}>
-                <i className="fas fa-user"></i>
-              </a>
+             {/* Кнопка входа на мобильном */}
+            <a href="#" className="header__action header__login--mobile" onClick={(e) => { 
+              e.preventDefault(); 
+              user ? setShowLogout(true) : onOpenAuth(); 
+            }}>
+              <i className={`fas ${user ? 'fa-user-check' : 'fa-user'}`}></i>
+            </a>
             </div>
           </div>
         </div>
@@ -160,6 +190,7 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
       {showLangModal && <LanguageModal onClose={() => setShowLangModal(false)} />}
       {showCityModal && <CityModal onClose={() => setShowCityModal(false)} currentCity={currentCity} onSelectCity={(city) => { setCurrentCity(city); localStorage.setItem('shopxand_city', city); }} />}
       {showMobileMenu && <MobileMenu onClose={() => setShowMobileMenu(false)} onOpenAuth={onOpenAuth} onOpenCart={onOpenCart} onOpenFavorites={onOpenFavorites} onOpenOrders={onOpenOrders} user={user} onOpenCityModal={() => setShowCityModal(true)} onOpenLangModal={() => setShowLangModal(true)} />}
+        {showVoice && <VoiceSearch onSearch={onSearch} onClose={() => setShowVoice(false)} />}
     </>
   );
 }

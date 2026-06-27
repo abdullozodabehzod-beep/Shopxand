@@ -1,165 +1,43 @@
 [
   {
-    "id": "SX-31194981",
-    "date": "2026-06-24T19:59:54.982Z",
-    "status": "processing",
-    "userId": "992300003230",
-    "customer": {
-      "name": "Бехзод",
-      "phone": "+992300003230",
-      "city": "Душанбе",
-      "address": "LUTFI 35/",
-      "comment": ""
-    },
-    "delivery": "courier",
-    "payment": "elsom",
-    "paymentStatus": "pending",
-    "items": [
-      {
-        "id": "6a30fdb1ca2494a8d62b56b0",
-        "name": "Часы: PIN-TIME",
-        "price": 100,
-        "img": "/img/Часы Royal-4.jpeg",
-        "cat": "Электроника",
-        "quantity": 1
-      }
-    ],
-    "total": 125,
-    "trackNumber": "SX194983",
-    "trackingHistory": [
-      {
-        "status": "Заказ оформлен",
-        "date": "2026-06-24T19:59:54.983Z",
-        "location": "Система ShopXand"
-      }
-    ],
-    "trackSteps": [
-      {
-        "label": "Заказ принят",
-        "completed": true,
-        "current": false
-      },
-      {
-        "label": "В обработке",
-        "completed": false,
-        "current": true
-      },
-      {
-        "label": "В пути",
-        "completed": false,
-        "current": false
-      },
-      {
-        "label": "Доставлен",
-        "completed": false,
-        "current": false
-      }
-    ]
-  },
-  {
-    "id": "SX-31065509",
-    "date": "2026-06-24T19:57:45.509Z",
-    "status": "processing",
-    "userId": "992300003230",
-    "customer": {
-      "name": "Бехзод",
-      "phone": "+992300003230",
-      "city": "Душанбе",
-      "address": "LUTFI 35/",
-      "comment": ""
-    },
-    "delivery": "courier",
-    "payment": "elsom",
-    "paymentStatus": "pending",
-    "items": [
-      {
-        "name": "Часы: RINNADY",
-        "price": 90,
-        "img": "/img/riddary-watch.jpeg",
-        "cat": "Электроника",
-        "quantity": 1
-      }
-    ],
-    "total": 115,
-    "trackNumber": "SX065510",
-    "trackingHistory": [
-      {
-        "status": "Заказ оформлен",
-        "date": "2026-06-24T19:57:45.510Z",
-        "location": "Система ShopXand"
-      }
-    ],
-    "trackSteps": [
-      {
-        "label": "Заказ принят",
-        "completed": true,
-        "current": false
-      },
-      {
-        "label": "В обработке",
-        "completed": false,
-        "current": true
-      },
-      {
-        "label": "В пути",
-        "completed": false,
-        "current": false
-      },
-      {
-        "label": "Доставлен",
-        "completed": false,
-        "current": false
-      }
-    ]
-  },
-  {
-    "id": "SX-24438481",
+    "id": "SX-44439428",
     "customer": {
       "name": "Pedro",
       "phone": "992300003230",
       "city": "Душанбе",
-      "address": "LUTFI 35/"
+      "address": "Уточнить"
     },
     "items": [
       {
-        "_id": "6a2e561760f09cc2d2fa1193",
-        "name": "Рубашка: мужская ретро с длинными рукавами",
-        "cat": "Одежда",
-        "price": 80,
-        "oldPrice": 139,
-        "img": "/img/Рубашка.jpeg",
-        "rating": 0,
+        "thumbPrices": [],
+        "_id": "6a284fe99ed5fd54c7d3cb14",
+        "name": "Кольцо персонализированное с ретро-узором",
+        "cat": "Аксессуары",
+        "price": 25,
+        "oldPrice": null,
+        "img": "/img/кальцо-серебро.jpeg",
+        "rating": 3,
         "reviews": 0,
-        "desc": "Мужская ретро-рубашка с длинными рукавами из вельвета для весны и осени  Повседневная свободная рубашка-куртка с воротником, однотонного цвета",
-        "sizes": [
-          "M",
-          "L",
-          "XL",
-          "2XL",
-          "3XL"
+        "desc": "Новое персонализированное кольцо с ретро-узором и смелым тотемом для мужчин, модное и стильное кольцо, одиночное кольцо, не выцветает",
+        "sizes": [],
+        "shoeSizes": [
+          "Американский размер"
         ],
-        "shoeSizes": [],
         "colors": [
-          "Черный",
-          "Желтый",
-          "Зеленый"
+          "Серебристый"
         ],
         "specs": [],
         "thumbs": [
-          "/img/Рубашка.jpeg",
-          "/img/Рубашка-2.jpeg",
-          "/img/Рубашка-4.jpeg"
+          "/img/кальцо-тату.jpeg"
         ],
         "inStock": true,
         "brightness": 128,
         "__v": 0,
-        "selectedSize": "M",
-        "selectedColor": "Черный",
         "quantity": 1
       }
     ],
-    "total": 110,
-    "status": "completed",
-    "date": "2026-06-15T11:53:58.481Z"
+    "total": 55,
+    "status": "processing",
+    "date": "2026-06-27T07:13:59.428Z"
   }
 ]
