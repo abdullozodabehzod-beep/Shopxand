@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopXand Admin — Пользователи</title>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="admin-sidebar">
+        <div class="admin-sidebar__logo">ShopXand Admin</div>
+        <nav class="admin-sidebar__nav">
+            <a href="dashboard.html">📊 Панель</a>
+            <a href="orders.html">📦 Заказы</a>
+            <a href="products.html">🛍️ Товары</a>
+            <a href="users.html" class="active">👥 Пользователи</a>
+            <a href="reviews.html">⭐ Отзывы</a>
+            <a href="analytics.html">📈 Аналитика</a>
+        </nav>
+    </div>
+
+    <div class="admin-main">
+        <div class="admin-header">
+            <h1>👥 Пользователи</h1>
+            <button onclick="logoutAdmin()">Выйти</button>
+        </div>
+
+        <div style="background:#fff;padding:20px;border-radius:12px;box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <h3 style="margin-bottom:16px;">📋 Список зарегистрированных</h3>
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя</th>
+                            <th>Телефон</th>
+                            <th>Email</th>
+                            <th>Дата регистрации</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTable">
+                        <tr><td colspan="5" style="text-align:center;">Загрузка...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+    <script>checkAdmin(); loadUsersAdmin();</script>
+</body>
+</html>

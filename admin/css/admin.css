@@ -1,0 +1,38 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f2f5; }
+
+/* Вход */
+.admin-login { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+.admin-login__container { background: #fff; padding: 40px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 380px; text-align: center; }
+.admin-login__logo { font-size: 24px; font-weight: 900; color: #0066ff; margin-bottom: 20px; }
+.admin-login__container h2 { font-size: 18px; margin-bottom: 24px; color: #333; }
+.form-group { margin-bottom: 16px; text-align: left; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #555; }
+.form-group input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; outline: none; }
+.form-group input:focus { border-color: #0066ff; }
+button[type="submit"] { width: 100%; padding: 14px; background: #0066ff; color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; }
+button[type="submit"]:hover { background: #0052cc; }
+
+/* Панель */
+.admin-sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 250px; background: #1a1a2e; color: #fff; padding: 20px; }
+.admin-sidebar__logo { font-size: 22px; font-weight: 900; margin-bottom: 30px; color: #0066ff; }
+.admin-sidebar__nav a { display: block; color: #ccc; text-decoration: none; padding: 12px 16px; border-radius: 8px; margin-bottom: 4px; transition: 0.2s; }
+.admin-sidebar__nav a:hover, .admin-sidebar__nav a.active { background: #0066ff; color: #fff; }
+.admin-main { margin-left: 250px; padding: 30px; }
+.admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+.admin-header h1 { font-size: 24px; }
+.admin-header button { padding: 10px 20px; background: #ff4757; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+
+/* Таблица */
+.admin-table { width: 100%; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.admin-table th, .admin-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #eee; }
+.admin-table th { background: #f8f9fb; font-weight: 700; font-size: 13px; color: #555; }
+.admin-table td { font-size: 14px; }
+.badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+.badge--green { background: #e8f5e9; color: #00c853; }
+.badge--blue { background: #e3f2fd; color: #0066ff; }
+.badge--red { background: #ffebee; color: #ff4757; }
+.badge--orange { background: #fff3e0; color: #ff9100; }
+.btn-sm { padding: 6px 12px; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; }
+.btn-sm--green { background: #00c853; color: #fff; }
+.btn-sm--red { background: #ff4757; color: #fff; }

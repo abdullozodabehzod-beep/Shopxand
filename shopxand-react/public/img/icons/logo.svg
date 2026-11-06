@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+    <defs>
+        <clipPath id="xclip">
+            <rect x="320" y="0" width="250" height="500"/>
+        </clipPath>
+    </defs>
+    <text x="320" y="410" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="400" fill="#1a6df0" text-anchor="middle" clip-path="url(#xclip)">X</text>
+    <text x="170" y="410" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="400" fill="#111111" text-anchor="middle">S</text>
+</svg>
