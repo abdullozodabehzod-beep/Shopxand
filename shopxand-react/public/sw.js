@@ -1,31 +1,9 @@
-var CACHE_NAME = 'shopxand-react-v1';
-var urlsToCache = [
-    '/',
-    '/index.html',
-    '/static/js/bundle.js',
-    '/manifest.json',
-    '/img/icons/icon-192x192.png'
-];
+// ShopXand service worker v2
+// Сеть в приоритете: сайт всегда берёт свежую версию, кэш — только запасной вариант без интернета.
+var CACHE_NAME = 'shopxand-react-v2';
 
-self.addEventListener('install', function(event) {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then(function(cache) {
-            return cache.addAll(urlsToCache);
-        })
-    );
-});
-
-self.addEventListener('fetch', function(event) {
-    event.respondWith(
-        caches.match(event.request).then(function(response) {
-            return response || fetch(event.request).then(function(fetchResponse) {
-                return caches.open(CACHE_NAME).then(function(cache) {
-                    cache.put(event.request, fetchResponse.clone());
-                    return fetchResponse;
-                });
-            });
-        })
-    );
+self.addEventListener('install', function() {
+    self.skipWaiting();
 });
 
 self.addEventListener('activate', function(event) {
@@ -35,6 +13,30 @@ self.addEventListener('activate', function(event) {
                 keys.filter(function(key) { return key !== CACHE_NAME; })
                     .map(function(key) { return caches.delete(key); })
             );
+        }).then(function() { return self.clients.claim(); })
+    );
+});
+
+self.addEventListener('fetch', function(event) {
+    var req = event.request;
+    var url = new URL(req.url);
+
+    // Не трогаем: POST/PUT/DELETE, чужие сайты, запросы к API
+    if (req.method !== 'GET') return;
+    if (url.origin !== self.location.origin) return;
+    if (url.pathname.indexOf('/api/') === 0) return;
+
+    event.respondWith(
+        fetch(req).then(function(res) {
+            if (res && res.ok && res.type === 'basic') {
+                var copy = res.clone();
+                caches.open(CACHE_NAME).then(function(cache) { cache.put(req, copy); });
+            }
+            return res;
+        }).catch(function() {
+            return caches.match(req).then(function(cached) {
+                return cached || caches.match('/index.html');
+            });
         })
     );
 });
