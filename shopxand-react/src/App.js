@@ -31,7 +31,7 @@ import Wishlist from './components/Wishlist';
 import QuickOrder from './components/QuickOrder';
 import Profile from './components/Profile';
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = '/api';
 
 // Внутренний компонент (имеет доступ к контекстам)
 function AppContent() {

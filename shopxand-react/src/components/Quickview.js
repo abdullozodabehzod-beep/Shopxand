@@ -37,7 +37,7 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products, u
 
   useEffect(() => {
     if (!product?._id) return;
-    fetch('http://localhost:3000/api/reviews')
+    fetch('/api/reviews')
       .then(r => r.json())
       .then(data => {
         const productReviews = data.reviews?.[product._id] || [];
@@ -76,7 +76,7 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products, u
     setReviewPhoto(null);
 
     // Отправляем на сервер
-    fetch('http://localhost:3000/api/reviews', {
+    fetch('/api/reviews', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -115,7 +115,7 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products, u
   };
 
   const sendReview = (reviewData) => {
-    fetch('http://localhost:3000/api/reviews', {
+    fetch('/api/reviews', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
