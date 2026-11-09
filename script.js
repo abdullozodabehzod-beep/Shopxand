@@ -11,7 +11,7 @@ var CHANNEL_ID = '-1002854630161';
 
 
 const API_URL = '/api';
-const API_TOKEN = localStorage.getItem('shopxand_token') || '';
+let API_TOKEN = localStorage.getItem('shopxand_token') || '';
 
 function apiHeaders() {
     var token = localStorage.getItem('shopxand_token');
