@@ -1,6 +1,10 @@
 import React from 'react';
+import { useCurrency } from '../context/CurrencyContext';
+import { useLanguage } from '../context/LanguageContext';
 
 function Recommendations({ currentProduct, products, onAddToCart, onSelect }) {
+  const { formatPrice } = useCurrency();
+  const { tr } = useLanguage();
   if (!currentProduct || !products) return null;
 
   // 1. Похожие товары (та же категория)
@@ -49,11 +53,11 @@ function Recommendations({ currentProduct, products, onAddToCart, onSelect }) {
               </div>
               <div className="recommendations__card-name">{p.name}</div>
               <div className="recommendations__card-price">
-                {p.price.toLocaleString()} с.
-                {p.oldPrice && <span className="recommendations__card-price-old">{p.oldPrice} с.</span>}
+                {formatPrice(p.price)}
+                {p.oldPrice && <span className="recommendations__card-price-old">{formatPrice(p.oldPrice)}</span>}
               </div>
               <button className="recommendations__card-btn" onClick={(e) => { e.stopPropagation(); onAddToCart(p); }}>
-                <i className="fas fa-shopping-cart"></i> В корзину
+                <i className="fas fa-shopping-cart"></i> {tr('В корзину')}
               </button>
             </div>
           ))}
@@ -64,10 +68,10 @@ function Recommendations({ currentProduct, products, onAddToCart, onSelect }) {
 
   return (
     <div className="recommendations">
-      {renderSection('Похожие товары', sameCategory, '📦')}
-      {renderSection('В том же бюджете', similarPrice, '💰')}
-      {renderSection('Популярные', popular, '⭐')}
-      {renderSection('Часто покупают вместе', frequentlyBought, '🎯')}
+      {renderSection(tr('Похожие товары'), sameCategory, '📦')}
+      {renderSection(tr('В том же бюджете'), similarPrice, '💰')}
+      {renderSection(tr('Популярные'), popular, '⭐')}
+      {renderSection(tr('Часто покупают вместе'), frequentlyBought, '🎯')}
     </div>
   );
 }

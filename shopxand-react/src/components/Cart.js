@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useCurrency } from '../context/CurrencyContext';
+import { useLanguage } from '../context/LanguageContext';
 
 function Cart({ cart, onRemove, onCheckout, onClose, onUpdateQuantity }) {
   const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
   const [addedItem, setAddedItem] = useState(null);
   const { formatPrice } = useCurrency();
+  const { tr } = useLanguage();
   useEffect(() => {
   if (addedItem) {
     setTimeout(() => setAddedItem(null), 1500);
@@ -16,8 +18,8 @@ function Cart({ cart, onRemove, onCheckout, onClose, onUpdateQuantity }) {
       <div className="cart-panel__content">
         <div className="cart-panel__header">
           <h3 className="cart-panel__title">
-            <i className="fas fa-shopping-cart"></i> Корзина
-            <span className="cart-panel__count">{cart.length} товаров</span>
+            <i className="fas fa-shopping-cart"></i> {tr('Корзина')}
+            <span className="cart-panel__count">{cart.length} {tr('товаров')}</span>
           </h3>
           <button className="cart-panel__close" onClick={onClose}>
             <i className="fas fa-times"></i>
@@ -25,11 +27,11 @@ function Cart({ cart, onRemove, onCheckout, onClose, onUpdateQuantity }) {
         </div>
 
         <div className="cart-panel__items">
-          {addedItem && <div className="cart-added-popup">✅ {addedItem} добавлен!</div>}
+          {addedItem && <div className="cart-added-popup">✅ {addedItem} {tr('добавлен!')}</div>}
           {cart.length === 0 ? (
             <div className="cart-panel__empty">
               <span className="cart-panel__empty-icon">🛒</span>
-              <h4>Корзина пуста</h4>
+              <h4>{tr('Корзина пуста')}</h4>
             </div>
           ) : (
             cart.map(item => (
@@ -59,11 +61,11 @@ function Cart({ cart, onRemove, onCheckout, onClose, onUpdateQuantity }) {
 
         <div className="cart-panel__footer">
           <div className="cart-panel__total">
-            <span>Итого:</span>
-            <span className="cart-panel__total-price">{total.toLocaleString()} с.</span>
+            <span>{tr('Итого:')}</span>
+            <span className="cart-panel__total-price">{formatPrice(total)}</span>
           </div>
           <button className="cart-panel__checkout-btn" onClick={onCheckout} disabled={cart.length === 0}>
-            Оформить заказ
+            {tr('Оформить заказ')}
           </button>
         </div>
       </div>

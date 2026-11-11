@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 const API_URL = '/api';
 
 function Auth({ onLogin, onClose }) {
+  const { tr } = useLanguage();
   const [isLogin, setIsLogin] = useState(true);
   const [form, setForm] = useState({ name: '', phone: '', email: '', password: '', passwordConfirm: '' });
 
@@ -28,10 +30,10 @@ function Auth({ onLogin, onClose }) {
       onLogin(data.user);
       onClose();
     } else {
-      alert(data.error || 'Ошибка');
+      alert(data.error || tr('Ошибка'));
     }
   } catch (err) {
-    alert('Ошибка сервера');
+    alert(tr('Ошибка сервера'));
   }
 };
   return (
@@ -46,19 +48,19 @@ function Auth({ onLogin, onClose }) {
               <span className="auth-form__logo-icon">SX</span>
               <span>ShopXand</span>
             </div>
-            <h2>{isLogin ? 'Вход в аккаунт' : 'Регистрация'}</h2>
-            <p>{isLogin ? 'Войдите для отслеживания заказов' : 'Создайте аккаунт для покупок'}</p>
+            <h2>{isLogin ? tr('Вход в аккаунт') : tr('Регистрация')}</h2>
+            <p>{isLogin ? tr('Войдите для отслеживания заказов') : tr('Создайте аккаунт для покупок')}</p>
           </div>
 
           <div className="auth-form__body">
             {!isLogin && (
               <div className="auth-form__group">
-                <label>Имя *</label>
-                <input type="text" placeholder="Ваше имя" onChange={e => setForm({...form, name: e.target.value})} />
+                <label>{tr('Имя *')}</label>
+                <input type="text" placeholder={tr('Ваше имя')} onChange={e => setForm({...form, name: e.target.value})} />
               </div>
             )}
             <div className="auth-form__group">
-              <label>Телефон *</label>
+              <label>{tr('Телефон *')}</label>
               <input type="tel" placeholder="+992 XXX XXX XXX" onChange={e => setForm({...form, phone: e.target.value})} />
             </div>
             {!isLogin && (
@@ -68,26 +70,26 @@ function Auth({ onLogin, onClose }) {
               </div>
             )}
             <div className="auth-form__group">
-              <label>Пароль *</label>
-              <input type="password" placeholder="Введите пароль" onChange={e => setForm({...form, password: e.target.value})} />
+              <label>{tr('Пароль *')}</label>
+              <input type="password" placeholder={tr('Введите пароль')} onChange={e => setForm({...form, password: e.target.value})} />
             </div>
             {!isLogin && (
               <div className="auth-form__group">
-                <label>Подтвердите пароль *</label>
-                <input type="password" placeholder="Повторите пароль" onChange={e => setForm({...form, passwordConfirm: e.target.value})} />
+                <label>{tr('Подтвердите пароль *')}</label>
+                <input type="password" placeholder={tr('Повторите пароль')} onChange={e => setForm({...form, passwordConfirm: e.target.value})} />
               </div>
             )}
 
             <button className="auth-form__submit" onClick={handleSubmit}>
-              {isLogin ? 'Войти' : 'Зарегистрироваться'}
+              {isLogin ? tr('Войти') : tr('Зарегистрироваться')}
             </button>
           </div>
 
           <div className="auth-form__footer">
             <p>
-              {isLogin ? 'Нет аккаунта?' : 'Уже есть аккаунт?'}{' '}
+              {isLogin ? tr('Нет аккаунта?') : tr('Уже есть аккаунт?')}{' '}
               <a href="#" onClick={(e) => { e.preventDefault(); setIsLogin(!isLogin); }}>
-                {isLogin ? 'Зарегистрироваться' : 'Войти'}
+                {isLogin ? tr('Зарегистрироваться') : tr('Войти')}
               </a>
             </p>
           </div>

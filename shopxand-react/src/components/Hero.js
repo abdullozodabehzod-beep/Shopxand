@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 function Hero() {
+  const { tr } = useLanguage();
   const [currentSlide, setCurrentSlide] = useState(0);
   
   const slides = [
@@ -45,12 +47,12 @@ function Hero() {
                   style={{ background: slide.bg }}
                 >
                   <div className="hero__slide-info">
-                    <h2 className="hero__slide-title">{slide.title}</h2>
-                    <p className="hero__slide-text">{slide.text}</p>
-                    <a href="#" className="hero__slide-btn">Посмотреть</a>
+                    <h2 className="hero__slide-title">{tr(slide.title)}</h2>
+                    <p className="hero__slide-text">{tr(slide.text)}</p>
+                    <a href="#" className="hero__slide-btn">{tr('Посмотреть')}</a>
                   </div>
                   <div className="hero__slide-img">
-                    <img src={slide.img} alt={slide.title} />
+                    <img src={slide.img} alt={tr(slide.title)} />
                   </div>
                 </div>
               ))}
@@ -72,8 +74,8 @@ function Hero() {
           <div className="hero__banners">
             <div className="hero__banner" style={{background: 'linear-gradient(135deg, #e3f2fd, #bbdefb)'}}>
               <div className="hero__banner-info">
-                <h4>Электроника</h4>
-                <p>Скидки до 30%</p>
+                <h4>{tr('Электроника')}</h4>
+                <p>{tr('Скидки до 30%')}</p>
               </div>
               <span className="hero__banner-icon">
                 🔌
@@ -81,8 +83,8 @@ function Hero() {
             </div>
             <div className="hero__banner" style={{background: 'linear-gradient(135deg, #fce4ec, #f8bbd0)'}}>
               <div className="hero__banner-info">
-                <h4>Детские товары</h4>
-                <p>Скоро выйдут</p>
+                <h4>{tr('Детские товары')}</h4>
+                <p>{tr('Скоро выйдут')}</p>
               </div>
               <span className="hero__banner-icon">
                 👶
@@ -90,8 +92,8 @@ function Hero() {
             </div>
             <div className="hero__banner" style={{background: 'linear-gradient(135deg, #f3e5f5, #e1bee7)'}}>
               <div className="hero__banner-info">
-                <h4>Красота</h4>
-                <p>Бесплатная доставка</p>
+                <h4>{tr('Красота')}</h4>
+                <p>{tr('Бесплатная доставка')}</p>
               </div>
               <span className="hero__banner-icon">
                 💖
@@ -99,8 +101,8 @@ function Hero() {
             </div>
             <div className="hero__banner" style={{background: 'linear-gradient(135deg, #e8eaf6, #c5cae9)'}}>
               <div className="hero__banner-info">
-                <h4>Для дома</h4>
-                <p>Комфорт</p>
+                <h4>{tr('Для дома')}</h4>
+                <p>{tr('Комфорт')}</p>
               </div>
               <span className="hero__banner-icon">
                 🏠

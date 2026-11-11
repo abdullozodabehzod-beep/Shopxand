@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
+import { useCurrency } from '../context/CurrencyContext';
+import { useLanguage } from '../context/LanguageContext';
 
 function QuickOrder({ product, onClose }) {
+  const { formatPrice } = useCurrency();
+  const { tr } = useLanguage();
   const [phone, setPhone] = useState('');
   const [name, setName] = useState('');
   const [size, setSize] = useState('');
@@ -10,7 +14,7 @@ function QuickOrder({ product, onClose }) {
 
   const handleSubmit = async () => {
     if (!phone || phone.length < 9) {
-      alert('Введите корректный номер телефона');
+      alert(tr('Введите корректный номер телефона'));
       return;
     }
 
@@ -41,7 +45,7 @@ function QuickOrder({ product, onClose }) {
       });
       setSubmitted(true);
     } catch (err) {
-      alert('Ошибка. Позвоните нам: +992 300 003 230');
+      alert(tr('Ошибка. Позвоните нам: +992 300 003 230'));
     }
     setLoading(false);
   };
@@ -53,9 +57,9 @@ function QuickOrder({ product, onClose }) {
         <div className="quick-order__modal">
           <div className="quick-order__success">
             <span>✅</span>
-            <h3>Заказ принят!</h3>
-            <p>Мы перезвоним вам в течение 15 минут</p>
-            <button onClick={onClose}>Закрыть</button>
+            <h3>{tr('Заказ принят!')}</h3>
+            <p>{tr('Мы перезвоним вам в течение 15 минут')}</p>
+            <button onClick={onClose}>{tr('Закрыть')}</button>
           </div>
         </div>
       </div>
@@ -67,22 +71,22 @@ function QuickOrder({ product, onClose }) {
       <div className="quick-order__overlay" onClick={onClose}></div>
       <div className="quick-order__modal">
         <button className="quick-order__close" onClick={onClose}>✕</button>
-        <h3>📞 Быстрый заказ</h3>
-        <p>Оставьте номер — мы перезвоним и оформим заказ</p>
+        <h3>📞 {tr('Быстрый заказ')}</h3>
+        <p>{tr('Оставьте номер — мы перезвоним и оформим заказ')}</p>
 
         {product && (
           <div className="quick-order__product">
             <img src={product.img} alt={product.name} />
             <div>
               <strong>{product.name}</strong>
-              <span>{product.price?.toLocaleString()} с.</span>
+              <span>{formatPrice(product.price || 0)}</span>
             </div>
           </div>
         )}
 
         <input 
           type="text" 
-          placeholder="Ваше имя" 
+          placeholder={tr('Ваше имя')} 
           value={name}
           onChange={e => setName(e.target.value)}
         />
@@ -95,14 +99,14 @@ function QuickOrder({ product, onClose }) {
         
         {product?.sizes?.length > 0 && (
           <select value={size} onChange={e => setSize(e.target.value)}>
-            <option value="">Размер</option>
+            <option value="">{tr('Размер')}</option>
             {product.sizes.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         )}
         
         {product?.colors?.length > 0 && (
           <select value={color} onChange={e => setColor(e.target.value)}>
-            <option value="">Цвет</option>
+            <option value="">{tr('Цвет')}</option>
             {product.colors.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         )}
@@ -112,10 +116,10 @@ function QuickOrder({ product, onClose }) {
           onClick={handleSubmit}
           disabled={loading}
         >
-          {loading ? '⏳ Отправка...' : '📞 Заказать звонок'}
+          {loading ? '⏳ ' + tr('Отправка...') : '📞 ' + tr('Заказать звонок')}
         </button>
         <p style={{fontSize:'11px',color:'#999',textAlign:'center',marginTop:'8px'}}>
-          Нажимая кнопку, вы соглашаетесь на обработку персональных данных
+          {tr('Нажимая кнопку, вы соглашаетесь на обработку персональных данных')}
         </p>
       </div>
     </div>

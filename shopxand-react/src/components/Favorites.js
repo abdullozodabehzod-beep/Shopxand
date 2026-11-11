@@ -1,6 +1,10 @@
 import React from 'react';
+import { useCurrency } from '../context/CurrencyContext';
+import { useLanguage } from '../context/LanguageContext';
 
 function Favorites({ favorites, onRemove, onAddToCart, onClose }) {
+  const { formatPrice } = useCurrency();
+  const { tr } = useLanguage();
   return (
     <div className="fav-panel active">
       <div className="fav-panel__overlay" onClick={onClose}></div>
@@ -8,8 +12,8 @@ function Favorites({ favorites, onRemove, onAddToCart, onClose }) {
         <div className="fav-panel__header">
           <h3 className="fav-panel__title">
             <i className="fas fa-heart"></i>
-            Избранное
-            <span className="fav-panel__count">{favorites.length} товаров</span>
+            {tr('Избранное')}
+            <span className="fav-panel__count">{favorites.length} {tr('товаров')}</span>
           </h3>
           <button className="fav-panel__close" onClick={onClose}>
             <i className="fas fa-times"></i>
@@ -20,8 +24,8 @@ function Favorites({ favorites, onRemove, onAddToCart, onClose }) {
           {favorites.length === 0 ? (
             <div className="fav-panel__empty">
               <span className="fav-panel__empty-icon">💖</span>
-              <h4>В избранном пусто</h4>
-              <p>Добавляйте товары, нажимая на сердечко</p>
+              <h4>{tr('В избранном пусто')}</h4>
+              <p>{tr('Добавляйте товары, нажимая на сердечко')}</p>
             </div>
           ) : (
             favorites.map(item => (
@@ -31,11 +35,11 @@ function Favorites({ favorites, onRemove, onAddToCart, onClose }) {
                 </div>
                 <div className="fav-item__info">
                   <h4 className="fav-item__name">{item.name}</h4>
-                  <div className="fav-item__price">{item.price.toLocaleString()} сомони</div>
+                  <div className="fav-item__price">{formatPrice(item.price)}</div>
                 </div>
                 <div className="fav-item__actions">
                   <button className="fav-item__cart-btn" onClick={() => onAddToCart(item)}>
-                    <i className="fas fa-shopping-cart"></i> В корзину
+                    <i className="fas fa-shopping-cart"></i> {tr('В корзину')}
                   </button>
                   <button className="fav-item__remove" onClick={() => onRemove(item._id)}>
                     <i className="fas fa-trash-alt"></i>

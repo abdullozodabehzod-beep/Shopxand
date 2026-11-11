@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
+import { useCurrency } from '../context/CurrencyContext';
+import { useLanguage } from '../context/LanguageContext';
 
 function PriceAlert({ product, onClose }) {
+  const { tr } = useLanguage();
+  const { formatPrice } = useCurrency();
   const [targetPrice, setTargetPrice] = useState(product.price);
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
@@ -9,7 +13,7 @@ function PriceAlert({ product, onClose }) {
        if (!targetPrice || targetPrice >= product.price) {
       const toast = document.createElement('div');
       toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#ff4757;color:#fff;padding:12px 24px;border-radius:10px;z-index:9999;font-weight:600;animation:fadeInOut 3s forwards;';
-      toast.textContent = '❌ Укажите цену ниже текущей';
+      toast.textContent = '❌ ' + tr('Укажите цену ниже текущей');
       document.body.appendChild(toast);
       setTimeout(() => toast.remove(), 3000);
       return;
@@ -35,8 +39,8 @@ function PriceAlert({ product, onClose }) {
     if (productAlerts.length > 0 && product.price <= productAlerts[0].targetPrice) {
       // Отправляем уведомление
       if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('💰 Цена снизилась!', {
-          body: `${product.name} теперь стоит ${product.price} сомони!`,
+        new Notification('💰 ' + tr('Цена снизилась!'), {
+          body: `${product.name} ${tr('теперь стоит')} ${formatPrice(product.price)}!`,
           icon: '/img/icons/icon-192x192.png'
         });
       }
@@ -61,8 +65,8 @@ function PriceAlert({ product, onClose }) {
         <div className="price-alert__modal">
           <div className="price-alert__success">
             <span>✅</span>
-            <h3>Уведомление создано!</h3>
-            <p>Мы сообщим когда цена на "{product.name}" снизится до {targetPrice.toLocaleString()} сомони</p>
+            <h3>{tr('Уведомление создано!')}</h3>
+            <p>{tr('Мы сообщим когда цена на')} "{product.name}" {tr('снизится до')} {targetPrice.toLocaleString()} {tr('сомони')}</p>
             <button onClick={onClose}>OK</button>
           </div>
         </div>
@@ -75,19 +79,19 @@ function PriceAlert({ product, onClose }) {
       <div className="price-alert__overlay" onClick={onClose}></div>
       <div className="price-alert__modal">
         <button className="price-alert__close" onClick={onClose}>✕</button>
-        <h3>💰 Узнать о снижении цены</h3>
-        <p>Текущая цена: <strong>{product.price.toLocaleString()} сомони</strong></p>
+        <h3>💰 {tr('Узнать о снижении цены')}</h3>
+        <p>{tr('Текущая цена:')} <strong>{formatPrice(product.price)}</strong></p>
         
         <div className="price-alert__form">
-          <label>Желаемая цена (сомони):</label>
+          <label>{tr('Желаемая цена (сомони):')}</label>
           <input 
             type="number" 
             value={targetPrice}
             onChange={e => setTargetPrice(Number(e.target.value))}
-            placeholder="Например: 100"
+            placeholder={tr('Например: 100')}
           />
           <button onClick={handleSubscribe}>
-            🔔 Уведомить о снижении
+            🔔 {tr('Уведомить о снижении')}
           </button>
         </div>
       </div>

@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
+import { useCurrency } from '../context/CurrencyContext';
+import { useLanguage } from '../context/LanguageContext';
 
 function Orders({ orders, onClose, onDelete, onCancel }) {
+  const { tr } = useLanguage();
+  const { formatPrice } = useCurrency();
   const [confirm, setConfirm] = useState(null);
   const [details, setDetails] = useState(null);
 
@@ -9,10 +13,10 @@ function Orders({ orders, onClose, onDelete, onCancel }) {
     const daysPassed = Math.floor((now - new Date(orderDate)) / (1000 * 60 * 60 * 24));
     
     return [
-      { label: 'В пути (Китай)', days: '1-3 дня', completed: daysPassed >= 0, current: daysPassed < 3 },
-      { label: 'В Таджикистане', days: '3-10 дней', completed: daysPassed >= 3, current: daysPassed >= 3 && daysPassed < 10 },
-      { label: 'На досмотре', days: '10-17 дней', completed: daysPassed >= 10, current: daysPassed >= 10 && daysPassed < 17 },
-      { label: 'Доставлен', days: '17 дней', completed: daysPassed >= 17, current: daysPassed >= 17 },
+      { label: tr('В пути (Китай)'), days: tr('1-3 дня'), completed: daysPassed >= 0, current: daysPassed < 3 },
+      { label: tr('В Таджикистане'), days: tr('3-10 дней'), completed: daysPassed >= 3, current: daysPassed >= 3 && daysPassed < 10 },
+      { label: tr('На досмотре'), days: tr('10-17 дней'), completed: daysPassed >= 10, current: daysPassed >= 10 && daysPassed < 17 },
+      { label: tr('Доставлен'), days: tr('17 дней'), completed: daysPassed >= 17, current: daysPassed >= 17 },
     ];
   };
 
@@ -22,8 +26,8 @@ function Orders({ orders, onClose, onDelete, onCancel }) {
       <div className="orders-panel__content">
         <div className="orders-panel__header">
           <h3 className="orders-panel__title">
-            <i className="fas fa-box"></i> Мои заказы
-            <span className="orders-panel__count">{orders.length} заказов</span>
+            <i className="fas fa-box"></i> {tr('Мои заказы')}
+            <span className="orders-panel__count">{orders.length} {tr('заказов')}</span>
           </h3>
           <button className="orders-panel__close" onClick={onClose}>
             <i className="fas fa-times"></i>
@@ -34,7 +38,7 @@ function Orders({ orders, onClose, onDelete, onCancel }) {
           {orders.length === 0 ? (
             <div className="orders-panel__empty">
               <span className="orders-panel__empty-icon">📦</span>
-              <h4>У вас пока нет заказов</h4>
+              <h4>{tr('У вас пока нет заказов')}</h4>
             </div>
           ) : (
             orders.map(order => (
@@ -46,11 +50,11 @@ function Orders({ orders, onClose, onDelete, onCancel }) {
                     <div className="order-card__customer">👤 {order.customer?.name}</div>
                   </div>
                   <span className={`order-card__status order-card__status--${order.status === 'completed' ? 'completed' : order.status === 'cancelled' ? 'cancelled' : 'processing'}`}>
-                    {order.status === 'completed' ? 'Доставлен' : order.status === 'cancelled' ? 'Отменён' : 'В обработке'}
+                    {order.status === 'completed' ? tr('Доставлен') : order.status === 'cancelled' ? tr('Отменён') : tr('В обработке')}
                   </span>
                 </div>
 
-                <div className="order-card__total">{order.total?.toLocaleString()} с.</div>
+                <div className="order-card__total">{formatPrice(order.total || 0)}</div>
 
                 {/* Отслеживание */}
                 <div className="order-track">
@@ -83,14 +87,14 @@ function Orders({ orders, onClose, onDelete, onCancel }) {
                 <div className="order-card__footer">
                   {order.status !== 'cancelled' && order.status !== 'completed' && (
                     <button className="order-card__cancel-btn" onClick={() => setConfirm({ type: 'cancel', id: order.id })}>
-                      <i className="fas fa-times"></i> Отменить
+                      <i className="fas fa-times"></i> {tr('Отменить')}
                     </button>
                   )}
                   <button className="order-card__delete-btn" onClick={() => setConfirm({ type: 'delete', id: order.id })}>
-                    <i className="fas fa-trash-alt"></i> Удалить
+                    <i className="fas fa-trash-alt"></i> {tr('Удалить')}
                   </button>
                   <button className="order-card__details-btn" onClick={() => setDetails(order)}>
-                    Детали
+                    {tr('Детали')}
                   </button>
                 </div>
               </div>
@@ -114,20 +118,20 @@ function Orders({ orders, onClose, onDelete, onCancel }) {
               <i className={`fas ${confirm.type === 'delete' ? 'fa-trash-alt' : 'fa-question-circle'}`}></i>
             </div>
             <h3 style={{fontSize:18,fontWeight:800,marginBottom:6}}>
-              {confirm.type === 'cancel' ? 'Отменить заказ?' : 'Удалить заказ?'}
+              {confirm.type === 'cancel' ? tr('Отменить заказ?') : tr('Удалить заказ?')}
             </h3>
             <p style={{fontSize:13,color:'#999',marginBottom:20}}>
-              {confirm.type === 'cancel' ? 'Заказ будет отменён' : 'Заказ будет удалён навсегда'}
+              {confirm.type === 'cancel' ? tr('Заказ будет отменён') : tr('Заказ будет удалён навсегда')}
             </p>
             <div style={{display:'flex',gap:10}}>
               <button style={{flex:1,padding:12,borderRadius:10,border:'none',background:'#f0f0f0',fontSize:14,fontWeight:700,cursor:'pointer'}}
-                onClick={() => setConfirm(null)}>Отмена</button>
+                onClick={() => setConfirm(null)}>{tr('Отмена')}</button>
               <button style={{flex:1,padding:12,borderRadius:10,border:'none',background:confirm.type === 'delete' ? '#ff4757' : '#ff9100',color:'#fff',fontSize:14,fontWeight:700,cursor:'pointer'}}
                 onClick={() => {
                   if (confirm.type === 'cancel') onCancel(confirm.id);
                   else onDelete(confirm.id);
                   setConfirm(null);
-                }}>Да</button>
+                }}>{tr('Да')}</button>
             </div>
           </div>
         </div>
@@ -144,32 +148,32 @@ function Orders({ orders, onClose, onDelete, onCancel }) {
             background:'#fff',borderRadius:20,padding:24,width:420,maxWidth:'90vw',maxHeight:'80vh',overflow:'auto'
           }} onClick={e => e.stopPropagation()}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-              <h3 style={{margin:0}}>Заказ {details.id}</h3>
+              <h3 style={{margin:0}}>{tr('Заказ')} {details.id}</h3>
               <button onClick={() => setDetails(null)} style={{background:'none',border:'none',fontSize:20,cursor:'pointer'}}>✕</button>
             </div>
             
             <div style={{background:'#f8f9fb',borderRadius:12,padding:16,marginBottom:12}}>
-              <div className="order-detail-row"><span>Дата</span><span>{new Date(details.date).toLocaleString('ru-RU')}</span></div>
-              <div className="order-detail-row"><span>Статус</span><span>{details.status}</span></div>
-              <div className="order-detail-row"><span>Имя</span><span>{details.customer?.name}</span></div>
-              <div className="order-detail-row"><span>Телефон</span><span>{details.customer?.phone}</span></div>
-              <div className="order-detail-row"><span>Город</span><span>{details.customer?.city}</span></div>
-              <div className="order-detail-row"><span>Адрес</span><span>{details.customer?.address}</span></div>
-              <div className="order-detail-row"><span>Сумма</span><span>{details.total?.toLocaleString()} с.</span></div>
+              <div className="order-detail-row"><span>{tr('Дата')}</span><span>{new Date(details.date).toLocaleString('ru-RU')}</span></div>
+              <div className="order-detail-row"><span>{tr('Статус')}</span><span>{details.status}</span></div>
+              <div className="order-detail-row"><span>{tr('Имя')}</span><span>{details.customer?.name}</span></div>
+              <div className="order-detail-row"><span>{tr('Телефон')}</span><span>{details.customer?.phone}</span></div>
+              <div className="order-detail-row"><span>{tr('Город')}</span><span>{details.customer?.city}</span></div>
+              <div className="order-detail-row"><span>{tr('Адрес')}</span><span>{details.customer?.address}</span></div>
+              <div className="order-detail-row"><span>{tr('Сумма')}</span><span>{formatPrice(details.total || 0)}</span></div>
             </div>
 
             <div style={{marginBottom:12}}>
-              <strong>Товары:</strong>
+              <strong>{tr('Товары:')}</strong>
               {details.items?.map((item, i) => (
                 <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontSize:14}}>
                   <span>{item.name} ×{item.quantity}</span>
-                  <span>{(item.price * item.quantity)?.toLocaleString()} с.</span>
+                  <span>{formatPrice(item.price * item.quantity)}</span>
                 </div>
               ))}
             </div>
 
             <button style={{width:'100%',padding:12,background:'#0066ff',color:'#fff',border:'none',borderRadius:8,cursor:'pointer',fontSize:14,fontWeight:600}}
-              onClick={() => setDetails(null)}>Закрыть</button>
+              onClick={() => setDetails(null)}>{tr('Закрыть')}</button>
           </div>
         </div>
       )}

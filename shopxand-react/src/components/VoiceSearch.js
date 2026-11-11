@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 function VoiceSearch({ onSearch, onClose }) {
+  const { tr, lang } = useLanguage();
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
-  const [status, setStatus] = useState('Нажмите и говорите');
+  const [status, setStatus] = useState('idle');
   const recognitionRef = useRef(null);
 
   useEffect(() => {
@@ -11,7 +13,7 @@ function VoiceSearch({ onSearch, onClose }) {
     
     if (SpeechRecognition) {
       recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.lang = 'ru-RU';
+      recognitionRef.current.lang = lang === 'en' ? 'en-US' : 'ru-RU';
       recognitionRef.current.interimResults = true;
       recognitionRef.current.continuous = false;
 
@@ -21,7 +23,7 @@ function VoiceSearch({ onSearch, onClose }) {
         setTranscript(text);
         
         if (result.isFinal) {
-          setStatus('✅ Распознано!');
+          setStatus('ok');
           setTimeout(() => {
             onSearch(text);
             onClose();
@@ -30,13 +32,13 @@ function VoiceSearch({ onSearch, onClose }) {
       };
 
       recognitionRef.current.onerror = (event) => {
-        setStatus('❌ Ошибка: ' + event.error);
+        setStatus('error:' + event.error);
         setIsListening(false);
       };
 
       recognitionRef.current.onend = () => {
         setIsListening(false);
-        if (!transcript) setStatus('Нажмите и говорите');
+        if (!transcript) setStatus('idle');
       };
     }
 
@@ -47,20 +49,27 @@ function VoiceSearch({ onSearch, onClose }) {
 
   const toggleListening = () => {
     if (!recognitionRef.current) {
-      alert('Голосовой поиск не поддерживается в вашем браузере. Используйте Chrome.');
+      alert(tr('Голосовой поиск не поддерживается в вашем браузере. Используйте Chrome.'));
       return;
     }
 
     if (isListening) {
       recognitionRef.current.stop();
       setIsListening(false);
-      setStatus('Нажмите и говорите');
+      setStatus('idle');
     } else {
       setTranscript('');
       recognitionRef.current.start();
       setIsListening(true);
-      setStatus('🎤 Говорите...');
+      setStatus('listening');
     }
+  };
+
+  const renderStatus = () => {
+    if (status === 'ok') return '✅ ' + tr('Распознано!');
+    if (status === 'listening') return '🎤 ' + tr('Говорите...');
+    if (status.startsWith('error:')) return '❌ ' + tr('Ошибка:') + ' ' + status.slice(6);
+    return tr('Нажмите и говорите');
   };
 
   const voiceCommands = [
@@ -83,7 +92,7 @@ function VoiceSearch({ onSearch, onClose }) {
           <i className={`fas fa-microphone${isListening ? '' : '-alt'}`}></i>
         </div>
 
-        <h3>{status}</h3>
+        <h3>{renderStatus()}</h3>
         
         {transcript && (
           <div className="voice-search__transcript">
@@ -92,15 +101,15 @@ function VoiceSearch({ onSearch, onClose }) {
         )}
 
         <p style={{marginTop:'12px',color:'#999',fontSize:'13px'}}>
-          {isListening ? 'Говорите...' : 'Нажмите на микрофон и скажите что ищете'}
+          {isListening ? tr('Говорите...') : tr('Нажмите на микрофон и скажите что ищете')}
         </p>
 
         <div className="voice-search__commands">
-          <p>Примеры команд:</p>
+          <p>{tr('Примеры команд:')}</p>
           <div className="voice-search__commands-grid">
             {voiceCommands.map((cmd, i) => (
               <button key={i} onClick={() => { onSearch(cmd.query); onClose(); }}>
-                🗣 {cmd.text}
+                🗣 {tr(cmd.text)}
               </button>
             ))}
           </div>

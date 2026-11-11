@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 const cities = [
   { name: 'Душанбе', region: 'Крупные города' },
@@ -19,11 +20,12 @@ const cities = [
 ];
 
 function CityModal({ onClose, currentCity, onSelectCity }) {
+  const { tr } = useLanguage();
   const [search, setSearch] = useState('');
   const [selectedCity, setSelectedCity] = useState(currentCity || 'Душанбе');
 
   const filteredCities = search 
-    ? cities.filter(c => c.name.toLowerCase().includes(search.toLowerCase()))
+    ? cities.filter(c => c.name.toLowerCase().includes(search.toLowerCase()) || tr(c.name).toLowerCase().includes(search.toLowerCase()))
     : cities;
 
   // Группировка по регионам
@@ -44,7 +46,7 @@ function CityModal({ onClose, currentCity, onSelectCity }) {
       <div className="city-modal__overlay" onClick={onClose}></div>
       <div className="city-modal__content">
         <div className="city-modal__header">
-          <h2>Выберите город</h2>
+          <h2>{tr('Выберите город')}</h2>
           <button className="city-modal__close" onClick={onClose}>
             <i className="fas fa-times"></i>
           </button>
@@ -54,7 +56,7 @@ function CityModal({ onClose, currentCity, onSelectCity }) {
           <i className="fas fa-search"></i>
           <input 
             type="text" 
-            placeholder="Поиск города..." 
+            placeholder={tr('Поиск города...')} 
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -63,14 +65,14 @@ function CityModal({ onClose, currentCity, onSelectCity }) {
         <div className="city-modal__list">
           {Object.keys(grouped).map(region => (
             <div key={region} className="city-modal__group">
-              <div className="city-modal__group-title">{region}</div>
+              <div className="city-modal__group-title">{tr(region)}</div>
               {grouped[region].map(city => (
                 <div 
                   key={city.name}
                   className={`city-modal__item ${selectedCity === city.name ? 'active' : ''}`}
                   onClick={() => handleSelect(city.name)}
                 >
-                  <span>{city.name}</span>
+                  <span>{tr(city.name)}</span>
                   {selectedCity === city.name && <i className="fas fa-check"></i>}
                 </div>
               ))}

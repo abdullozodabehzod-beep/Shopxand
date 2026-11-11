@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 function Wishlist({ onClose, onAddToCart }) {
+  const { tr } = useLanguage();
   const [wishlist, setWishlist] = useState(
     JSON.parse(localStorage.getItem('shopxand_wishlist') || '[]')
   );
@@ -13,7 +15,7 @@ function Wishlist({ onClose, onAddToCart }) {
     const item = {
       id: Date.now().toString(),
       name: newItemName,
-      price: newItemPrice || 'Не указана',
+      price: newItemPrice || tr('Не указана'),
       date: new Date().toISOString()
     };
     
@@ -31,14 +33,14 @@ function Wishlist({ onClose, onAddToCart }) {
   };
 
   const shareWishlist = () => {
-    const text = '🎁 Мой список желаний из ShopXand:\n\n' + 
+    const text = '🎁 ' + tr('Мой список желаний из ShopXand:') + '\n\n' + 
       wishlist.map((item, i) => `${i+1}. ${item.name} — ${item.price} с.`).join('\n');
     
     if (navigator.share) {
-      navigator.share({ title: 'Мой список желаний ShopXand', text });
+      navigator.share({ title: tr('Мой список желаний ShopXand'), text });
     } else {
       navigator.clipboard.writeText(text);
-      alert('Список скопирован! Отправьте друзьям.');
+      alert(tr('Список скопирован! Отправьте друзьям.'));
     }
   };
 
@@ -47,34 +49,34 @@ function Wishlist({ onClose, onAddToCart }) {
       <div className="wishlist-panel__overlay" onClick={onClose}></div>
       <div className="wishlist-panel__content">
         <div className="wishlist-panel__header">
-          <h3>🎁 Список желаний</h3>
+          <h3>🎁 {tr('Список желаний')}</h3>
           <button onClick={onClose}><i className="fas fa-times"></i></button>
         </div>
 
         <div className="wishlist-panel__add">
           <input 
             type="text" 
-            placeholder="Что хотите?" 
+            placeholder={tr('Что хотите?')} 
             value={newItemName}
             onChange={e => setNewItemName(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && addItem()}
           />
           <input 
             type="text" 
-            placeholder="Цена (необязательно)" 
+            placeholder={tr('Цена (необязательно)')} 
             value={newItemPrice}
             onChange={e => setNewItemPrice(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && addItem()}
           />
-          <button onClick={addItem}>Добавить</button>
+          <button onClick={addItem}>{tr('Добавить')}</button>
         </div>
 
         <div className="wishlist-panel__items">
           {wishlist.length === 0 ? (
             <div className="wishlist-panel__empty">
               <span>🎁</span>
-              <p>Ваш список желаний пуст</p>
-              <p>Добавьте товары которые хотите купить</p>
+              <p>{tr('Ваш список желаний пуст')}</p>
+              <p>{tr('Добавьте товары которые хотите купить')}</p>
             </div>
           ) : (
             wishlist.map(item => (
@@ -87,7 +89,7 @@ function Wishlist({ onClose, onAddToCart }) {
                   </div>
                 </div>
                 <div className="wishlist-item__actions">
-                  <button onClick={() => removeItem(item.id)} title="Удалить">
+                  <button onClick={() => removeItem(item.id)} title={tr('Удалить')}>
                     <i className="fas fa-trash-alt"></i>
                   </button>
                 </div>
@@ -98,7 +100,7 @@ function Wishlist({ onClose, onAddToCart }) {
 
         {wishlist.length > 0 && (
           <button className="wishlist-panel__share" onClick={shareWishlist}>
-            <i className="fas fa-share-alt"></i> Поделиться списком
+            <i className="fas fa-share-alt"></i> {tr('Поделиться списком')}
           </button>
         )}
       </div>

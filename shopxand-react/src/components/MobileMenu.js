@@ -3,7 +3,7 @@ import React from "react";
 import { useLanguage } from "../context/LanguageContext";
 
 function MobileMenu({ onClose, onOpenAuth, onOpenCart, onOpenFavorites, onOpenOrders, user, onOpenCityModal, onOpenLangModal  }) {
-  const { lang, t } = useLanguage();
+  const { lang, t, tr } = useLanguage();
 
   return (
     <div className="mobile-menu active">
@@ -77,7 +77,7 @@ function MobileMenu({ onClose, onOpenAuth, onOpenCart, onOpenFavorites, onOpenOr
     <li>
   <a href="#" onClick={(e) => { e.preventDefault(); onOpenCityModal(); onClose(); }}>
     <i className="fas fa-map-marker-alt"></i>
-    <span>Душанбе</span>
+    <span>{tr('Душанбе')}</span>
   </a>
 </li>
 <li>

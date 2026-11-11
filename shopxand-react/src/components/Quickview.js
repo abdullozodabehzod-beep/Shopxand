@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Reviews from './Reviews';
-import Recommendations from './Recommendations';
 import PriceAlert from './PriceAlert';
 import { useCurrency } from '../context/CurrencyContext';
+import { useLanguage } from '../context/LanguageContext';
 import Subscribe from './Subscribe';
 import StockNotify from './StockNotify';
 import QuickOrder from './QuickOrder';
@@ -23,6 +23,7 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products, u
   const [showPriceAlert, setShowPriceAlert] = useState(false);
   const [reviewPhoto, setReviewPhoto] = useState(null);
   const { formatPrice } = useCurrency();
+  const { tr } = useLanguage();
   const [showSubscribe, setShowSubscribe] = useState(false);
   const [showStockNotify, setShowStockNotify] = useState(false);
   const [showQuickOrder, setShowQuickOrder] = useState(false);
@@ -51,8 +52,8 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products, u
   }, [product?._id]);
 
      const handleSubmitReview = () => {
-    if (reviewRating === 0) { showToast('Поставьте оценку'); return; }
-    if (!reviewText.trim()) { showToast('Напишите отзыв'); return; }
+    if (reviewRating === 0) { showToast(tr('Поставьте оценку')); return; }
+    if (!reviewText.trim()) { showToast(tr('Напишите отзыв')); return; }
 
     const newReview = { 
       name: 'Клиент', 
@@ -87,10 +88,10 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products, u
     .then(r => r.json())
     .then(data => {
       if (!data.success) {
-        showToast('Ошибка сохранения');
+        showToast(tr('Ошибка сохранения'));
       }
     })
-    .catch(() => showToast('Ошибка сервера'));
+    .catch(() => showToast(tr('Ошибка сервера')));
   };
 
   const compressImage = (base64, callback) => {
@@ -136,10 +137,10 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products, u
         setReviewText('');
         setReviewRating(0);
         setReviewPhoto(null);
-        showToast('Отзыв отправлен!');
+        showToast(tr('Отзыв отправлен!'));
       }
     })
-    .catch(() => showToast('Ошибка'));
+    .catch(() => showToast(tr('Ошибка')));
   };
 
   if (!product) return null;
@@ -167,7 +168,7 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products, u
 </div>
 
 <div className="quickview__info">
-<span className="quickview__cat">{product.cat}</span>
+<span className="quickview__cat">{tr(product.cat)}</span>
 <h2 className="quickview__name">{product.name}</h2>
 
 <div className="quickview__rating">
@@ -175,21 +176,21 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products, u
     {[1,2,3,4,5].map(i => (<i key={i} className={`${i <= Math.round(avgRating) ? 'fas' : 'far'} fa-star`}></i>))}
   </div>
   <span className="quickview__rating-num">{avgRating}</span>
-  <span className="quickview__reviews">({reviewsCount} отзывов)</span>
+  <span className="quickview__reviews">({reviewsCount} {tr('отзывов')})</span>
 </div>
 
 <div className="quickview__prices">
-  {product.oldPrice && <span className="quickview__price-old">{formatPrice(currentPrice)}</span>}
+  {product.oldPrice && <span className="quickview__price-old">{formatPrice(product.oldPrice)}</span>}
   <span className="quickview__price-current">{formatPrice(currentPrice)}</span>
   {product.oldPrice && <span className="quickview__discount">-{Math.round((1 - product.price / product.oldPrice) * 100)}%</span>}
 </div>
 
-<p className="quickview__desc">{product.desc || 'Нет описания'}</p>
+<p className="quickview__desc">{product.desc || tr('Нет описания')}</p>
 
 <div className="quickview__reviews-section">
   <div className="quickview__reviews-header">
-    <h4>Отзывы о товаре</h4>
-    <button className="quickview__add-review-btn" onClick={() => setShowReviewForm(!showReviewForm)}><i className="fas fa-pen"></i> Написать отзыв</button>
+    <h4>{tr('Отзывы о товаре')}</h4>
+    <button className="quickview__add-review-btn" onClick={() => setShowReviewForm(!showReviewForm)}><i className="fas fa-pen"></i> {tr('Написать отзыв')}</button>
   </div>
                 {showReviewForm && (
     <div className="quickview__review-form">
@@ -204,7 +205,7 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products, u
   {/* Загрузка фото */}
   <div className="quickview__review-photo">
     <label htmlFor="reviewPhotoInput">
-      <i className="fas fa-camera"></i> Добавить фото
+      <i className="fas fa-camera"></i> {tr('Добавить фото')}
     </label>
     <input 
       type="file" 
@@ -217,7 +218,7 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products, u
       
       // Проверяем размер
       if (file.size > 500 * 1024) { // больше 500KB
-        showToast('Фото слишком большое. Максимум 500KB');
+        showToast(tr('Фото слишком большое. Максимум 500KB'));
         return;
       }
       
@@ -234,10 +235,10 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products, u
         )}
       </div>
 
-      <textarea placeholder="Напишите ваш отзыв..." rows="3" value={reviewText} onChange={e => setReviewText(e.target.value)} />
+      <textarea placeholder={tr('Напишите ваш отзыв...')} rows="3" value={reviewText} onChange={e => setReviewText(e.target.value)} />
       <div className="quickview__review-actions">
-        <button className="quickview__review-cancel" onClick={() => { setShowReviewForm(false); setReviewPhoto(null); }}>Отмена</button>
-        <button className="quickview__review-submit" onClick={handleSubmitReview}>Отправить отзыв</button>
+        <button className="quickview__review-cancel" onClick={() => { setShowReviewForm(false); setReviewPhoto(null); }}>{tr('Отмена')}</button>
+        <button className="quickview__review-submit" onClick={handleSubmitReview}>{tr('Отправить отзыв')}</button>
       </div>
     </div>
   )}
@@ -246,24 +247,24 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products, u
     <Reviews productId={product._id} reviews={reviews} />
 
     <div className="quickview__specs">
-      {product.material && <div className="quickview__spec"><span>Материал</span><span>{product.material}</span></div>}
-      {product.season && <div className="quickview__spec"><span>Сезон</span><span>{product.season}</span></div>}
-      {product.style && <div className="quickview__spec"><span>Стиль</span><span>{product.style}</span></div>}
+      {product.material && <div className="quickview__spec"><span>{tr('Материал')}</span><span>{product.material}</span></div>}
+      {product.season && <div className="quickview__spec"><span>{tr('Сезон')}</span><span>{product.season}</span></div>}
+      {product.style && <div className="quickview__spec"><span>{tr('Стиль')}</span><span>{product.style}</span></div>}
       {product.specs && product.specs.map((spec, i) => (<div key={i} className="quickview__spec"><span>{spec[0]}</span><span>{spec[1]}</span></div>))}
     </div>
 
     {product.sizes && product.sizes.length > 0 && (
-      <div className="quickview__size"><span>Размер:</span><div className="quickview__size-options">{product.sizes.map(size => (<button key={size} className={`quickview__size-btn ${selectedSize === size ? 'active' : ''}`} onClick={() => setSelectedSize(size)}>{size}</button>))}</div></div>
+      <div className="quickview__size"><span>{tr('Размер:')}</span><div className="quickview__size-options">{product.sizes.map(size => (<button key={size} className={`quickview__size-btn ${selectedSize === size ? 'active' : ''}`} onClick={() => setSelectedSize(size)}>{size}</button>))}</div></div>
     )}
     {product.shoeSizes && product.shoeSizes.length > 0 && (
-      <div className="quickview__size"><span>Размер обуви:</span><div className="quickview__size-options">{product.shoeSizes.map(size => (<button key={size} className={`quickview__size-btn ${selectedSize === size ? 'active' : ''}`} onClick={() => setSelectedSize(size)}>{size}</button>))}</div></div>
+      <div className="quickview__size"><span>{tr('Размер обуви:')}</span><div className="quickview__size-options">{product.shoeSizes.map(size => (<button key={size} className={`quickview__size-btn ${selectedSize === size ? 'active' : ''}`} onClick={() => setSelectedSize(size)}>{size}</button>))}</div></div>
     )}
     {product.colors && product.colors.length > 0 && (
-      <div className="quickview__colors"><span>Цвет:</span><div className="quickview__color-options">{product.colors.map((color, i) => (<button key={i} className={`quickview__color-btn ${selectedColor === color ? 'active' : ''}`} onClick={() => { setSelectedColor(color); setCurrentPrice(product.thumbPrices?.[i] || product.price); if (product.thumbs?.[i]) setMainImg(product.thumbs[i]); }}>{color}</button>))}</div></div>
+      <div className="quickview__colors"><span>{tr('Цвет:')}</span><div className="quickview__color-options">{product.colors.map((color, i) => (<button key={i} className={`quickview__color-btn ${selectedColor === color ? 'active' : ''}`} onClick={() => { setSelectedColor(color); setCurrentPrice(product.thumbPrices?.[i] || product.price); if (product.thumbs?.[i]) setMainImg(product.thumbs[i]); }}>{color}</button>))}</div></div>
     )}
 
     <div className="quickview__quantity">
-      <span>Количество:</span>
+      <span>{tr('Количество:')}</span>
       <div className="quickview__qty-controls">
         <button className="quickview__qty-btn" onClick={() => quantity > 1 && setQuantity(quantity - 1)}>−</button>
         <span className="quickview__qty-num">{quantity}</span>
@@ -272,20 +273,20 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products, u
     </div>
 
     <div className="quickview__actions">
-      <button className="quickview__cart-btn" onClick={() => { onAddToCart({...product, img: selectedThumb || mainImg || product.img, price: currentPrice, selectedSize, selectedColor, material: product.material, season: product.season, style: product.style}); onClose(); }}><i className="fas fa-shopping-cart"></i> В корзину</button>
+      <button className="quickview__cart-btn" onClick={() => { onAddToCart({...product, img: selectedThumb || mainImg || product.img, price: currentPrice, selectedSize, selectedColor, material: product.material, season: product.season, style: product.style}); onClose(); }}><i className="fas fa-shopping-cart"></i> {tr('В корзину')}</button>
       <button className="quickview__fav-btn" onClick={() => {
         const favs = JSON.parse(localStorage.getItem('shopxand_favorites') || '[]');
         const exists = favs.find(f => f._id === product._id);
         if (exists) localStorage.setItem('shopxand_favorites', JSON.stringify(favs.filter(f => f._id !== product._id)));
         else { favs.push(product); localStorage.setItem('shopxand_favorites', JSON.stringify(favs)); }
-        showToast(exists ? 'Удалено из избранного' : 'Добавлено в избранное');
+        showToast(exists ? tr('Удалено из избранного') : tr('Добавлено в избранное'));
       }}><i className="far fa-heart"></i></button>
-      <button className="quickview__share-btn" onClick={() => { if (navigator.share) navigator.share({ title: product.name, text: product.price + ' сомони', url: window.location.href }); }}><i className="fas fa-share-alt"></i></button>
+      <button className="quickview__share-btn" onClick={() => { if (navigator.share) navigator.share({ title: product.name, text: formatPrice(product.price), url: window.location.href }); }}><i className="fas fa-share-alt"></i></button>
       <button className="quickview__price-alert-btn" onClick={() => setShowPriceAlert(true)}>
-      🔔 Узнать о снижении цены
+      🔔 {tr('Узнать о снижении цены')}
     </button>
      <button className="quickview__subscribe-btn" onClick={() => setShowSubscribe(true)}>
-        📦 Подписка
+        📦 {tr('Подписка')}
       </button>
       
     </div>
@@ -298,26 +299,12 @@ function Quickview({ product, onClose, onAddToCart, onUpdateProduct, products, u
               />
             )}
     <div className="quickview__delivery">
-      <div className="quickview__delivery-item"><i className="fas fa-truck"></i><div><strong>Курьерская доставка</strong><span>от 1 до 3 дней, 30 сомони</span></div></div>
-      <div className="quickview__delivery-item"><i className="fas fa-store"></i><div><strong>Самовывоз</strong><span>сегодня, бесплатно</span></div></div>
+      <div className="quickview__delivery-item"><i className="fas fa-truck"></i><div><strong>{tr('Курьерская доставка')}</strong><span>{tr('от 1 до 3 дней, 30 сомони')}</span></div></div>
+      <div className="quickview__delivery-item"><i className="fas fa-store"></i><div><strong>{tr('Самовывоз')}</strong><span>{tr('сегодня, бесплатно')}</span></div></div>
     </div>
-    <a href={`https://wa.me/992300003230?text=Здравствуйте! Интересует товар: ${product.name} — ${product.price} сомони`} target="_blank" className="quickview__whatsapp-btn" rel="noopener noreferrer"><i className="fab fa-whatsapp"></i><span>Написать в WhatsApp</span></a>
+    <a href={`https://wa.me/992300003230?text=Здравствуйте! Интересует товар: ${product.name} — ${product.price} сомони`} target="_blank" className="quickview__whatsapp-btn" rel="noopener noreferrer"><i className="fab fa-whatsapp"></i><span>{tr('Написать в WhatsApp')}</span></a>
 
-    <div className="quickview__related">
-      <h3 className="quickview__related-title">Похожие товары</h3>
-      <div className="quickview__related-grid">
-        {products && products.filter(p => p.cat === product.cat && p._id !== product._id).slice(0, 4).map(p => (
-          <div key={p._id} className="related-card" onClick={() => window.location.reload()}><div className="related-card__img"><img src={p.img} alt={p.name} /></div><div className="related-card__name">{p.name}</div><div className="related-card__price">{p.price} с.</div></div>
-        ))}
-      </div>
-    </div>
   </div>
-          <Recommendations 
-        currentProduct={product} 
-        products={products} 
-        onAddToCart={onAddToCart}
-        onSelect={(p) => window.location.reload()}
-      />
         </div>
       </div>
        {showPriceAlert && <PriceAlert product={product} onClose={() => setShowPriceAlert(false)} />}

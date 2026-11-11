@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 function CategoriesBar({ onSelectCategory }) {
+  const { tr } = useLanguage();
   const [showSub, setShowSub] = useState(null);
 
   const categories = [
@@ -32,7 +34,7 @@ function CategoriesBar({ onSelectCategory }) {
 
   return (
     <section className="categories-bar">
-      <h3>Личные категории</h3>
+      <h3>{tr('Личные категории')}</h3>
       <div className="container">
         <div className="categories-bar__grid">
           {categories.map((cat, i) => (
@@ -51,7 +53,7 @@ function CategoriesBar({ onSelectCategory }) {
                 }}
               >
                 <div className="category-btn__icon">{cat.icon}</div>
-                <span>{cat.name}</span>
+                <span>{tr(cat.name)}</span>
               </a>
               
               {showSub === i && (
@@ -67,7 +69,7 @@ function CategoriesBar({ onSelectCategory }) {
                         setShowSub(null);
                       }}
                     >
-                      {sub}
+                      {tr(sub)}
                     </a>
                   ))}
                 </div>

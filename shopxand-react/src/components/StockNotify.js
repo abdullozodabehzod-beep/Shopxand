@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 function StockNotify({ product, user, onClose }) {
+  const { tr } = useLanguage();
   const [phone, setPhone] = useState(user?.phone || '');
   const [subscribed, setSubscribed] = useState(false);
 
   const handleSubscribe = () => {
     if (!phone || phone.length < 9) {
-      alert('Введите корректный номер телефона');
+      alert(tr('Введите корректный номер телефона'));
       return;
     }
     
@@ -37,8 +39,8 @@ function StockNotify({ product, user, onClose }) {
       <div className="stock-notify">
         <div className="stock-notify__success">
           <span>✅</span>
-          <p>Вы подписались на уведомление!</p>
-          <p style={{fontSize:'12px',color:'#999'}}>Мы сообщим когда товар появится</p>
+          <p>{tr('Вы подписались на уведомление!')}</p>
+          <p style={{fontSize:'12px',color:'#999'}}>{tr('Мы сообщим когда товар появится')}</p>
         </div>
       </div>
     );
@@ -47,8 +49,8 @@ function StockNotify({ product, user, onClose }) {
   return (
     <div className="stock-notify">
       <div className="stock-notify__icon">📦</div>
-      <h4>Товара нет в наличии</h4>
-      <p>Оставьте телефон, мы сообщим когда товар появится</p>
+      <h4>{tr('Товара нет в наличии')}</h4>
+      <p>{tr('Оставьте телефон, мы сообщим когда товар появится')}</p>
       <div className="stock-notify__form">
         <input 
           type="tel" 
@@ -57,10 +59,10 @@ function StockNotify({ product, user, onClose }) {
           onChange={e => setPhone(e.target.value)}
         />
         <button onClick={handleSubscribe}>
-          <i className="fas fa-bell"></i> Уведомить
+          <i className="fas fa-bell"></i> {tr('Уведомить')}
         </button>
       </div>
-      <button className="stock-notify__close" onClick={onClose}>Закрыть</button>
+      <button className="stock-notify__close" onClick={onClose}>{tr('Закрыть')}</button>
     </div>
   );
 }

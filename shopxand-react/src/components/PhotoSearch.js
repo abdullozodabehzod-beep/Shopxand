@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
+import { useCurrency } from '../context/CurrencyContext';
+import { useLanguage } from '../context/LanguageContext';
 
 function PhotoSearch({ products, onProductSelect, onClose }) {
+  const { tr } = useLanguage();
+  const { formatPrice } = useCurrency();
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState([]);
   const [showUpload, setShowUpload] = useState(true);
@@ -58,7 +62,7 @@ function PhotoSearch({ products, onProductSelect, onClose }) {
       <div className="photo-search-modal__overlay" onClick={onClose}></div>
       <div className="photo-search-modal__content">
         <div className="photo-search-modal__header">
-          <h3>📸 Поиск по фото</h3>
+          <h3>📸 {tr('Поиск по фото')}</h3>
           <button className="photo-search-modal__close" onClick={onClose}>
             <i className="fas fa-times"></i>
           </button>
@@ -67,8 +71,8 @@ function PhotoSearch({ products, onProductSelect, onClose }) {
           {showUpload && (
             <div className="photo-search-upload">
               <i className="fas fa-cloud-upload-alt"></i>
-              <p>Загрузите фото товара</p>
-              <button onClick={() => document.getElementById('photoInput').click()}>Выбрать фото</button>
+              <p>{tr('Загрузите фото товара')}</p>
+              <button onClick={() => document.getElementById('photoInput').click()}>{tr('Выбрать фото')}</button>
               <input type="file" id="photoInput" accept="image/*" style={{display:'none'}} onChange={handleFileSelect} />
             </div>
           )}
@@ -76,14 +80,14 @@ function PhotoSearch({ products, onProductSelect, onClose }) {
           {loading && (
             <div className="photo-search-loading">
               <div className="photo-search-spinner"></div>
-              <p>Ищем похожие товары...</p>
+              <p>{tr('Ищем похожие товары...')}</p>
             </div>
           )}
 
           {!showUpload && !loading && (
             <div className="photo-search-results">
               {results.length === 0 ? (
-                <p>Ничего не найдено</p>
+                <p>{tr('Ничего не найдено')}</p>
               ) : (
                 results.map(p => (
                   <div key={p._id} className="related-card" onClick={() => { onProductSelect(p); onClose(); }}>
@@ -91,7 +95,7 @@ function PhotoSearch({ products, onProductSelect, onClose }) {
                       <img src={p.img} alt={p.name} />
                     </div>
                     <div className="related-card__name">{p.name}</div>
-                    <div className="related-card__price">{p.price} с.</div>
+                    <div className="related-card__price">{formatPrice(p.price)}</div>
                   </div>
                 ))
               )}

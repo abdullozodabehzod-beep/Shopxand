@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 function PwaInstall() {
+  const { tr } = useLanguage();
   const [showInstall, setShowInstall] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
 
@@ -45,11 +47,11 @@ function PwaInstall() {
           </svg>
         </div>
         <div className="pwa-install-btn__text">
-          <strong>Установить приложение</strong>
-          <span>Быстрый доступ на телефоне</span>
+          <strong>{tr('Установить приложение')}</strong>
+          <span>{tr('Быстрый доступ на телефоне')}</span>
         </div>
         <button className="pwa-install-btn__action" onClick={handleInstall}>
-          <i className="fas fa-download"></i> Установить
+          <i className="fas fa-download"></i> {tr('Установить')}
         </button>
         <button className="pwa-install-btn__dismiss" onClick={() => setShowInstall(false)}>✕</button>
       </div>

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 function ChatWidget() {
+  const { tr } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([
@@ -39,8 +41,8 @@ function ChatWidget() {
             <div className="chat-widget__header-info">
               <div className="chat-widget__avatar"><i className="fas fa-headset"></i></div>
               <div>
-                <h4>Поддержка ShopXand</h4>
-                <span>Онлайн</span>
+                <h4>{tr('Поддержка ShopXand')}</h4>
+                <span>{tr('Онлайн')}</span>
               </div>
             </div>
             <button className="chat-widget__close-btn" onClick={() => setIsOpen(false)}>
@@ -52,8 +54,8 @@ function ChatWidget() {
             {messages.map((msg, i) => (
               <div key={i} className={`chat-message chat-message--${msg.type}`}>
                 <div className="chat-message__bubble">
-                  <p>{msg.text}</p>
-                  <span className="chat-message__time">{msg.time}</span>
+                  <p>{tr(msg.text)}</p>
+                  <span className="chat-message__time">{tr(msg.time)}</span>
                 </div>
               </div>
             ))}
@@ -62,7 +64,7 @@ function ChatWidget() {
           <div className="chat-widget__form">
             <input 
               type="text" 
-              placeholder="Введите сообщение..." 
+              placeholder={tr('Введите сообщение...')} 
               value={message} 
               onChange={e => setMessage(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && sendMessage()}

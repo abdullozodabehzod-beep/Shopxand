@@ -1,6 +1,8 @@
 import React from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 function Reviews({ productId, reviews = [] }) {
+  const { tr } = useLanguage();
   const validReviews = Array.isArray(reviews) ? reviews.filter(r => r) : [];
 
   return (
@@ -8,13 +10,13 @@ function Reviews({ productId, reviews = [] }) {
       {validReviews.length === 0 ? (
         <div className="quickview__review-empty">
           <span>📝</span>
-          <p>Отзывов пока нет. Будьте первым!</p>
+          <p>{tr('Отзывов пока нет. Будьте первым!')}</p>
         </div>
       ) : (
         validReviews.map((r, i) => (
           <div key={r.id || i} className="qv-review-item">
             <div className="qv-review-item__header">
-              <span className="qv-review-item__name">{r.name || 'Гость'}</span>
+              <span className="qv-review-item__name">{r.name || tr('Гость')}</span>
               <span className="qv-review-item__date">
                 {r.date ? new Date(r.date).toLocaleDateString('ru-RU') : ''}
               </span>
@@ -28,7 +30,7 @@ function Reviews({ productId, reviews = [] }) {
             {/* Фото отзыва */}
             {r.photo && (
               <div className="qv-review-item__photo">
-                <img src={r.photo} alt="Фото отзыва" />
+                <img src={r.photo} alt={tr('Фото отзыва')} />
               </div>
             )}
           </div>

@@ -1,6 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useCurrency } from '../context/CurrencyContext';
+import { useLanguage } from '../context/LanguageContext';
 
-function Search({ products, onSearchSelect, onSearch }) {
+function Search({ products, onSearchSelect, onSearch, onPhoto, onVoice }) {
+  const { formatPrice } = useCurrency();
+  const { t, tr } = useLanguage();
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -91,29 +95,40 @@ function Search({ products, onSearchSelect, onSearch }) {
   };
 
   return (
-    <div className="header__search" ref={searchRef}>
+    <div className="sx-search" ref={searchRef}>
+      <i className="fas fa-search sx-search__lead"></i>
       <input 
         type="text" 
-        className="header__search-input" 
-        placeholder="Я ищу..." 
+        className="sx-search__input" 
+        placeholder={t('search')} 
         value={query}
         onChange={e => setQuery(e.target.value)}
-        onKeyDown={handleKeyDown}
+        onKeyDown={(e) => { handleKeyDown(e); if (e.key === 'Enter' && selectedIndex < 0) handleSearch(); }}
         onFocus={() => {
           if (suggestions.length > 0) setShowSuggestions(true);
         }}
       />
-      <button className="header__search-by-photo" title="Поиск по фото">
+      {query && (
+        <button type="button" className="sx-search__clear" onClick={() => { setQuery(''); if (onSearch) onSearch(''); }} aria-label="clear">
+          <i className="fas fa-times"></i>
+        </button>
+      )}
+      <button type="button" className="sx-search__icon-btn" title={tr('Поиск по фото')} onClick={() => onPhoto && onPhoto()}>
         <i className="fas fa-camera"></i>
       </button>
-      <button className="header__search-btn" onClick={handleSearch}>
-        <i className="fas fa-search"></i>
+      {onVoice && (
+        <button type="button" className="sx-search__icon-btn" title={tr('Голосовой поиск')} onClick={() => onVoice()}>
+          <i className="fas fa-microphone"></i>
+        </button>
+      )}
+      <button type="button" className="sx-search__btn" onClick={handleSearch}>
+        <i className="fas fa-search"></i><span>{tr('Найти')}</span>
       </button>
 
       {showSuggestions && suggestions.length > 0 && (
         <div className="search-suggestions active">
           <div className="search-suggestions__group">
-            <div className="search-suggestions__group-title">Товары</div>
+            <div className="search-suggestions__group-title">{tr('Товары')}</div>
             {suggestions.map((product, i) => (
               <div 
                 key={product._id || i}
@@ -132,14 +147,14 @@ function Search({ products, onSearchSelect, onSearch }) {
                     className="search-suggestions__item-name"
                     dangerouslySetInnerHTML={{ __html: highlightMatch(product.name, query) }}
                   />
-                  <div className="search-suggestions__item-cat">{product.cat}</div>
+                  <div className="search-suggestions__item-cat">{tr(product.cat)}</div>
                 </div>
-                <div className="search-suggestions__item-price">{product.price} с.</div>
+                <div className="search-suggestions__item-price">{formatPrice(product.price)}</div>
               </div>
             ))}
           </div>
           <div className="search-suggestions__footer">
-            <button onClick={handleSearch}>Показать все результаты</button>
+            <button onClick={handleSearch}>{tr('Показать все результаты')}</button>
           </div>
         </div>
       )}

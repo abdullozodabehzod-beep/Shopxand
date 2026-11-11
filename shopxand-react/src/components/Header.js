@@ -8,11 +8,12 @@ import VoiceSearch from './VoiceSearch';
 import { useTheme } from '../context/ThemeContext';
 import CurrencySwitcher from './CurrencySwitcher';
 import { useCurrency } from '../context/CurrencyContext';
+import { BLOCKS, pick } from '../data/categories';
 
 
-function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, products, onOpenFavorites, onOpenOrders, setShowPhotoSearch, onSelectCategory, setShowLogout, onOpenWishlist, onOpenProfile }) {
+function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, products, onOpenFavorites, onOpenOrders, setShowPhotoSearch, onSelectCategory, onSelectBlock, onSelectItem, setShowLogout, onOpenWishlist, onOpenProfile }) {
   const { currency, changeCurrency, rates } = useCurrency();
-  const { lang, t } = useLanguage();
+  const { lang, t, tr } = useLanguage();
   const [showLangModal, setShowLangModal] = useState(false);
   const [showCityModal, setShowCityModal] = useState(false);
   const [showCatalog, setShowCatalog] = useState(false);
@@ -33,7 +34,7 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
             <div className="header__top-inner">
               <div className="header__location" onClick={() => setShowCityModal(true)}>
                 <i className="fas fa-map-marker-alt"></i>
-                <span className="header__city">{currentCity}</span>
+                <span className="header__city">{tr(currentCity)}</span>
                 <i className="fas fa-chevron-down"></i>
               </div>
               <div className="header__lang" onClick={() => setShowLangModal(true)}>
@@ -71,11 +72,8 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
                 <span>{t('catalog')}</span>
               </button>
 
-              <div className="header__search header__search--desktop">
-                <Search products={products} onSearchSelect={onSearchSelect} onSearch={onSearch} />
-                <button className="header__voice-btn" onClick={() => setShowVoice(true)}>
-                <i className="fas fa-microphone"></i>
-              </button>
+              <div className="sx-search-wrap header__search--desktop">
+                <Search products={products} onSearchSelect={onSearchSelect} onSearch={onSearch} onPhoto={() => setShowPhotoSearch(true)} onVoice={() => setShowVoice(true)} />
               </div>
 
               <div className="header__actions header__actions--desktop">
@@ -100,7 +98,7 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
                 </a>
                 <a href="#" className="header__action" onClick={(e) => { e.preventDefault(); onOpenWishlist(); }}>
                 <i className="fas fa-gift"></i>
-                <span>Желания</span>
+                <span>{tr('Желания')}</span>
               </a>
               </div>
 
@@ -122,62 +120,27 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
         {showMobileSearch && (
           <div className="header__search--mobile active">
             <div className="container">
-              <Search products={products} onSearchSelect={onSearchSelect} onSearch={onSearch} />
+              <Search products={products} onSearchSelect={onSearchSelect} onSearch={onSearch} onPhoto={() => { setShowMobileSearch(false); setShowPhotoSearch(true); }} onVoice={() => { setShowMobileSearch(false); setShowVoice(true); }} />
             </div>
           </div>
         )}
 
-        <nav className="header__nav">
-          <div className="container">
-            <ul className="header__nav-list">
-              <li><a href="#" className="header__nav-link" onClick={(e) => { e.preventDefault(); onSelectCategory('Одежда'); }}>{t('clothing')}</a></li>
-              <li><a href="#" className="header__nav-link" onClick={(e) => { e.preventDefault(); onSelectCategory('Электроника'); }}>{t('electronics')}</a></li>
-              <li><a href="#" className="header__nav-link" onClick={(e) => { e.preventDefault(); onSelectCategory('Дом и сад'); }}>{t('home')}</a></li>
-              <li><a href="#" className="header__nav-link" onClick={(e) => { e.preventDefault(); onSelectCategory('Компьютеры'); }}>{t('computers')}</a></li>
-              <li><a href="#" className="header__nav-link" onClick={(e) => { e.preventDefault(); onSelectCategory('Косметика'); }}>{t('cosmetics')}</a></li>
-              <li><a href="#" className="header__nav-link" onClick={(e) => { e.preventDefault(); onSelectCategory('Обувь'); }}>Обувь</a></li>
-              <li><a href="#" className="header__nav-link" onClick={(e) => { e.preventDefault(); onSelectCategory('Акции'); }}>{t('sales')}</a></li>
-            </ul>
-          </div>
-        </nav>
 
         <div className={`catalog-dropdown ${showCatalog ? 'active' : ''}`}>
           <div className="container">
-            <div className="catalog-dropdown__grid">
-              
-              <div className="catalog-dropdown__col">
-                <a href="#" className="catalog-dropdown__category" onClick={(e) => { e.preventDefault(); onSelectCategory('Одежда'); setShowCatalog(false); }}>
-                  <i className="fas fa-tshirt"></i><span>Одежда</span>
-                </a>
-                <ul className="catalog-dropdown__sub">
-                  <li><a href="#" onClick={(e) => { e.preventDefault(); onSearch('обувь'); setShowCatalog(false); }}>Обувь</a></li>
-                  <li><a href="#" onClick={(e) => { e.preventDefault(); onSearch('рубашка'); setShowCatalog(false); }}>Рубашки</a></li>
-                  <li><a href="#" onClick={(e) => { e.preventDefault(); onSearch('кроссовка'); setShowCatalog(false); }}>Крассовки</a></li>
-                  <li><a href="#" onClick={(e) => { e.preventDefault(); onSearch('брюки'); setShowCatalog(false); }}>Брюки</a></li>
-                </ul>
-              </div>
-              
-              <div className="catalog-dropdown__col">
-                <a href="#" className="catalog-dropdown__category" onClick={(e) => { e.preventDefault(); onSelectCategory('Электроника'); setShowCatalog(false); }}>
-                  <i className="fas fa-laptop"></i><span>Электроника</span>
-                </a>
-                <ul className="catalog-dropdown__sub">
-                  <li><a href="#" onClick={(e) => { e.preventDefault(); onSearch('наушник'); setShowCatalog(false); }}>Наушники</a></li>
-                  <li><a href="#" onClick={(e) => { e.preventDefault(); onSearch('часы'); setShowCatalog(false); }}>Часы</a></li>
-                  <li><a href="#" onClick={(e) => { e.preventDefault(); onSearch('аксессуар'); setShowCatalog(false); }}>Аксессуары</a></li>
-                </ul>
-              </div>
-              
-              <div className="catalog-dropdown__col">
-                <a href="#" className="catalog-dropdown__category" onClick={(e) => { e.preventDefault(); onSelectCategory('Дом и сад'); setShowCatalog(false); }}>
-                  <i className="fas fa-home"></i><span>Дом и сад</span>
-                </a>
-                <ul className="catalog-dropdown__sub">
-                  <li><a href="#" onClick={(e) => { e.preventDefault(); onSearch('мебель'); setShowCatalog(false); }}>Мебель</a></li>
-                  <li><a href="#" onClick={(e) => { e.preventDefault(); onSearch('декор'); setShowCatalog(false); }}>Декор</a></li>
-                </ul>
-              </div>
-
+            <div className="catalog-dropdown__grid catalog-dropdown__grid--blocks">
+              {BLOCKS.map(block => (
+                <div key={block.key} className="catalog-dropdown__col">
+                  <a href="#" className="catalog-dropdown__category" onClick={(e) => { e.preventDefault(); onSelectBlock(block); setShowCatalog(false); }}>
+                    <span className="catalog-dropdown__emoji">{block.icon}</span><span>{pick(block.title, lang)}</span>
+                  </a>
+                  <ul className="catalog-dropdown__sub">
+                    {block.items.slice(0, 5).map((item, i) => (
+                      <li key={i}><a href="#" onClick={(e) => { e.preventDefault(); onSelectItem(block, item); setShowCatalog(false); }}>{pick(item, lang)}</a></li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           </div>
         </div>
