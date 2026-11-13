@@ -94,13 +94,25 @@
   <style>@keyframes load{0%{width:0%}50%{width:60%}100%{width:100%}}</style>
 </div>
 <script>
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      const splash = document.getElementById('splash');
+  // Заставка исчезает сама: не ждём полной загрузки страницы (на телефоне она может зависнуть),
+  // и она никогда не блокирует нажатия.
+  (function () {
+    var splash = document.getElementById('splash');
+    if (!splash) return;
+    function hide() {
+      if (!splash.parentNode) return;
+      splash.style.transition = 'opacity .4s';
       splash.style.opacity = '0';
-      setTimeout(() => splash.remove(), 500);
-    }, 2000);
-  });
+      splash.style.pointerEvents = 'none';
+      setTimeout(function () { if (splash.parentNode) splash.parentNode.removeChild(splash); }, 450);
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () { setTimeout(hide, 1200); });
+    } else {
+      setTimeout(hide, 1200);
+    }
+    setTimeout(hide, 3500);
+  })();
 </script>
 
 <script>

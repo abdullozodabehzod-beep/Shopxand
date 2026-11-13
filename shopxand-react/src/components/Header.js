@@ -9,9 +9,10 @@ import { useTheme } from '../context/ThemeContext';
 import CurrencySwitcher from './CurrencySwitcher';
 import { useCurrency } from '../context/CurrencyContext';
 import { BLOCKS, pick } from '../data/categories';
+import { useBackClose } from '../utils/backClose';
 
 
-function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, products, onOpenFavorites, onOpenOrders, setShowPhotoSearch, onSelectCategory, onSelectBlock, onSelectItem, setShowLogout, onOpenWishlist, onOpenProfile }) {
+function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, products, onOpenFavorites, onOpenOrders, setShowPhotoSearch, onSelectCategory, onSelectBlock, onSelectItem, setShowLogout, onOpenWishlist, onOpenProfile, onOpenCatalog }) {
   const { currency, changeCurrency, rates } = useCurrency();
   const { lang, t, tr } = useLanguage();
   const [showLangModal, setShowLangModal] = useState(false);
@@ -19,6 +20,7 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
   const [showCatalog, setShowCatalog] = useState(false);
   const [currentCity, setCurrentCity] = useState(localStorage.getItem('shopxand_city') || 'Душанбе');
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  useBackClose(showMobileMenu, () => setShowMobileMenu(false));
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [showVoice, setShowVoice] = useState(false);
   const { darkMode, toggleTheme } = useTheme();
@@ -149,7 +151,7 @@ function Header({ user, onOpenAuth, onOpenCart, onSearchSelect, onSearch, produc
 
       {showLangModal && <LanguageModal onClose={() => setShowLangModal(false)} />}
       {showCityModal && <CityModal onClose={() => setShowCityModal(false)} currentCity={currentCity} onSelectCity={(city) => { setCurrentCity(city); localStorage.setItem('shopxand_city', city); }} />}
-      {showMobileMenu && <MobileMenu onClose={() => setShowMobileMenu(false)} onOpenAuth={onOpenAuth} onOpenCart={onOpenCart} onOpenFavorites={onOpenFavorites} onOpenOrders={onOpenOrders} user={user} onOpenCityModal={() => setShowCityModal(true)} onOpenLangModal={() => setShowLangModal(true)} />}
+      {showMobileMenu && <MobileMenu onClose={() => setShowMobileMenu(false)} onOpenAuth={onOpenAuth} onOpenCart={onOpenCart} onOpenFavorites={onOpenFavorites} onOpenOrders={onOpenOrders} user={user} onOpenCityModal={() => setShowCityModal(true)} onOpenLangModal={() => setShowLangModal(true)} onOpenCatalog={onOpenCatalog} onOpenWishlist={onOpenWishlist} />}
         {showVoice && <VoiceSearch onSearch={onSearch} onClose={() => setShowVoice(false)} />}
     </>
   );

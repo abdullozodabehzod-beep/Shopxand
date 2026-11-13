@@ -8608,3 +8608,123 @@ body {
     .quickview__modal { border-radius: 0; }
     .quickview__back { position: fixed; background: rgba(255,255,255,.92); box-shadow: 0 2px 8px rgba(0,0,0,.15); }
 }
+
+
+/* =====================================================
+   ШАПКА НА ТЕЛЕФОНЕ: логотип сверху, поиск отдельной строкой
+   ===================================================== */
+@media (max-width: 768px) {
+    .header__main-inner { flex-wrap: wrap; row-gap: 10px; padding-bottom: 10px; }
+    .header__logo { margin-right: auto; }
+    .sx-search-wrap { display: flex !important; order: 20; flex: 1 1 100%; max-width: 100%; }
+    .header__search-toggle { display: none !important; }
+    .header__search--mobile { display: none !important; }
+    .sx-search { padding-left: 14px; }
+    .sx-search__input { font-size: 15px; }
+}
+
+/* =====================================================
+   КАТАЛОГ И РЕЗУЛЬТАТЫ НА ВЕСЬ ЭКРАН
+   ===================================================== */
+body.sx-fullscreen { overflow: hidden; }
+body.sx-fullscreen .bottom-nav,
+body.sx-fullscreen .chat-widget,
+body.sx-fullscreen .telegram-btn,
+body.sx-fullscreen .pwa-install-btn { display: none !important; }
+
+.cat-page, .res-page {
+    position: fixed; inset: 0; z-index: 2500;
+    display: flex; flex-direction: column;
+    background: #f3f6fc;
+    animation: sxPageIn .25s ease;
+}
+@keyframes sxPageIn { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+
+.cat-page__bar, .res-page__bar {
+    flex-shrink: 0; display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; padding-top: calc(12px + env(safe-area-inset-top, 0px));
+    background: #fff; box-shadow: 0 2px 14px rgba(20, 33, 61, 0.08);
+}
+.cat-page__back {
+    flex-shrink: 0; width: 42px; height: 42px; border-radius: 50%; border: none; cursor: pointer;
+    background: #eef3fc; color: #14213d; font-size: 17px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s, transform .15s;
+}
+.cat-page__back:hover { background: #dfe9fb; }
+.cat-page__back:active { transform: scale(.92); }
+.cat-page__bar-text { min-width: 0; }
+.cat-page__bar-text h2 { margin: 0; font-size: 20px; font-weight: 800; color: #14213d; line-height: 1.25;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cat-page__bar-text span { font-size: 13px; color: #7a869f; }
+
+.cat-page__body, .res-page__body {
+    flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    padding: 14px 12px calc(28px + env(safe-area-inset-bottom, 0px));
+}
+.cat-page__list { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+
+.cat-card {
+    background: #fff; border-radius: 20px; overflow: hidden;
+    border: 1px solid #e8edf6; box-shadow: 0 4px 18px rgba(20, 33, 61, 0.07);
+    transition: border-color .25s, box-shadow .25s;
+}
+.cat-card.is-open { border-color: var(--c1); box-shadow: 0 10px 28px rgba(20, 33, 61, 0.13); }
+.cat-card__head {
+    width: 100%; display: flex; align-items: center; gap: 14px; text-align: left;
+    padding: 14px 16px; border: none; background: transparent; cursor: pointer; font-family: inherit;
+}
+.cat-card__icon {
+    flex-shrink: 0; width: 54px; height: 54px; border-radius: 16px; font-size: 28px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--c1), var(--c2)); box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+.cat-card__title { flex: 1; font-size: 17px; font-weight: 700; color: #14213d; line-height: 1.3; }
+.cat-card__chev { color: #9aa5b8; transition: transform .3s, color .3s; }
+.cat-card.is-open .cat-card__chev { transform: rotate(180deg); color: var(--c1); }
+
+/* Раскрытие списка: сначала скрыт, потом плавно появляется */
+.cat-card__panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease; }
+.cat-card.is-open .cat-card__panel { grid-template-rows: 1fr; }
+.cat-card__inner { min-height: 0; overflow: hidden; padding: 0 10px; opacity: 0; transition: opacity .25s ease; }
+.cat-card.is-open .cat-card__inner { opacity: 1; padding-bottom: 14px; transition-delay: .08s; }
+
+.cat-card__items { list-style: none; margin: 0; padding: 0; border-top: 1px solid #eef1f7; padding-top: 6px; }
+.cat-card__item {
+    width: 100%; display: flex; align-items: center; gap: 12px; text-align: left;
+    padding: 11px 10px; border: none; border-radius: 12px; background: transparent; cursor: pointer;
+    font-family: inherit; font-size: 15px; font-weight: 500; color: #1f2a44;
+    transition: background .15s, transform .15s;
+}
+.cat-card__item:hover, .cat-card__item:active { background: #f0f5ff; transform: translateX(3px); }
+.cat-card__item i { margin-left: auto; font-size: 11px; color: #b2bccf; }
+.cat-card__num {
+    flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; color: #fff; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--c1), var(--c2));
+}
+.cat-card__all {
+    width: 100%; margin-top: 8px; padding: 13px 16px; border: none; border-radius: 14px; cursor: pointer;
+    font-family: inherit; font-size: 14px; font-weight: 700; color: #fff;
+    background: linear-gradient(135deg, var(--c1), var(--c2));
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+}
+.cat-card__all:active { transform: scale(.98); }
+
+.res-page__body .container { max-width: 1200px; margin: 0 auto; padding: 0 4px; }
+
+/* Тёмная тема */
+.dark-theme .cat-page, .dark-theme .res-page { background: #0f1630; }
+.dark-theme .cat-page__bar, .dark-theme .res-page__bar { background: #16213e; box-shadow: none; border-bottom: 1px solid #2a2a4a; }
+.dark-theme .cat-page__back { background: #202b4d; color: #e8ebf3; }
+.dark-theme .cat-page__bar-text h2, .dark-theme .cat-card__title { color: #f1f4fb; }
+.dark-theme .cat-card { background: #16213e; border-color: #2a2a4a; box-shadow: none; }
+.dark-theme .cat-card.is-open { border-color: var(--c1); }
+.dark-theme .cat-card__items { border-top-color: #2a2a4a; }
+.dark-theme .cat-card__item { color: #dfe5f3; }
+.dark-theme .cat-card__item:hover, .dark-theme .cat-card__item:active { background: #1f2d55; }
+
+@media (min-width: 900px) {
+    .cat-page__body { padding-top: 24px; }
+    .cat-card__head { padding: 16px 20px; }
+}

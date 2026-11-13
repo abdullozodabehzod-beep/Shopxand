@@ -2,7 +2,7 @@ import React from "react";
 
 import { useLanguage } from "../context/LanguageContext";
 
-function MobileMenu({ onClose, onOpenAuth, onOpenCart, onOpenFavorites, onOpenOrders, user, onOpenCityModal, onOpenLangModal  }) {
+function MobileMenu({ onClose, onOpenAuth, onOpenCart, onOpenFavorites, onOpenOrders, user, onOpenCityModal, onOpenLangModal, onOpenCatalog, onOpenWishlist }) {
   const { lang, t, tr } = useLanguage();
 
   return (
@@ -28,45 +28,17 @@ function MobileMenu({ onClose, onOpenAuth, onOpenCart, onOpenFavorites, onOpenOr
           <div className="mobile-menu__section-title">{t('menuTitle')}</div>
           <ul className="mobile-menu__nav">
             <li>
-              <a href="#">
-                <i className="fas fa-tshirt"></i>
-                <span>{t('clothing')}</span>
+              <a href="#" onClick={(e) => { e.preventDefault(); onClose(); onOpenCatalog && onOpenCatalog(); }}>
+                <i className="fas fa-th-large"></i>
+                <span>{tr('Каталог')}</span>
                 <i className="fas fa-chevron-right"></i>
               </a>
             </li>
             <li>
-              <a href="#">
-                <i className="fas fa-laptop"></i>
-                <span>{t('electronics')}</span>
+              <a href="#" onClick={(e) => { e.preventDefault(); onClose(); onOpenWishlist && onOpenWishlist(); }}>
+                <i className="fas fa-gift"></i>
+                <span>{tr('Желания')}</span>
                 <i className="fas fa-chevron-right"></i>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fas fa-home"></i>
-                <span>{t('home')}</span>
-                <i className="fas fa-chevron-right"></i>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fas fa-desktop"></i>
-                <span>{t('computers')}</span>
-                <i className="fas fa-chevron-right"></i>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fas fa-spa"></i>
-                <span>{t('cosmetics')}</span>
-                <i className="fas fa-chevron-right"></i>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fas fa-percent"></i>
-                <span>{t('sales')}</span>
-                <span className="mobile-menu__badge">Hot</span>
               </a>
             </li>
           </ul>

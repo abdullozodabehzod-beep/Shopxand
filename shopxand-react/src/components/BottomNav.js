@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
 
-function BottomNav({ onOpenCart, onOpenFavorites, onOpenOrders, cartCount, onOpenMenu, user, setShowAuth, onOpenWishlist }) {
+function BottomNav({ onOpenCart, onOpenFavorites, onOpenOrders, cartCount, onOpenMenu, user, setShowAuth, onOpenCatalog }) {
   const { tr } = useLanguage();
   return (
     <nav className="bottom-nav">
@@ -10,9 +10,9 @@ function BottomNav({ onOpenCart, onOpenFavorites, onOpenOrders, cartCount, onOpe
           <div className="bottom-nav__icon">🏠</div>
           <span>{tr('Главная')}</span>
         </button>
-        <button className="bottom-nav__item" onClick={onOpenWishlist}>
-          <div className="bottom-nav__icon">🎁</div>
-          <span>{tr('Желания')}</span>
+        <button className="bottom-nav__item" onClick={onOpenCatalog}>
+          <div className="bottom-nav__icon">🗂️</div>
+          <span>{tr('Каталог')}</span>
         </button>
         <button className="bottom-nav__item" onClick={onOpenCart}>
           <div className="bottom-nav__icon">🛒</div>

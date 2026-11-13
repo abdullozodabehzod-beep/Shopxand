@@ -11,7 +11,9 @@ import Orders from './components/Orders';
 import Auth from './components/Auth';
 import BottomNav from './components/BottomNav';
 import Favorites from './components/Favorites';
-import Marketplace from './components/Marketplace';
+import CatalogPage from './components/CatalogPage';
+import ResultsPage from './components/ResultsPage';
+import { useBackClose } from './utils/backClose';
 import { pick, matchesItem } from './data/categories';
 import { sendOrderToTelegram } from './components/TelegramOrder';
 import PhotoSearch from './components/PhotoSearch';
@@ -34,7 +36,8 @@ const API_URL = '/api';
 function AppContent() {
   const { formatPrice } = useCurrency();
   const { tr, lang } = useLanguage();
-  const [filterLabel, setFilterLabel] = useState(null);
+  const [catalogOpen, setCatalogOpen] = useState(false);
+  const [results, setResults] = useState(null);
   
   const [showPhotoSearch, setShowPhotoSearch] = useState(false);
   const [activeCategory, setActiveCategory] = useState(null);
@@ -57,7 +60,26 @@ function AppContent() {
   const [savedAddress, setSavedAddress] = useState(null);
    const currencyContext = useCurrency();
 const [visibleCount, setVisibleCount] = useState(10);
-const [showProfile, setShowProfile] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+
+  // Кнопка «Назад» на телефоне закрывает верхнее окно
+  useBackClose(catalogOpen, () => setCatalogOpen(false));
+  useBackClose(!!results, () => setResults(null));
+  useBackClose(!!selectedProduct, () => setSelectedProduct(null));
+  useBackClose(showCart, () => setShowCart(false));
+  useBackClose(showCheckout, () => setShowCheckout(false));
+  useBackClose(showAuth, () => setShowAuth(false));
+  useBackClose(showOrders, () => setShowOrders(false));
+  useBackClose(showFavorites, () => setShowFavorites(false));
+  useBackClose(showProfile, () => setShowProfile(false));
+  useBackClose(showWishlist, () => setShowWishlist(false));
+  useBackClose(showPhotoSearch, () => setShowPhotoSearch(false));
+
+  // Пока открыт каталог или результаты — прячем плавающие кнопки и нижнее меню
+  useEffect(() => {
+    document.body.classList.toggle('sx-fullscreen', catalogOpen || !!results);
+    return () => document.body.classList.remove('sx-fullscreen');
+  }, [catalogOpen, results]);
 
   useEffect(() => { initGA(); initYM(); }, []);
   useEffect(() => { initPixel(); }, []);
@@ -98,19 +120,11 @@ const [showProfile, setShowProfile] = useState(false);
     setTimeout(() => toast.remove(), 3000);
   };
 
-  const scrollToProducts = () => setTimeout(() => document.querySelector('.products')?.scrollIntoView({ behavior: 'smooth' }), 60);
-  const handleViewAll = () => { setActiveCategory(null); setFilterLabel(null); setFilteredProducts(products); setVisibleCount(10);};
-  const handleSelectCategory = (cat) => { setActiveCategory(cat); setFilterLabel(tr(cat)); setFilteredProducts(products.filter(p => p.cat === cat)); setVisibleCount(10); scrollToProducts();};
-  const handleSelectBlock = (block) => {
-    setActiveCategory(block.key); setFilterLabel(pick(block.title, lang));
-    setFilteredProducts(products.filter(p => block.cats.includes(p.cat)));
-    setVisibleCount(10); scrollToProducts();
-  };
-  const handleSelectItem = (block, item) => {
-    setActiveCategory(block.key); setFilterLabel(pick(item, lang));
-    setFilteredProducts(products.filter(p => matchesItem(p, item[0])));
-    setVisibleCount(10); scrollToProducts();
-  };
+  const openResults = (title, list) => setResults({ title, list });
+  const handleViewAll = () => openResults(tr('Все товары'), products);
+  const handleSelectCategory = (cat) => openResults(tr(cat), products.filter(p => p.cat === cat));
+  const handleSelectBlock = (block) => openResults(pick(block.title, lang), products.filter(p => block.cats.includes(p.cat)));
+  const handleSelectItem = (block, item) => openResults(pick(item, lang), products.filter(p => matchesItem(p, item[0])));
 
   const showMore = () => {
   setVisibleCount(prev => Math.min(prev + 10, filteredProducts.length));
@@ -207,17 +221,22 @@ const handleLogout = () => {
     setOrders(prev => [order, ...prev]); setCart([]); setShowCheckout(false);
   };
 
+  const searchProducts = (query) => products.filter(p => (p.name || '').toLowerCase().includes(query.toLowerCase()) || (p.cat || '').toLowerCase().includes(query.toLowerCase()));
   const handleSearch = (query) => {
-    if (!query) { setFilteredProducts(products); return; }
-    setFilteredProducts(products.filter(p => (p.name || '').toLowerCase().includes(query.toLowerCase()) || (p.cat || '').toLowerCase().includes(query.toLowerCase())));
-    setVisibleCount(10);
+    if (!query || !query.trim()) return;
+    openResults('🔍 ' + query.trim(), searchProducts(query.trim()));
   };
 
   const handleSearchSelect = (query) => {
-    const similar = products.filter(p => (p.name || '').toLowerCase().includes(query.toLowerCase()) || (p.cat || '').toLowerCase().includes(query.toLowerCase()));
-    setFilteredProducts(similar.length > 0 ? similar : products);
-    document.querySelector('.products')?.scrollIntoView({ behavior: 'smooth' });
+    openResults('🔍 ' + query, searchProducts(query));
   };
+
+  const renderCard = (product) => (
+    <div key={product._id || product.id} className="product-card" onClick={() => setSelectedProduct(product)}><div className="product-card__img"><img src={product.img} alt={product.name} /><button className="product-card__fav" onClick={(e) => { e.stopPropagation(); toggleFavorite(product); }}><i className={`${favorites.some(f => f._id === product._id) ? 'fas' : 'far'} fa-heart`}></i></button>{product.oldPrice && (<span className="product-card__badge">-{Math.round((1 - product.price / product.oldPrice) * 100)}%</span>)}</div><div className="product-card__body"><span className="product-card__cat">{tr(product.cat)}</span><h3 className="product-card__name">{product.name}</h3><div className="product-card__rating"><i className="fas fa-star"></i><span>{product.rating || '0'}</span><span className="product-card__reviews">({product.reviews || 0} {tr('отзывов')})</span></div><div className="product-card__price">
+          {product.oldPrice && <span className="product-card__price-old">{formatPrice(product.oldPrice)}</span>}
+          <span className="product-card__price-current">{formatPrice(product.price)}</span>
+        </div><button className="product-card__cart-btn" onClick={(e) => { e.stopPropagation(); addToCart(product); }}><i className="fas fa-shopping-cart"></i> {tr('В корзину')}</button></div></div>
+  );
 
   const path = window.location.pathname;
   if (path === '/delivery') return <Delivery />;
@@ -227,14 +246,10 @@ const handleLogout = () => {
   return (
     <ThemeProvider>
       <div className="App">
-        <Header onOpenWishlist={() => setShowWishlist(true)} user={user} onOpenAuth={() => setShowAuth(true)} onOpenCart={() => { if (!user) { setShowAuth(true); return; } setShowCart(true); }} onSearch={handleSearch} products={products} onProductSelect={setSelectedProduct} onOpenFavorites={() => setShowFavorites(true)} onOpenOrders={() => { if (!user) { setShowAuth(true); return; } setShowOrders(true); }} setShowPhotoSearch={setShowPhotoSearch} onSelectCategory={handleSelectCategory} onSelectBlock={handleSelectBlock} onSelectItem={handleSelectItem} setShowLogout={setShowLogout} onOpenMobileMenu={() => setShowMobileMenu(true)} onSearchSelect={handleSearchSelect} onOpenProfile={() => setShowProfile(true)}/>
+        <Header onOpenCatalog={() => setCatalogOpen(true)} onOpenWishlist={() => setShowWishlist(true)} user={user} onOpenAuth={() => setShowAuth(true)} onOpenCart={() => { if (!user) { setShowAuth(true); return; } setShowCart(true); }} onSearch={handleSearch} products={products} onProductSelect={setSelectedProduct} onOpenFavorites={() => setShowFavorites(true)} onOpenOrders={() => { if (!user) { setShowAuth(true); return; } setShowOrders(true); }} setShowPhotoSearch={setShowPhotoSearch} onSelectCategory={handleSelectCategory} onSelectBlock={handleSelectBlock} onSelectItem={handleSelectItem} setShowLogout={setShowLogout} onOpenMobileMenu={() => setShowMobileMenu(true)} onSearchSelect={handleSearchSelect} onOpenProfile={() => setShowProfile(true)}/>
         <Hero />
-        <Marketplace onSelectBlock={handleSelectBlock} onSelectItem={handleSelectItem} />
-        <section className="products"><div className="container"><div className="products__header"><h2 className="products__title">{filterLabel || tr('Популярные товары')}</h2><a href="#" className="products__all" onClick={(e) => { e.preventDefault(); handleViewAll(); }}>{tr('Смотреть все')} <i className="fas fa-arrow-right"></i></a></div>{filteredProducts.length === 0 && products.length > 0 && (<div className="products__empty"><span>🛍️</span><h3>{tr('Пока нет товаров в этом разделе')}</h3><p>{tr('Скоро здесь появятся новые товары')}</p><button onClick={handleViewAll}>{tr('Показать все товары')}</button></div>)}
-<div className="products__grid">{filteredProducts.slice(0, visibleCount).map(product => (<div key={product._id || product.id} className="product-card" onClick={() => setSelectedProduct(product)}><div className="product-card__img"><img src={product.img} alt={product.name} /><button className="product-card__fav" onClick={(e) => { e.stopPropagation(); toggleFavorite(product); }}><i className={`${favorites.some(f => f._id === product._id) ? 'fas' : 'far'} fa-heart`}></i></button>{product.oldPrice && (<span className="product-card__badge">-{Math.round((1 - product.price / product.oldPrice) * 100)}%</span>)}</div><div className="product-card__body"><span className="product-card__cat">{tr(product.cat)}</span><h3 className="product-card__name">{product.name}</h3><div className="product-card__rating"><i className="fas fa-star"></i><span>{product.rating || '0'}</span><span className="product-card__reviews">({product.reviews || 0} {tr('отзывов')})</span></div><div className="product-card__price">
-          {product.oldPrice && <span className="product-card__price-old">{formatPrice(product.oldPrice)}</span>}
-          <span className="product-card__price-current">{formatPrice(product.price)}</span>
-        </div><button className="product-card__cart-btn" onClick={(e) => { e.stopPropagation(); addToCart(product); }}><i className="fas fa-shopping-cart"></i> {tr('В корзину')}</button></div></div>))}</div>
+        <section className="products"><div className="container"><div className="products__header"><h2 className="products__title">{tr('Популярные товары')}</h2><a href="#" className="products__all" onClick={(e) => { e.preventDefault(); handleViewAll(); }}>{tr('Смотреть все')} <i className="fas fa-arrow-right"></i></a></div>{filteredProducts.length === 0 && products.length > 0 && (<div className="products__empty"><span>🛍️</span><h3>{tr('Пока нет товаров в этом разделе')}</h3><p>{tr('Скоро здесь появятся новые товары')}</p><button onClick={handleViewAll}>{tr('Показать все товары')}</button></div>)}
+<div className="products__grid">{filteredProducts.slice(0, visibleCount).map(renderCard)}</div>
   {visibleCount < filteredProducts.length && (
               <div style={{textAlign:'center', marginTop:'20px'}}>
                 <button 
@@ -254,6 +269,8 @@ const handleLogout = () => {
                 </button>
               </div>
             )}</div></section>
+        {catalogOpen && <CatalogPage onClose={() => setCatalogOpen(false)} onPickBlock={handleSelectBlock} onPickItem={handleSelectItem} />}
+        {results && <ResultsPage title={results.title} list={results.list} renderCard={renderCard} onClose={() => setResults(null)} />}
         {selectedProduct && <Quickview product={selectedProduct} products={products} user={user} onClose={() => setSelectedProduct(null)} onAddToCart={addToCart} />}
         {showFavorites && <Favorites favorites={favorites} onRemove={(id) => setFavorites(prev => prev.filter(i => i._id !== id))} onAddToCart={addToCart} onClose={() => setShowFavorites(false)} />}
         {showCart && <Cart cart={cart} onRemove={removeFromCart} onCheckout={() => { setShowCart(false); setShowCheckout(true); }} onClose={() => setShowCart(false)} onUpdateQuantity={updateCartQuantity} />}
@@ -263,7 +280,7 @@ const handleLogout = () => {
         {showPhotoSearch && <PhotoSearch products={products} onProductSelect={(p) => setSelectedProduct(p)} onClose={() => setShowPhotoSearch(false)} />}
         {showProfile && <Profile user={user} onClose={() => setShowProfile(false)} onLogout={handleLogout} onUpdateUser={setUser} />}
         <PwaInstall /><ChatWidget /><TelegramButton /><Footer />
-        <BottomNav onOpenWishlist={() => setShowWishlist(true)} onOpenCart={() => { if (!user) { setShowAuth(true); return; } setShowCart(true); }} onOpenFavorites={() => setShowFavorites(true)} onOpenOrders={() => { if (!user) { setShowAuth(true); return; } setShowOrders(true); }} cartCount={cart.reduce((s, i) => s + i.quantity, 0)} onOpenMenu={() => setShowMobileMenu(true)} user={user} setShowAuth={setShowAuth} />
+        <BottomNav onOpenCatalog={() => setCatalogOpen(true)} onOpenCart={() => { if (!user) { setShowAuth(true); return; } setShowCart(true); }} onOpenFavorites={() => setShowFavorites(true)} onOpenOrders={() => { if (!user) { setShowAuth(true); return; } setShowOrders(true); }} cartCount={cart.reduce((s, i) => s + i.quantity, 0)} onOpenMenu={() => setShowMobileMenu(true)} user={user} setShowAuth={setShowAuth} />
         {showLogout && (
           <div className="logout-modal active">
             <div className="logout-modal__overlay" onClick={() => setShowLogout(false)}></div>
